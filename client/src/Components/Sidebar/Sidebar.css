@@ -1,0 +1,18 @@
+@keyframes mobile-top-navigation-animation {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.mobile-top-navigation-column {
+  animation-name: mobile-top-navigation-animation;
+  animation-duration: 250ms;
+  animation-timing-function: ease;
+}
+
+.slide_up_effect {
+  transform: translateY(-5px);
+}
