@@ -1,12 +1,7 @@
 const LoadingSpinner = ({ strokeColor, fontSize }) => {
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
+      <div className="dflex jfycenter">
         <div className="spinner bottomSpinner">
           <span>
             <svg

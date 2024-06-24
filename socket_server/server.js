@@ -1,34 +1,26 @@
+require("dotenv").config();
 const express = require("express");
 const logger = require("morgan");
 const http = require("http");
 const socketIo = require("socket.io");
 const cors = require("cors");
-const session = require("express-session");
 const app = express();
-require("dotenv").config();
+const cookieParser = require("cookie-parser");
 const corsOptions = {
   origin: "http://localhost:5173", // İstemcinin domaini
   methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
   credentials: true,
 };
 app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.set("trust proxy", 1);
-
 app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: false,
-    cookie: {
-      sameSite: "strict",
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-    },
+  express.json({
+    limit: "50mb",
   })
 );
+app.use(express.urlencoded({ extended: true }));
+app.set("trust proxy", 1);
 
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -40,18 +32,56 @@ const io = socketIo(server, {
 
 // routes start to check
 const authRoutes = require("./routes/auth.routes");
-const verifyUserRoutes = require("./routes/verify_user.routes");
-const coworkersRoutes = require("./routes/coworkers.routes");
+const userVerification = require("./routes/userVerification.routes");
+const userRoutes = require("./routes/user.routes");
+const conversationRoutes = require("./routes/conversation.routes");
+const messageRoutes = require("./routes/message.routes");
 
 app.use("/auth", authRoutes);
-app.use("/verify_user", verifyUserRoutes);
-app.use("/coworkers", coworkersRoutes);
+app.use("/user-verify", userVerification);
+app.use("/", userRoutes);
+app.use("/conversations", conversationRoutes);
+app.use("/messages", messageRoutes);
 // routes finish to check
+
+let users = [];
+
+const addUser = (userId, socketId) => {
+  !users.some((user) => user.userId === userId) &&
+    users.push({ userId, socketId });
+};
+
+const removeUser = (socketId) => {
+  users = users.filter((user) => user.socketId !== socketId);
+};
+
+const getUser = (userId) => {
+  return users.find((user) => user.userId === userId);
+};
 
 io.on("connection", (socket) => {
   console.log("A new user connected :", socket.id);
 
+  //take userId and socketId from user
+  socket.on("addUser", (userId) => {
+    addUser(userId, socket.id);
+    console.log("online users:", users);
+    io.emit("getUsers", users);
+  });
+
+  //send and get message
+  socket.on("sendMessage", ({ senderId, receiverId, text }) => {
+    console.log("sender:", senderId, "receiver:", receiverId, "message:", text);
+    const user = getUser(receiverId);
+    console.log("receiver:", user);
+    io.to(user.socketId).emit("getMessage", {
+      senderId,
+      text,
+    });
+  });
+
   socket.on("disconnect", () => {
+    removeUser(socket.id);
     console.log("User disconnected :", socket.id);
   });
 });

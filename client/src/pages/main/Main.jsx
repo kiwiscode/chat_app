@@ -1,9 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
 import axios from "axios";
-import { useUser } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
-
 const API_URL = "http://localhost:3000";
 
 function Main() {
@@ -13,6 +11,7 @@ function Main() {
     email: "",
     password: "",
   });
+  const navigate = useNavigate();
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -187,9 +186,15 @@ function Main() {
     setVerificationCode("");
     setemailVerificationCodeStatus(null);
     try {
-      const result = await axios.post(`${API_URL}/auth/signup`, {
-        formData,
-      });
+      const result = await axios.post(
+        `${API_URL}/auth/signup`,
+        {
+          formData,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       if (result) {
         setUsernameError("");
@@ -232,16 +237,6 @@ function Main() {
     });
   };
 
-  const {
-    user,
-    setUser,
-    authToken,
-    setAuthToken,
-    isAuthenticatedUser,
-    setIsAuthenticatedUser,
-  } = useUser();
-  const navigate = useNavigate();
-
   const handleLogin = async () => {
     try {
       const result = await axios.post(
@@ -249,24 +244,20 @@ function Main() {
         {
           loginFormData,
         },
-        { withCredentials: "include" }
+        {
+          withCredentials: true,
+        }
       );
-
-      const userFromResult = result.data.user;
-      const authTokenFromResult = result.data.token;
-      setUser(userFromResult);
-      setAuthToken(authTokenFromResult);
-      setIsAuthenticatedUser(true);
+      console.log("result:", result);
+      console.log("result:status", result.status);
+      if (result?.status === 200) {
+        navigate("/dashboard");
+        window.location.reload();
+      }
     } catch (error) {
       console.error("Error:", error);
     }
   };
-
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
-    }
-  }, [user]);
 
   return (
     <div
@@ -278,15 +269,13 @@ function Main() {
         <div
           className={
             showInfoMessageClose
-              ? `top_info_message_animation_close`
-              : `top_info_message_animation_open`
+              ? `top_info_message_animation_close dflex algncenter jfycenter`
+              : `top_info_message_animation_open dflex algncenter jfycenter`
           }
           style={{
             width: "100%",
             textAlign: "center",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+
             position: "fixed",
             top: "45px",
             zIndex: 9999,
@@ -294,7 +283,7 @@ function Main() {
           }}
         >
           <div
-            className="chirp-medium-font"
+            className="chirp-medium-font dflex jfycenter algncenter"
             style={{
               boxShadow:
                 "rgba(101, 119, 134, 0.2) 0px 0px 8px 0px, rgba(101, 119, 134, 0.25) 0px 1px 3px 1px",
@@ -303,17 +292,11 @@ function Main() {
               borderRadius: "4px",
               padding: "12px",
               backgroundColor: "white",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+
               gap: ".5em",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-              }}
-            >
+            <div className="dlfex">
               <svg
                 viewBox="64 64 896 896"
                 focusable="false"
@@ -620,6 +603,7 @@ function Main() {
                           pointerEvents: pointerEvent,
                         }}
                         onClick={() => {
+                          setVerificationCode("");
                           sendEmailVerificationCodeAgain(formData.email);
                         }}
                         className="pointer color-dark-text chirp-regular-font fs-13 lh-16 text_decoration_underline"
@@ -778,11 +762,10 @@ function Main() {
           </div>
         </div>
         <div
+          className="dflex w-100"
           style={{
             fontSize: "36px",
             lineHeight: "36px",
-            width: "100%",
-            display: "flex",
             justifyContent: "flex-end",
           }}
         >
@@ -810,12 +793,12 @@ function Main() {
           </div>
         </div>
         <img
+          className="p-abs"
           src="https://tailwindui.com/img/beams-home@95.jpg"
           alt=""
           style={{
             marginLeft: "-67.5rem",
             width: "163rem",
-            position: "absolute",
             top: "-1rem",
             left: "50%",
             height: "100%",

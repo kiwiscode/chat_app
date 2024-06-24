@@ -64,6 +64,10 @@ body {
   border-radius: 4px;
 }
 
+.fs-23 {
+  font-size: 23px;
+}
+
 .fs-15 {
   font-size: 15px;
 }
@@ -72,12 +76,35 @@ body {
   font-size: 13px;
 }
 
+.lh-28 {
+  line-height: 28px;
+}
+
 .lh-16 {
   line-height: 16px;
 }
 
 .lh-20 {
   line-height: 20px;
+}
+
+.border-1px {
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.bt-1px {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.bb-1px {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.br-1px {
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+.bl-1px {
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .text_decoration_underline:hover {
@@ -96,6 +123,50 @@ body {
 
 .p-16 {
   padding: 16px;
+}
+
+.dflex {
+  display: flex;
+}
+.jfycenter {
+  justify-content: center;
+}
+.algncenter {
+  align-items: center;
+}
+
+.light_scheme {
+  color-scheme: light;
+}
+
+.shadow_div_white {
+  background-color: white !important;
+  box-shadow: 0 0 15px rgba(101, 119, 134, 0.2),
+    0 0 5px 3px rgba(101, 119, 134, 0.15) !important;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.h-100 {
+  height: 100%;
+}
+
+.t-ov {
+  text-overflow: ellipsis;
+}
+
+.ov-hid {
+  overflow: hidden;
+}
+
+.w-sp {
+  white-space: nowrap;
+}
+
+.p-abs {
+  position: absolute;
 }
 
 :root {
@@ -295,4 +366,22 @@ body {
   animation-name: top_info_message_animation_close;
   animation-duration: 250ms;
   animation-fill-mode: forwards;
+}
+
+.you {
+  background-color: #1c9bef;
+  color: rgb(231, 233, 234);
+}
+
+.him-her {
+  background-color: rgb(16, 23, 42);
+  color: rgb(231, 233, 234);
+}
+
+.selected-message {
+  background-color: #f7f9f9 !important ;
+}
+
+.each-message-parent-div:hover {
+  background-color: #f7f9f9 !important ;
 }

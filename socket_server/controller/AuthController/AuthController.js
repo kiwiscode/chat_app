@@ -4,6 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
+const { createSecretToken } = require("../../util/SecretToken");
 require("dotenv").config();
 let sendVerificationCodeToEmail;
 emailProcess();
@@ -134,7 +135,7 @@ const authSignup = async (req, res) => {
     }
 
     // Check if username already exists
-    const existingUser = await prisma.users.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: {
         username: checkUserName,
       },
@@ -148,7 +149,7 @@ const authSignup = async (req, res) => {
       });
     }
     // Check if email already exists
-    const existingEmail = await prisma.users.findUnique({
+    const existingEmail = await prisma.user.findUnique({
       where: {
         email: checkEmail,
       },
@@ -174,12 +175,17 @@ const authSignup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create user in database
-    await prisma.users.create({
+    const user = await prisma.user.create({
       data: {
         username,
         email,
         password: hashedPassword,
       },
+    });
+    const token = createSecretToken(user.id);
+    res.cookie("token", token, {
+      withCredentials: true,
+      httpOnly: false,
     });
 
     res.status(200).json({ message: "User created successfully" });
@@ -195,14 +201,13 @@ const authLogin = async (req, res) => {
   try {
     const { authentication, password } = req.body.loginFormData;
 
-    console.log("req.body:", req.body.loginFormData);
-
-    const authenticationExistWithEmail = await prisma.users.findUnique({
+    console.log("password:", password);
+    const authenticationExistWithEmail = await prisma.user.findUnique({
       where: {
         email: authentication,
       },
     });
-    const authenticationExistWithUsername = await prisma.users.findUnique({
+    const authenticationExistWithUsername = await prisma.user.findUnique({
       where: {
         username: authentication,
       },
@@ -225,13 +230,7 @@ const authLogin = async (req, res) => {
         .json({ passwordError: true, message: "Wrong password" });
     }
 
-    const token = jwt.sign(
-      { id: user.id, username: user.username },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "1h" }
-    );
-
-    await prisma.users.update({
+    await prisma.user.update({
       where: {
         id: user.id,
       },
@@ -240,10 +239,15 @@ const authLogin = async (req, res) => {
       },
     });
 
-    req.session.token = token;
-    console.log("SESSION =====> ", req.session);
+    const token = createSecretToken(user.id);
+    res.cookie("token", token, {
+      withCredentials: true,
+      httpOnly: false,
+    });
 
-    return res.status(200).json({ message: "Login successful", token, user });
+    return res
+      .status(200)
+      .json({ message: "User logged in successfully", token, user });
   } catch (error) {
     console.error("Error:", error);
   }
@@ -251,9 +255,8 @@ const authLogin = async (req, res) => {
 
 const authLogout = async (req, res) => {
   try {
-    const { id } = req.user;
-
-    await prisma.users.update({
+    const { id } = req.body;
+    await prisma.user.update({
       where: {
         id: id,
       },
@@ -261,18 +264,14 @@ const authLogout = async (req, res) => {
         active: false,
       },
     });
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ error: "Failed to destroy session" });
-      }
-      res.clearCookie("connect.sid");
-      res.status(200).json({ message: "Logout successful" });
-    });
+
+    res.clearCookie("token");
+    res.status(200).json({ message: "Logout successful" });
   } catch (error) {
-    console.error("Error logging out user:", error);
+    console.error("Error while user logging out:", error);
     res.status(500).json({
       message:
-        "An error occurred while logging out user. Please try again later.",
+        "An error occurred while user logging out . Please try again later.",
     });
   }
 };

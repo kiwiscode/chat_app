@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import "../../index.css";
 import "./Sidebar.css";
+import axios from "axios";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
+const API_URL = "http://localhost:3000";
 
 function Sidebar() {
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
-  const { user, isAuthenticatedUser, logout } = useUser();
+  const { user, isAuthenticatedUser, handleLogout, updateUser } = useUser();
   const handleParentClick = () => {
     setShow(false);
   };
@@ -16,19 +19,66 @@ function Sidebar() {
   };
 
   const [effect, setEffect] = useState(null);
+  // file upload
+  const [profileImage, setprofileImage] = useState("");
+  const [changingBar, setChangingBar] = useState(false);
+  const handleChangeProfileImage = (e) => {
+    const file = e.target.files[0];
+    handleChangeProfileImageSetFileToBase(file);
+    setShow(false);
+  };
 
+  const handleChangeProfileImageSetFileToBase = (file) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setprofileImage(reader.result);
+    };
+  };
+
+  const changeProfileImage = async () => {
+    setChangingBar(true);
+
+    try {
+      const result = await axios.post(
+        `${API_URL}/change_profile_image`,
+        {
+          id: user.id,
+          image: profileImage,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      updateUser({ profilePicture: result.data.imageInfo.url });
+      if (result.data.imageInfo.url) {
+        setChangingBar(false);
+      } else {
+        window.location.reload();
+      }
+      console.log("result:", result);
+    } catch (error) {
+      console.error("error:", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    if (profileImage) {
+      changeProfileImage();
+    }
+  }, [profileImage]);
   return (
     <>
       <div
+        className="dflex algncenter"
         style={{
           position: "sticky",
           right: "0px",
           top: "0px",
-          display: "flex",
           width: "100%",
           justifyContent: "space-between",
           height: "53px",
-          alignItems: "center",
           backgroundColor: "rgba(255, 255, 255, 0.85)",
           backdropFilter: "blur(12px)",
           zIndex: 9999,
@@ -57,16 +107,97 @@ function Sidebar() {
           }}
           className="pointer"
         >
-          <svg
-            viewBox="0 0 24 24"
-            width="1em"
-            height="1em"
-            fill="currentColor"
-            focusable="false"
-            aria-hidden="true"
-          >
-            <path d="M.75 2.25h22.5a.75.75 0 0 0 0-1.5H.75a.75.75 0 0 0 0 1.5m22.5 19.5H.75a.75.75 0 0 0 0 1.5h22.5a.75.75 0 0 0 0-1.5m-22.5-9h12a.75.75 0 0 0 0-1.5h-12a.75.75 0 0 0 0 1.5"></path>
-          </svg>
+          {!changingBar ? (
+            <>
+              {!isAuthenticatedUser ? (
+                <>
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="1em"
+                    height="1em"
+                    fill="currentColor"
+                    focusable="false"
+                    aria-hidden="true"
+                  >
+                    <path d="M.75 2.25h22.5a.75.75 0 0 0 0-1.5H.75a.75.75 0 0 0 0 1.5m22.5 19.5H.75a.75.75 0 0 0 0 1.5h22.5a.75.75 0 0 0 0-1.5m-22.5-9h12a.75.75 0 0 0 0-1.5h-12a.75.75 0 0 0 0 1.5"></path>
+                  </svg>
+                </>
+              ) : (
+                <>
+                  <div
+                    style={{
+                      height: "100%",
+                      transitionDuration: "0.2s",
+                      outlineStyle: "none",
+                      width: "40px",
+                      height: "40px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {user?.profilePicture !== "default_profile_picture_url" ? (
+                      <div
+                        className="image-hover-effect"
+                        style={{
+                          width: "44px",
+                          height: "44px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          borderRadius: "50%",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <img
+                          src={user?.profilePicture}
+                          width={40}
+                          height={40}
+                          alt=""
+                          style={{
+                            borderRadius: "50%",
+                          }}
+                        />{" "}
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          width: "44px",
+                          height: "44px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          borderRadius: "50%",
+                          cursor: "pointer",
+                        }}
+                        href=""
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="40"
+                          height="40"
+                          fill={"rgb(83, 100, 113)"}
+                          style={{
+                            borderRadius: "50%",
+                          }}
+                          className="bi bi-person-circle"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                          <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                        </svg>{" "}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </>
+          ) : (
+            <LoadingSpinner
+              fontSize={true}
+              strokeColor={"#36bbf7"}
+            ></LoadingSpinner>
+          )}
         </div>
       </div>
       {show && (
@@ -74,9 +205,9 @@ function Sidebar() {
           onClick={() => {
             handleParentClick();
           }}
+          className="dflex"
           style={{
             position: "fixed",
-            display: "flex",
             left: 0,
             bottom: 0,
             top: 0,
@@ -87,15 +218,13 @@ function Sidebar() {
         >
           <div
             onClick={handleChildClick}
-            className="mobile-top-navigation-column"
+            className="mobile-top-navigation-column p-abs dflex"
             style={{
-              position: "absolute",
               right: "0px",
               maxWidth: "70%",
               minWidth: "280px",
               height: "100vh",
               minHeight: "0px",
-              display: "flex",
               flexDirection: "column",
               flexShrink: "1",
               flexGrow: "1",
@@ -110,12 +239,10 @@ function Sidebar() {
             {isAuthenticatedUser ? (
               <>
                 <div
+                  className="dflex algncenter algncenter"
                   style={{
                     padding: "32px",
-                    display: "flex",
                     flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
                   }}
                 >
                   <div
@@ -201,6 +328,44 @@ function Sidebar() {
                       Friends
                     </div>
                   </div>
+                  <div
+                    onClick={() =>
+                      document
+                        .getElementById("formuploadModal-profile-image")
+                        .click()
+                    }
+                    style={{
+                      width: "100%",
+                      marginTop: "16px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div
+                      className={
+                        effect === "add_picture"
+                          ? "slide_up_effect color-dark-text"
+                          : " color-dark-text"
+                      }
+                      onMouseEnter={() => setEffect("add_picture")}
+                      onMouseLeave={() => setEffect(null)}
+                      style={{
+                        padding: "16px",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        transition: "transform 0.3s ease",
+                      }}
+                    >
+                      Add picture
+                    </div>{" "}
+                    <input
+                      onChange={handleChangeProfileImage}
+                      type="file"
+                      id="formuploadModal-profile-image"
+                      name="profileImage"
+                      className="form-control"
+                      style={{ display: "none" }}
+                    />
+                  </div>
 
                   <div
                     style={{
@@ -215,7 +380,7 @@ function Sidebar() {
                       }
                       onClick={() => {
                         setShow(false);
-                        logout();
+                        handleLogout();
                       }}
                       style={{
                         transition: "transform 0.3s ease",
@@ -233,12 +398,10 @@ function Sidebar() {
               <>
                 {" "}
                 <div
+                  className="dflex jfycenter algncenter"
                   style={{
                     padding: "32px",
-                    display: "flex",
                     flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
                   }}
                 >
                   <div
@@ -316,6 +479,7 @@ function Sidebar() {
                     </div>
                   </div>
                   <div
+                    onClick={() => navigate("/")}
                     style={{
                       width: "100%",
                       marginTop: "16px",

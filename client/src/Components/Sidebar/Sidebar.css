@@ -16,3 +16,20 @@
 .slide_up_effect {
   transform: translateY(-5px);
 }
+
+.image-hover-effect::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+  z-index: 0;
+}
+
+.image-hover-effect:hover::before {
+  background-color: rgba(26, 26, 26, 0.14);
+}
