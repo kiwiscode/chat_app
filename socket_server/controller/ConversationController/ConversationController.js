@@ -17,12 +17,21 @@ const addConversation = async (req, res) => {
     const existingConversation = await prisma.conversation.findFirst({
       where: {
         AND: [
-          { members: { some: { id: user1Id } } },
-          { members: { some: { id: user2Id } } },
+          { members: { some: { id: parseInt(user1Id) } } },
+          { members: { some: { id: parseInt(user2Id) } } },
         ],
       },
       include: {
-        members: true,
+        members: {
+          include: {
+            conversations: true,
+          },
+        },
+        Message: {
+          include: {
+            sender: true,
+          },
+        },
       },
     });
 

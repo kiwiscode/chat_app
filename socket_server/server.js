@@ -36,12 +36,14 @@ const userVerification = require("./routes/userVerification.routes");
 const userRoutes = require("./routes/user.routes");
 const conversationRoutes = require("./routes/conversation.routes");
 const messageRoutes = require("./routes/message.routes");
+const connectionRoutes = require("./routes/connection.routes");
 
 app.use("/auth", authRoutes);
 app.use("/user-verify", userVerification);
-app.use("/", userRoutes);
+app.use("/users", userRoutes);
 app.use("/conversations", conversationRoutes);
 app.use("/messages", messageRoutes);
+app.use("/", connectionRoutes);
 // routes finish to check
 
 let users = [];
@@ -74,10 +76,12 @@ io.on("connection", (socket) => {
     console.log("sender:", senderId, "receiver:", receiverId, "message:", text);
     const user = getUser(receiverId);
     console.log("receiver:", user);
-    io.to(user.socketId).emit("getMessage", {
-      senderId,
-      text,
-    });
+    if (user) {
+      io.to(user.socketId).emit("getMessage", {
+        senderId,
+        text,
+      });
+    }
   });
 
   socket.on("disconnect", () => {

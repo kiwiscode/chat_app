@@ -280,9 +280,6 @@ function Sidebar() {
                     }}
                   >
                     <div
-                      onClick={() => {
-                        navigate("/coworkers");
-                      }}
                       className={
                         effect === "coworkers_div"
                           ? "slide_up_effect  color-dark-text"
@@ -308,9 +305,6 @@ function Sidebar() {
                     }}
                   >
                     <div
-                      onClick={() => {
-                        navigate("/friends");
-                      }}
                       className={
                         effect === "friends_div"
                           ? "slide_up_effect color-dark-text"
@@ -355,7 +349,9 @@ function Sidebar() {
                         transition: "transform 0.3s ease",
                       }}
                     >
-                      Add picture
+                      {user?.profilePicture !== "default_profile_picture_url"
+                        ? "Change your picture"
+                        : "Add picture"}
                     </div>{" "}
                     <input
                       onChange={handleChangeProfileImage}

@@ -8,16 +8,61 @@ datasource db {
 }
 
 model User {
-  id             Int            @id @default(autoincrement())
-  email          String         @unique
-  username       String         @unique
-  password       String
-  active         Boolean        @default(false)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  Message        Message[]
-  conversations  Conversation[] @relation("UserConversations")
-  profilePicture String         @default("default_profile_picture_url")
+  id                       Int               @id @default(autoincrement())
+  email                    String            @unique
+  username                 String            @unique
+  password                 String
+  active                   Boolean           @default(false)
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime          @updatedAt
+  Message                  Message[]
+  conversations            Conversation[]    @relation("UserConversations")
+  profilePicture           String            @default("default_profile_picture_url")
+  sentCoworkerRequests     CoworkerRequest[] @relation("SentCoworkerRequests")
+  receivedCoworkerRequests CoworkerRequest[] @relation("ReceivedCoworkerRequests")
+  sentFriendRequests       FriendRequest[]   @relation("SentFriendRequests")
+  receivedFriendRequests   FriendRequest[]   @relation("ReceivedFriendRequests")
+  coworkers                Coworker[]        @relation("UserCoworkers")
+  friends                  Friend[]          @relation("UserFriends")
+  testField                String            @default("testField")
+  Coworker                 Coworker[]
+  Friend                   Friend[]
+}
+
+model Coworker {
+  id         Int  @id @default(autoincrement())
+  userId     Int
+  coworkerId Int
+  coworker   User @relation("UserCoworkers", fields: [userId], references: [id])
+  user       User @relation(fields: [coworkerId], references: [id])
+}
+
+model Friend {
+  id       Int  @id @default(autoincrement())
+  userId   Int
+  friendId Int
+  friend   User @relation("UserFriends", fields: [userId], references: [id])
+  user     User @relation(fields: [friendId], references: [id])
+}
+
+model CoworkerRequest {
+  id          Int      @id @default(autoincrement())
+  requester   User     @relation("SentCoworkerRequests", fields: [requesterId], references: [id])
+  requesterId Int
+  recipient   User     @relation("ReceivedCoworkerRequests", fields: [recipientId], references: [id])
+  recipientId Int
+  status      String   @default("pending") // pending, accepted, rejected
+  createdAt   DateTime @default(now())
+}
+
+model FriendRequest {
+  id          Int      @id @default(autoincrement())
+  requester   User     @relation("SentFriendRequests", fields: [requesterId], references: [id])
+  requesterId Int
+  recipient   User     @relation("ReceivedFriendRequests", fields: [recipientId], references: [id])
+  recipientId Int
+  status      String   @default("pending") // pending, accepted, rejected
+  createdAt   DateTime @default(now())
 }
 
 model Conversation {

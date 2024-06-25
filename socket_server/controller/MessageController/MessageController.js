@@ -50,9 +50,11 @@ const getMessages = async (req, res) => {
         id: parseInt(conversationId),
       },
       include: {
-        Message: true,
-      },
-      include: {
+        members: {
+          include: {
+            conversations: true,
+          },
+        },
         Message: {
           include: {
             sender: true,
@@ -60,6 +62,7 @@ const getMessages = async (req, res) => {
         },
       },
     });
+    console.log("message members:", messages.members);
 
     res.status(200).json(messages);
   } catch (error) {

@@ -64,6 +64,14 @@ body {
   border-radius: 4px;
 }
 
+.border-999 {
+  border-radius: 999px;
+}
+
+.border-50 {
+  border-radius: 50%;
+}
+
 .fs-23 {
   font-size: 23px;
 }
@@ -374,8 +382,8 @@ body {
 }
 
 .him-her {
-  background-color: rgb(16, 23, 42);
-  color: rgb(231, 233, 234);
+  background-color: #eff3f4;
+  color: rgb(16, 23, 42);
 }
 
 .selected-message {
@@ -383,5 +391,9 @@ body {
 }
 
 .each-message-parent-div:hover {
+  background-color: #f7f9f9 !important ;
+}
+
+.hover_close_btn:hover {
   background-color: #f7f9f9 !important ;
 }
