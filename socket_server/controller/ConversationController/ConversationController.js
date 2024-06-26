@@ -62,7 +62,6 @@ const addConversation = async (req, res) => {
 const getConversations = async (req, res) => {
   try {
     const userId = req.params.userId;
-    console.log("userid:", typeof userId);
 
     const conversations = await prisma.conversation.findMany({
       where: {

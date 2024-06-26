@@ -67,6 +67,46 @@ function emailProcess() {
   };
 }
 
+// check if the username already exists in the database
+const checkIfUsernameExists = async (req, res) => {
+  try {
+    const { username } = req.body;
+    const user = await prisma.user.findUnique({
+      where: {
+        username: username.toLowerCase(),
+      },
+    });
+    if (user) {
+      return res.status(409).json({ exists: true });
+    } else {
+      return res.status(200).json({ exists: false });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// check if the email already exists in the database
+const checkIfEmailExists = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email.toLowerCase(),
+      },
+    });
+    if (user) {
+      return res.status(409).json({ exists: true });
+    } else {
+      return res.status(200).json({ exists: false });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 const handleEmailVerificationCode = (req, res) => {
   const { receiverEmail } = req.body;
 
@@ -88,7 +128,7 @@ const handleEmailVerificationCode = (req, res) => {
   console.log("Random code =>", randomCode.join(""));
 
   console.log("Email received =>", receiverEmail);
-  sendVerificationCodeToEmail(receiverEmail, randomCode.join(""))
+  sendVerificationCodeToEmail(receiverEmail.toLowerCase(), randomCode.join(""))
     .then((result) => {
       console.log("RESULT AFTER EMAIL VERIFICATION SEND =>", result);
 
@@ -177,8 +217,8 @@ const authSignup = async (req, res) => {
     // Create user in database
     const user = await prisma.user.create({
       data: {
-        username,
-        email,
+        username: username.toLowerCase(),
+        email: email.toLowerCase(),
         password: hashedPassword,
       },
     });
@@ -281,4 +321,6 @@ module.exports = {
   handleEmailVerificationCode,
   authLogin,
   authLogout,
+  checkIfUsernameExists,
+  checkIfEmailExists,
 };

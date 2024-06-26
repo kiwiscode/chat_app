@@ -4,11 +4,12 @@ const prisma = new PrismaClient();
 
 const handleProfilePicture = async (req, res) => {
   try {
-    const { image, id } = req.body;
+    const { image } = req.body;
+    const userId = req.params.userId;
 
     const user = await prisma.user.findUnique({
       where: {
-        id: id,
+        id: parseInt(userId),
       },
     });
 
@@ -28,7 +29,7 @@ const handleProfilePicture = async (req, res) => {
       });
 
       await prisma.user.update({
-        where: { id: id },
+        where: { id: parseInt(userId) },
         data: {
           profilePicture: imageInfo.url,
         },

@@ -64,11 +64,11 @@ body {
   border-radius: 4px;
 }
 
-.border-999 {
+.border-r-999 {
   border-radius: 999px;
 }
 
-.border-50 {
+.border-r-50 {
   border-radius: 50%;
 }
 
@@ -76,8 +76,16 @@ body {
   font-size: 23px;
 }
 
+.fs-20 {
+  font-size: 20px;
+}
+
 .fs-15 {
   font-size: 15px;
+}
+
+.fs-14 {
+  font-size: 14px;
 }
 
 .fs-13 {
@@ -86,6 +94,10 @@ body {
 
 .lh-28 {
   line-height: 28px;
+}
+
+.lh-24 {
+  line-height: 24px;
 }
 
 .lh-16 {
@@ -129,6 +141,10 @@ body {
   pointer-events: none;
 }
 
+.none-outline {
+  outline: none;
+}
+
 .p-16 {
   padding: 16px;
 }
@@ -143,6 +159,10 @@ body {
   align-items: center;
 }
 
+.fdir-column {
+  flex-direction: column;
+}
+
 .light_scheme {
   color-scheme: light;
 }
@@ -151,6 +171,16 @@ body {
   background-color: white !important;
   box-shadow: 0 0 15px rgba(101, 119, 134, 0.2),
     0 0 5px 3px rgba(101, 119, 134, 0.15) !important;
+}
+
+.m-0 {
+  margin: 0;
+}
+.p-0 {
+  padding: 0;
+}
+.z-9999 {
+  z-index: 9999 !important;
 }
 
 .w-100 {
@@ -175,6 +205,14 @@ body {
 
 .p-abs {
   position: absolute;
+}
+
+.p-rel {
+  position: relative;
+}
+
+.toggle-view-hover-effect:hover {
+  background-color: #e7e7e8 !important ;
 }
 
 :root {
@@ -396,4 +434,101 @@ body {
 
 .hover_close_btn:hover {
   background-color: #f7f9f9 !important ;
+}
+
+.light-popover .MuiPaper-root,
+.dark-popover .MuiPaper-root,
+.cyber-punk-popover .MuiPaper-root {
+  height: 400px !important;
+  width: 400px !important;
+  box-shadow: 0 0 15px rgba(101, 119, 134, 0.2),
+    0 0 5px 3px rgba(101, 119, 134, 0.15) !important;
+}
+
+.dark-popover .MuiPaper-root {
+  background-color: black !important;
+}
+.cyber-punk-popover .MuiPaper-root {
+  background-color: #fff248 !important;
+}
+/* arrow animation  */
+
+.arrow_animation_active_forward {
+  transition: transform 0.3s ease;
+  transform: translate(0.3rem, -0.3rem);
+  fill: #36bbf7;
+}
+
+.arrow_animation_done_forward {
+  transition: transform 0.3s ease;
+  transform: translate(0rem, 0rem);
+}
+
+.rotate {
+  transform: rotate(-180deg) !important;
+}
+
+.arrow_animation_active_down {
+  transition: transform 0.3s ease !important;
+  transform: translate(-0.3rem, 0.3rem) rotate(-180deg) !important;
+  fill: #36bbf7;
+}
+
+.arrow_animation_done_down {
+  transition: transform 0.3s ease !important;
+  transform: translate(0rem, 0rem) rotate(-180deg) !important;
+}
+
+.circle_hover_accept:hover {
+  transition-duration: 0.2s;
+  background-color: #e4f0f9;
+  outline: none;
+}
+
+.circle_hover_reject:hover {
+  transition-duration: 0.2s !important;
+  background-color: #f8e5e6 !important;
+  outline: none !important;
+}
+
+.dark_btn_hover_effect:hover {
+  transition-duration: 0.2s !important;
+  background-color: #272c30 !important;
+}
+
+.cancel_btn_hover_effect:hover {
+  transition-duration: 0.2s !important;
+  background-color: #e7e7e8 !important;
+}
+
+/* antd message custom style */
+.ant-message {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  position: fixed;
+  bottom: 20px;
+  width: 100%;
+}
+
+.ant-message-notice-content {
+  background-color: #36bbf7 !important;
+  color: white !important;
+}
+
+.ant-message-custom-content a {
+  text-decoration: none !important;
+}
+
+.ant-message-custom-content a:hover {
+  text-decoration: underline !important;
+  text-decoration-color: white !important;
+}
+
+.ant-message-success {
+  padding: 6px;
+}
+
+.anticon-check-circle {
+  display: none !important;
 }

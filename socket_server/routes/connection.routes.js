@@ -1,10 +1,22 @@
 const router = require("express").Router();
 const ConnectionController = require("../controller/ConnectionController/ConnectionController");
 
-router.get("/coworker-requests", ConnectionController.getCoworkerRequest);
-router.get("/friend-requests", ConnectionController.getFriendRequests);
+router.get(
+  "/:userId/coworker-requests",
+  ConnectionController.getCoworkerRequests
+);
+router.get("/:userId/friend-requests", ConnectionController.getFriendRequests);
 router.post("/coworker-requests", ConnectionController.sendCoworkerRequest);
 router.post("/friend-requests", ConnectionController.sendFriendRequest);
+router.delete(
+  "/coworker-requests/:requestId",
+  ConnectionController.cancelCoworkerRequest
+);
+router.delete(
+  "/friend-requests/:requestId",
+  ConnectionController.cancelFriendRequest
+);
+
 router.post(
   "/coworker-requests/:id/accept",
   ConnectionController.acceptCoworkerRequest

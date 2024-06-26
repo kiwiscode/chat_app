@@ -2,9 +2,9 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 // get coworker requests
-const getCoworkerRequest = async (req, res) => {
+const getCoworkerRequests = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.params.userId;
 
     const user = await prisma.user.findUnique({
       where: {
@@ -12,16 +12,25 @@ const getCoworkerRequest = async (req, res) => {
       },
       include: {
         receivedCoworkerRequests: {
+          where: {
+            status: "pending",
+          },
           include: {
             requester: true,
             recipient: true,
           },
         },
+        sentCoworkerRequests: true,
       },
     });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     return res.status(200).json({
       message: "Coworker requests",
       coworkerRequests: user.receivedCoworkerRequests,
+      sentCoworkerRequests: user.sentCoworkerRequests,
     });
   } catch (error) {
     console.error(error);
@@ -31,7 +40,8 @@ const getCoworkerRequest = async (req, res) => {
 // get friend requests
 const getFriendRequests = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.params.userId;
+    console.log("id f.requests:", userId);
 
     const user = await prisma.user.findUnique({
       where: {
@@ -39,16 +49,24 @@ const getFriendRequests = async (req, res) => {
       },
       include: {
         receivedFriendRequests: {
+          where: {
+            status: "pending",
+          },
           include: {
             requester: true,
             recipient: true,
           },
         },
+        sentFriendRequests: true,
       },
     });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
     return res.status(200).json({
       message: "Friend requests",
       friendRequests: user.receivedFriendRequests,
+      sentFriendRequests: user.sentFriendRequests,
     });
   } catch (error) {
     console.error(error);
@@ -59,6 +77,27 @@ const getFriendRequests = async (req, res) => {
 const sendCoworkerRequest = async (req, res) => {
   try {
     const { requesterId, recipientId } = req.body;
+
+    const isAlreadyCoworker = await prisma.coworker.findFirst({
+      where: {
+        OR: [
+          {
+            userId: requesterId,
+            coworkerId: recipientId,
+          },
+          {
+            userId: recipientId,
+            coworkerId: requesterId,
+          },
+        ],
+      },
+    });
+
+    if (isAlreadyCoworker) {
+      return res
+        .status(400)
+        .json({ error: "These users are already coworkers." });
+    }
 
     const existingRequest = await prisma.coworkerRequest.findFirst({
       where: {
@@ -72,6 +111,45 @@ const sendCoworkerRequest = async (req, res) => {
       return res
         .status(400)
         .json({ error: "There is already a pending coworker request." });
+    }
+
+    const reverseRequest = await prisma.coworkerRequest.findFirst({
+      where: {
+        requesterId: recipientId,
+        recipientId: requesterId,
+        status: "pending",
+      },
+    });
+
+    if (reverseRequest) {
+      await prisma.coworkerRequest.update({
+        where: {
+          id: reverseRequest.id,
+        },
+        data: {
+          status: "accepted",
+        },
+      });
+
+      await prisma.coworker.create({
+        data: {
+          userId: requesterId,
+          coworkerId: recipientId,
+        },
+      });
+      await prisma.coworker.create({
+        data: {
+          userId: recipientId,
+          coworkerId: requesterId,
+        },
+      });
+
+      return res.status(200).json({
+        status: "reverse_request_accepted",
+        message:
+          "This user has already sent you a request and you have accepted it.",
+        reverseRequest: reverseRequest,
+      });
     }
 
     const newRequest = await prisma.coworkerRequest.create({
@@ -95,6 +173,27 @@ const sendFriendRequest = async (req, res) => {
   try {
     const { requesterId, recipientId } = req.body;
 
+    const isAlreadyFriend = await prisma.friend.findFirst({
+      where: {
+        OR: [
+          {
+            userId: requesterId,
+            friendId: recipientId,
+          },
+          {
+            userId: recipientId,
+            friendId: requesterId,
+          },
+        ],
+      },
+    });
+
+    if (isAlreadyFriend) {
+      return res
+        .status(400)
+        .json({ error: "These users are already friends." });
+    }
+
     const existingRequest = await prisma.friendRequest.findFirst({
       where: {
         requesterId,
@@ -109,6 +208,46 @@ const sendFriendRequest = async (req, res) => {
         .json({ error: "There is already a pending friend request." });
     }
 
+    const reverseRequest = await prisma.friendRequest.findFirst({
+      where: {
+        requesterId: recipientId,
+        recipientId: requesterId,
+        status: "pending",
+      },
+    });
+
+    if (reverseRequest) {
+      await prisma.friendRequest.update({
+        where: {
+          id: reverseRequest.id,
+        },
+        data: {
+          status: "accepted",
+        },
+      });
+
+      await prisma.friend.create({
+        data: {
+          userId: requesterId,
+          friendId: recipientId,
+        },
+      });
+
+      await prisma.friend.create({
+        data: {
+          userId: recipientId,
+          friendId: requesterId,
+        },
+      });
+
+      return res.status(200).json({
+        status: "reverse_request_accepted",
+        message:
+          "This user has already sent you a request and you have accepted it.",
+        reverseRequest: reverseRequest,
+      });
+    }
+
     const newRequest = await prisma.friendRequest.create({
       data: {
         requesterId,
@@ -120,6 +259,47 @@ const sendFriendRequest = async (req, res) => {
       message: "Friend request sent successfully",
       request: newRequest,
     });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// cancel pending coworker request
+const cancelCoworkerRequest = async (req, res) => {
+  try {
+    const requestId = req.params.requestId;
+    console.log("request id:", requestId);
+
+    const deletedRequest = await prisma.coworkerRequest.delete({
+      where: {
+        id: parseInt(requestId),
+      },
+    });
+
+    if (!deletedRequest) {
+      return res.status(404).json({ error: "Coworker request not found" });
+    }
+    res.status(200).json({ message: "Coworker request canceled successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+// cancel pending friend request
+const cancelFriendRequest = async (req, res) => {
+  try {
+    const requestId = req.params.requestId;
+    console.log("request id:", requestId);
+    const deletedRequest = await prisma.friendRequest.delete({
+      where: {
+        id: parseInt(requestId),
+      },
+    });
+    if (!deletedRequest) {
+      return res.status(404).json({ error: "Friend request not found" });
+    }
+    res.status(200).json({ message: "Friend request canceled successfully" });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -399,10 +579,12 @@ const removeFriend = async (req, res) => {
 };
 
 module.exports = {
-  getCoworkerRequest,
+  getCoworkerRequests,
   getFriendRequests,
   sendCoworkerRequest,
   sendFriendRequest,
+  cancelCoworkerRequest,
+  cancelFriendRequest,
   acceptCoworkerRequest,
   acceptFriendRequest,
   rejectCoworkerRequest,

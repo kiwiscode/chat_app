@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "User" ADD COLUMN     "testField" TEXT NOT NULL DEFAULT 'testField';

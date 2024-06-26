@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -19,13 +19,22 @@ function Main() {
       [name]: value,
     });
   };
+
   const handleParentClick = () => {
-    if (!authModal) {
+    if (!authModal && !showVerificationCodeScreen && !loginPage) {
       setAuthModal(true);
-    } else {
+    } else if (authModal) {
       setAuthModal(false);
       setShowVerificationCodeScreen(false);
       setLoginPage(false);
+    } else if (showVerificationCodeScreen && !authModal && !loginPage) {
+      setShowVerificationCodeScreen(true);
+      setAuthModal(false);
+      setLoginPage(false);
+    } else if (loginPage && !authModal && !showVerificationCodeScreen) {
+      setLoginPage(true);
+      setAuthModal(false);
+      setShowVerificationCodeScreen(false);
     }
   };
   const handleChildClick = (event) => {
@@ -56,12 +65,9 @@ function Main() {
 
   const userNameCheck = async () => {
     try {
-      const response = await axios.post(
-        `${API_URL}/users/username_exist_check`,
-        {
-          username: formData.username,
-        }
-      );
+      const response = await axios.post(`${API_URL}/auth/check-username`, {
+        username: formData.username,
+      });
       console.log(response.data.message);
       setUsernameError("");
     } catch (error) {
@@ -73,9 +79,17 @@ function Main() {
       }
     }
   };
+
+  const emailRegex =
+    /^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|co\.uk|ukmail\.com|hotmail\.tr|icloud\.com|yahoo\.com)$/;
+
+  const validateEmail = (email) => {
+    return emailRegex.test(email);
+  };
+
   const emailCheck = async () => {
     try {
-      const response = await axios.post(`${API_URL}/users/email_exist_check`, {
+      const response = await axios.post(`${API_URL}/auth/check-email`, {
         email: formData.email,
       });
       console.log(response.data.message);
@@ -103,30 +117,35 @@ function Main() {
     setInvalidCodeError(null);
   }, [verificationCode]);
   const sendEmailVerificationCode = async (recipientEmail) => {
-    setLoading(true);
-    try {
-      const result = await axios.post(
-        `${API_URL}/auth/send-email-verification-code`,
-        {
-          receiverEmail: recipientEmail,
+    const validation = validateEmail(formData.email);
+    if (!validation) {
+      setEmailError("Please enter a valid email.");
+    } else {
+      setLoading(true);
+      try {
+        const result = await axios.post(
+          `${API_URL}/auth/send-email-verification-code`,
+          {
+            receiverEmail: recipientEmail,
+          }
+        );
+        console.log("Result:", result);
+        if (result.status === 201) {
+          setemailVerificationCodeStatus(201);
+          setemailVerificationCode(result.data.code);
+
+          setTimeout(() => {
+            setShowVerificationCodeScreen(true);
+            setAuthModal(false);
+          }, 300);
+
+          setTimeout(() => {
+            setLoading(false);
+          }, 400);
         }
-      );
-      console.log("Result:", result);
-      if (result.status === 201) {
-        setemailVerificationCodeStatus(201);
-        setemailVerificationCode(result.data.code);
-
-        setTimeout(() => {
-          setShowVerificationCodeScreen(true);
-          setAuthModal(false);
-        }, 300);
-
-        setTimeout(() => {
-          setLoading(false);
-        }, 400);
+      } catch (error) {
+        console.error("Error:", error);
       }
-    } catch (error) {
-      console.error("Error:", error);
     }
   };
 
@@ -259,6 +278,25 @@ function Main() {
     }
   };
 
+  // click outside event listener
+  const divRef = useRef();
+  const handleClickOutside = (event) => {
+    if (divRef.current && !divRef.current.contains(event.target)) {
+      setAuthModal(false);
+      setShowVerificationCodeScreen(false);
+      setLoginPage(false);
+      console.log("Clicked outside of div");
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div
       style={{
@@ -319,10 +357,17 @@ function Main() {
         </div>
       )}
       <div
+        ref={divRef}
+        className={`color-white-text fs-15 lh-20 border-r-4 p-16 chirp-medium-font ${
+          !authModal && !showVerificationCodeScreen && !loginPage
+            ? "sky-blue-btn-hover-effect pointer"
+            : ""
+        } `}
         onClick={() => {
-          handleParentClick();
+          if (!authModal) {
+            handleParentClick();
+          }
         }}
-        className={`color-white-text fs-15 border-r-4 pointer p-16 chirp-medium-font sky-blue-btn-hover-effect`}
         style={{
           position: "fixed",
           right: "15px",
@@ -333,7 +378,10 @@ function Main() {
       >
         <div
           style={{
-            pointerEvents: authModal && "none",
+            pointerEvents:
+              authModal || showVerificationCodeScreen || loginPage
+                ? "none"
+                : "",
           }}
         >
           Start for free
@@ -515,16 +563,19 @@ function Main() {
             <button
               onClick={() => {
                 setAuthModal(false);
-                setLoginPage(true);
                 setLoading(false);
+                setLoginPage(true);
               }}
-              className="color-white-text chirp-medium-font fs-15 border-r-4 pointer sky-blue-btn-hover-effect"
+              className={`color-white-text chirp-medium-font fs-15 border-r-4 sky-blue-btn-hover-effect ${
+                !loading && "pointer"
+              }`}
               style={{
                 width: "120px",
                 height: "40px",
                 backgroundColor: "#37BCF8",
                 border: "none",
                 marginTop: "4px",
+                pointerEvents: loading && "none",
               }}
             >
               Sign in
@@ -558,7 +609,9 @@ function Main() {
                       }}
                     >
                       Enter it below to verify{" "}
-                      <span>{formData?.email ? formData.email : ""}</span>
+                      <span>
+                        {formData?.email ? formData.email.toLowerCase() : ""}
+                      </span>
                     </div>
                     <div style={{}} className="auth_signup_input">
                       <label
@@ -615,11 +668,16 @@ function Main() {
                       onClick={() => {
                         if (emailVerificationCode === verificationCode) {
                           handleSignup();
-                        } else {
+                        } else if (verificationCode?.length) {
                           setInvalidCodeError("Invalid verification code.");
                         }
                       }}
-                      className="color-white-text chirp-medium-font fs-15 border-r-4 pointer sky-blue-btn-hover-effect"
+                      className={`color-white-text chirp-medium-font fs-15 border-r-4   
+                      ${
+                        verificationCode?.length
+                          ? "sky-blue-btn-hover-effect pointer"
+                          : ""
+                      }`}
                       style={{
                         width: "120px",
                         height: "40px",
@@ -724,6 +782,17 @@ function Main() {
             </>
           </>
         ) : null}
+      </div>
+      <div
+        className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none p-16 chirp-regular-font`}
+        style={{
+          position: "fixed",
+          left: "15px",
+          bottom: "15px",
+          zIndex: 1, // Diğer içeriklerden üstte olacak
+        }}
+      >
+        © Aykut Kav 2024
       </div>
       <div
         onClick={() => {
