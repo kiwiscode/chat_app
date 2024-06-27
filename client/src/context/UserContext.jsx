@@ -3,10 +3,10 @@ import { createContext, useState, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { verifyCookie, logout } from "../utils/verify-user";
+import config from "../config/config";
 const UserContext = createContext();
 
-// const API_URL = "http://localhost:3000";
-const API_URL = "https://chat-app-mpi2.onrender.com/";
+const API_URL = config.backendUrl;
 export const UserProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(null);
   const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(false);

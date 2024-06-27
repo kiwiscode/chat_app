@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import "../../index.css";
@@ -7,7 +7,8 @@ import axios from "axios";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import useWindowDimensions from "../../utils/window-dimensions";
 import { Modal } from "@mui/material";
-const API_URL = "https://chat-app-mpi2.onrender.com";
+import config from "../../config/config";
+const API_URL = config.backendUrl;
 
 function Sidebar() {
   const [show, setShow] = useState(false);
@@ -76,9 +77,9 @@ function Sidebar() {
 
   const [showCRequestsModal, setShowCRequestsModal] = useState(false);
   const [showFRequestsModal, setShowFRequestsModal] = useState(false);
-  const [showCoworkers, setShowCoworkers] = useState(false);
+  const [showCoworkers, setShowCoworkers] = useState(true);
   const [showCoworkerRequests, setShowCoworkerRequests] = useState(false);
-  const [showFriends, setShowFriends] = useState(false);
+  const [showFriends, setShowFriends] = useState(true);
   const [showFriendRequests, setShowFriendRequests] = useState(false);
 
   const handleOpenCReqModal = () => {
