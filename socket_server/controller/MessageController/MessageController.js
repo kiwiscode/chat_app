@@ -1,5 +1,4 @@
 const prisma = require("../../util/PrismaConfig");
-
 const addMessage = async (req, res) => {
   try {
     const { conversationId, senderId, message } = req.body;
