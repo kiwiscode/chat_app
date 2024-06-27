@@ -5,7 +5,8 @@ import { useCookies } from "react-cookie";
 import { verifyCookie, logout } from "../utils/verify-user";
 const UserContext = createContext();
 
-const API_URL = "http://localhost:3000";
+// const API_URL = "http://localhost:3000";
+const API_URL = "https://chat-app-mpi2.onrender.com/";
 export const UserProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(null);
   const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(false);

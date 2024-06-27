@@ -7,8 +7,7 @@ import axios from "axios";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import useWindowDimensions from "../../utils/window-dimensions";
 import { Modal } from "@mui/material";
-import config from "../../config/config";
-const API_URL = config.backendUrl;
+const API_URL = "https://chat-app-mpi2.onrender.com";
 
 function Sidebar() {
   const [show, setShow] = useState(false);

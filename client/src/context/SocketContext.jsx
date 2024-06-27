@@ -1,13 +1,12 @@
 import { createContext, useContext, useEffect } from "react";
 import { io } from "socket.io-client";
-import config from "../config/config";
 const SocketContext = createContext();
 
 export const useSocket = () => {
   return useContext(SocketContext);
 };
 
-const socket = io(config.backendUrl);
+const socket = io("https://chat-app-mpi2.onrender.com");
 
 export const SocketProvider = ({ children }) => {
   useEffect(() => {
