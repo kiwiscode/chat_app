@@ -71,6 +71,8 @@ export const UserProvider = ({ children }) => {
         }
       );
 
+      console.log("result:", result);
+
       setUser(result.data);
     } catch (error) {
       console.error("error:", error);
@@ -80,6 +82,7 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (user?.id) {
+      console.log("userid:", user.id);
       refreshUser();
     }
   }, [user?.id]);

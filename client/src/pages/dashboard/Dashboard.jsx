@@ -79,7 +79,9 @@ function Dashboard() {
   }, [searchInput]);
 
   useEffect(() => {
-    refreshUser();
+    if (user?.id) {
+      refreshUser();
+    }
     getAllUsers();
   }, []);
 
@@ -342,7 +344,9 @@ function Dashboard() {
   // search user modal
   const [showSearchPeopleModal, setShowSearchPeopleModal] = useState(false);
   const searchPeopleModal = () => {
-    refreshUser();
+    if (user?.id) {
+      refreshUser();
+    }
     getAllUsers();
     setShowSearchPeopleModal(true);
   };
@@ -398,7 +402,9 @@ function Dashboard() {
           6
         );
       }
-      refreshUser();
+      if (user?.id) {
+        refreshUser();
+      }
       getAllUsers();
     } catch (error) {
       console.error("error:", error);
@@ -434,7 +440,9 @@ function Dashboard() {
       setShowCancelCoworkerReqModal(false);
       setRecipientInfoCancelCReq(null);
       setRecipientInfoCancelFReq(null);
-      refreshUser();
+      if (user?.id) {
+        refreshUser();
+      }
       getAllUsers();
     } catch (error) {
       console.error("error:", error);
@@ -464,7 +472,9 @@ function Dashboard() {
           6
         );
       }
-      refreshUser();
+      if (user?.id) {
+        refreshUser();
+      }
       getAllUsers();
     } catch (error) {
       console.error("error:", error);
@@ -500,7 +510,9 @@ function Dashboard() {
       setShowCancelCoworkerReqModal(false);
       setRecipientInfoCancelCReq(null);
       setRecipientInfoCancelFReq(null);
-      refreshUser();
+      if (user?.id) {
+        refreshUser();
+      }
       getAllUsers();
     } catch (error) {
       console.error("error:", error);
@@ -553,7 +565,9 @@ function Dashboard() {
       await axios.delete(`${API_URL}/coworker/${userId}/users/${user?.id}`);
       setShowRemoveCoworkerModal(false);
       setCoworkerToRemove(null);
-      refreshUser();
+      if (user?.id) {
+        refreshUser();
+      }
       getAllUsers();
     } catch (error) {
       console.error("error:", error);
@@ -579,7 +593,9 @@ function Dashboard() {
       await axios.delete(`${API_URL}/friend/${userId}/users/${user?.id}`);
       setShowRemoveFriendModal(false);
       setFriendToRemove(null);
-      refreshUser();
+      if (user?.id) {
+        refreshUser();
+      }
       getAllUsers();
     } catch (error) {
       console.error("error:", error);
@@ -1093,7 +1109,7 @@ function Dashboard() {
                     {users.map((eachUser) => {
                       return (
                         <Avatar
-                          key={eachUser.id}
+                          key={eachUser?.id}
                           alt={eachUser.username}
                           src={eachUser.profilePicture}
                         />
@@ -1130,7 +1146,7 @@ function Dashboard() {
                                 justifyContent: "flex-start",
                                 gap: "12px",
                               }}
-                              key={eachUser.id}
+                              key={eachUser?.id}
                             >
                               <div>
                                 {eachUser.profilePicture !==
@@ -1546,7 +1562,7 @@ function Dashboard() {
                         {user?.coworkers?.map((eachUser) => {
                           return (
                             <Avatar
-                              key={eachUser.user.id}
+                              key={eachUser?.user.id}
                               alt={eachUser.user.username}
                               src={eachUser.user.profilePicture}
                             />
@@ -1758,7 +1774,7 @@ function Dashboard() {
                         {user?.friends?.map((eachUser) => {
                           return (
                             <Avatar
-                              key={eachUser.user.id}
+                              key={eachUser?.user.id}
                               alt={eachUser.user.username}
                               src={eachUser.user.profilePicture}
                             />
@@ -1927,7 +1943,7 @@ function Dashboard() {
                                   .username === selectedUser?.username &&
                                 "selected-message dflex"
                               } each-message-parent-div dflex algncenter`}
-                              key={eachConv.id}
+                              key={eachConv?.id}
                               style={{
                                 borderRight:
                                   findMemberNotEqualUser(eachConv.members)[0]

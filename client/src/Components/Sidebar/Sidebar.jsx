@@ -23,7 +23,7 @@ function Sidebar() {
     event.stopPropagation();
   };
 
-  const [effect, setEffect] = useState(false);
+  const [effect, setEffect] = useState(null);
   // file upload
   const [profileImage, setprofileImage] = useState("");
   const [changingBar, setChangingBar] = useState(false);
@@ -804,7 +804,7 @@ function Sidebar() {
                                       marginLeft: "16px",
                                       marginRight: "16px",
                                     }}
-                                    key={eachCRequest.id}
+                                    key={eachCRequest?.id}
                                   >
                                     <div>
                                       {eachCRequest?.requester
@@ -1289,7 +1289,7 @@ function Sidebar() {
                                     marginLeft: "16px",
                                     marginRight: "16px",
                                   }}
-                                  key={eachCRequest.id}
+                                  key={eachCRequest?.id}
                                 >
                                   <div>
                                     {eachCRequest?.requester?.profilePicture !==
