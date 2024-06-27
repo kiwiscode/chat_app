@@ -24,7 +24,5 @@
   "devDependencies": {
     "prisma": "^5.15.1"
   },
-  "scripts": {
-    "start": "node server.js"
-  }
+  "start": "npx prisma db push && npx prisma generate && node ./build/server.js"
 }
