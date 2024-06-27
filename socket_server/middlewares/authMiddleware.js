@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../util/PrismaConfig");
 
 module.exports.userVerification = (req, res) => {
   const token = req.cookies.token;
