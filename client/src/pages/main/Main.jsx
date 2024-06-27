@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-const API_URL = "https://chat-app-mpi2.onrender.com";
+import config from "../../config/config";
+const API_URL = config.backendUrl;
 
 function Main() {
   const [authModal, setAuthModal] = useState(null);

@@ -9,7 +9,8 @@ import { ThemeContext } from "../../context/ThemeContext";
 import { useAntdMessageHandler } from "../../utils/useAntdMessageHandler";
 import useWindowDimensions from "../../utils/window-dimensions";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
-const API_URL = "https://chat-app-mpi2.onrender.com";
+import config from "../../config/config";
+const API_URL = config.backendUrl;
 
 function Dashboard() {
   const { user, refreshUser } = useUser();
