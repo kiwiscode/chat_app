@@ -10,23 +10,23 @@ body {
 
 @font-face {
   font-family: "chirp-regular";
-  src: url("./assets/font/Chirp-Regular.80fda27a.woff2") format("woff2");
+  src: url("./assets/Chirp-Regular.80fda27a.woff2") format("woff2");
 }
 @font-face {
   font-family: "chirp-medium";
-  src: url("./assets/font/Chirp-Medium.f8e2739a.woff2") format("woff2");
+  src: url("./assets/Chirp-Medium.f8e2739a.woff2") format("woff2");
 }
 @font-face {
   font-family: "chirp-heavy";
-  src: url("./assets/font/Chirp-Heavy.f44ae4ea.woff2") format("woff2");
+  src: url("./assets/Chirp-Heavy.f44ae4ea.woff2") format("woff2");
 }
 @font-face {
   font-family: "chirp-bold";
-  src: url("./assets/font/Chirp-Bold.ebb56aba.woff2") format("woff2");
+  src: url("./assets/Chirp-Bold.ebb56aba.woff2") format("woff2");
 }
 @font-face {
   font-family: "chirp-extended-heavy";
-  src: url("./assets/font/chirp-extended-heavy-web.woff2") format("woff2");
+  src: url("./assets/chirp-extended-heavy-web.woff2") format("woff2");
 }
 
 .chirp-regular-font {
