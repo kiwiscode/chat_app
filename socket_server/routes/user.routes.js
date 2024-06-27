@@ -1,7 +1,5 @@
-const express = require("express");
-const router = express();
+const router = require("express").Router();
 const UserController = require("../controller/UserController/UserController");
-const { userVerification } = require("../middlewares/authMiddleware");
 const { handleProfilePicture } = require("../util/FileUploader");
 
 router.get("/", UserController.getAllUsers);

@@ -5,12 +5,13 @@ import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import { UserProvider } from "./context/UserContext.jsx";
 
+import { disableReactDevTools } from "@fvilers/disable-react-devtools";
+if (process.env.NODE_ENV === "production") disableReactDevTools();
+
 ReactDOM.createRoot(document.getElementById("root")).render(
-  // <React.StrictMode>
   <BrowserRouter>
     <UserProvider>
       <App />
     </UserProvider>
   </BrowserRouter>
-  // </React.StrictMode>
 );

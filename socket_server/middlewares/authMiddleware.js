@@ -22,25 +22,44 @@ module.exports.userVerification = (req, res) => {
           active: true,
           createdAt: true,
           updatedAt: true,
-          Message: true,
           conversations: true,
           profilePicture: true,
-          sentCoworkerRequests: true,
-          receivedCoworkerRequests: true,
-          sentFriendRequests: true,
-          receivedFriendRequests: true,
+          sentCoworkerRequests: {
+            include: {
+              recipient: true,
+              requester: true,
+            },
+          },
+          receivedCoworkerRequests: {
+            include: {
+              recipient: true,
+              requester: true,
+            },
+          },
+          sentFriendRequests: {
+            include: {
+              recipient: true,
+              requester: true,
+            },
+          },
+          receivedFriendRequests: {
+            include: {
+              recipient: true,
+              requester: true,
+            },
+          },
           coworkers: {
             include: {
+              coworker: true,
               user: true,
             },
           },
           friends: {
             include: {
+              friend: true,
               user: true,
             },
           },
-          Coworker: true,
-          Friend: true,
         },
       });
       if (user) return res.json({ status: true, user: user });

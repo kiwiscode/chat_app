@@ -1,11 +1,9 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// get coworker requests
 const getCoworkerRequests = async (req, res) => {
   try {
     const userId = req.params.userId;
-
     const user = await prisma.user.findUnique({
       where: {
         id: parseInt(userId),
@@ -37,12 +35,9 @@ const getCoworkerRequests = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-// get friend requests
 const getFriendRequests = async (req, res) => {
   try {
     const userId = req.params.userId;
-    console.log("id f.requests:", userId);
-
     const user = await prisma.user.findUnique({
       where: {
         id: parseInt(userId),
@@ -73,7 +68,6 @@ const getFriendRequests = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-// send coworker request
 const sendCoworkerRequest = async (req, res) => {
   try {
     const { requesterId, recipientId } = req.body;
@@ -168,7 +162,6 @@ const sendCoworkerRequest = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-// send friend request
 const sendFriendRequest = async (req, res) => {
   try {
     const { requesterId, recipientId } = req.body;
@@ -264,13 +257,9 @@ const sendFriendRequest = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-// cancel pending coworker request
 const cancelCoworkerRequest = async (req, res) => {
   try {
     const requestId = req.params.requestId;
-    console.log("request id:", requestId);
-
     const deletedRequest = await prisma.coworkerRequest.delete({
       where: {
         id: parseInt(requestId),
@@ -286,11 +275,9 @@ const cancelCoworkerRequest = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-// cancel pending friend request
 const cancelFriendRequest = async (req, res) => {
   try {
     const requestId = req.params.requestId;
-    console.log("request id:", requestId);
     const deletedRequest = await prisma.friendRequest.delete({
       where: {
         id: parseInt(requestId),
@@ -305,8 +292,6 @@ const cancelFriendRequest = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-// accept coworker request
 const acceptCoworkerRequest = async (req, res) => {
   try {
     const { requesterId, recipientId } = req.body;
@@ -358,8 +343,6 @@ const acceptCoworkerRequest = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-// accept friend request
 const acceptFriendRequest = async (req, res) => {
   try {
     const { requesterId, recipientId } = req.body;
@@ -411,8 +394,6 @@ const acceptFriendRequest = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-// reject coworker request
 const rejectCoworkerRequest = async (req, res) => {
   try {
     const { requesterId, recipientId } = req.body;
@@ -447,8 +428,6 @@ const rejectCoworkerRequest = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-// reject friend request
 const rejectFriendRequest = async (req, res) => {
   try {
     const { requesterId, recipientId } = req.body;
@@ -485,11 +464,10 @@ const rejectFriendRequest = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-// remove coworker
 const removeCoworker = async (req, res) => {
   try {
-    const { coworkerId, userId } = req.params;
+    const userId = req.params.userId;
+    const coworkerId = req.params.coworkerId;
 
     const coworkerRelation1 = await prisma.coworker.findFirst({
       where: {
@@ -521,8 +499,6 @@ const removeCoworker = async (req, res) => {
       },
     });
 
-    console.log("relation f:", coworkerRelation1);
-    console.log("relation s:", coworkerRelation2);
     return res
       .status(200)
       .json({ message: "Coworker relationship deleted successfully" });
@@ -531,8 +507,6 @@ const removeCoworker = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-// remove friend
 const removeFriend = async (req, res) => {
   try {
     const { friendId, userId } = req.params;
@@ -567,8 +541,6 @@ const removeFriend = async (req, res) => {
       },
     });
 
-    console.log("relation f:", friendRelation1);
-    console.log("relation s:", friendRelation2);
     return res
       .status(200)
       .json({ message: "Friend relationship deleted successfully" });

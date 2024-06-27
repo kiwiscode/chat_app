@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-const API_URL = "http://localhost:3000";
+import config from "../../config/config";
+const API_URL = config.backendUrl;
 
 function Main() {
   const [authModal, setAuthModal] = useState(null);
@@ -68,7 +69,6 @@ function Main() {
       const response = await axios.post(`${API_URL}/auth/check-username`, {
         username: formData.username,
       });
-      console.log(response.data.message);
       setUsernameError("");
     } catch (error) {
       console.error("Error:", error);
@@ -92,7 +92,6 @@ function Main() {
       const response = await axios.post(`${API_URL}/auth/check-email`, {
         email: formData.email,
       });
-      console.log(response.data.message);
       setEmailError("");
     } catch (error) {
       console.error("Error:", error);
@@ -129,7 +128,6 @@ function Main() {
             receiverEmail: recipientEmail,
           }
         );
-        console.log("Result:", result);
         if (result.status === 201) {
           setemailVerificationCodeStatus(201);
           setemailVerificationCode(result.data.code);
@@ -167,7 +165,6 @@ function Main() {
           receiverEmail: recipientEmail,
         }
       );
-      console.log("Result:", result);
       if (result.status === 201) {
         setemailVerificationCodeStatus(201);
         setemailVerificationCode(result.data.code);
@@ -177,11 +174,9 @@ function Main() {
           setClassName("animated_border_active paused");
         }, 300);
 
-        // if (className === "animated_border_active paused") {
         setTimeout(() => {
           setShowInfoMessage(true);
         }, 450);
-        // }
 
         setTimeout(() => {
           setVerificationCodeSending(false);
@@ -256,6 +251,8 @@ function Main() {
     });
   };
 
+  const [LOG_INusernameOrEmailErr, setLOG_INusernameOrEmailErr] = useState("");
+  const [LOG_INpasswordError, setLOG_INpasswordError] = useState("");
   const handleLogin = async () => {
     try {
       const result = await axios.post(
@@ -267,25 +264,29 @@ function Main() {
           withCredentials: true,
         }
       );
-      console.log("result:", result);
-      console.log("result:status", result.status);
       if (result?.status === 200) {
         navigate("/dashboard");
         window.location.reload();
       }
     } catch (error) {
+      const { message } = error.response.data;
+      if (error.response.data.passwordError && message) {
+        setLOG_INpasswordError(message);
+        setLOG_INusernameOrEmailErr("");
+      } else if (error.response.data.authenticationError && message) {
+        setLOG_INusernameOrEmailErr(message);
+        setLOG_INpasswordError("");
+      }
       console.error("Error:", error);
     }
   };
 
-  // click outside event listener
   const divRef = useRef();
   const handleClickOutside = (event) => {
     if (divRef.current && !divRef.current.contains(event.target)) {
       setAuthModal(false);
       setShowVerificationCodeScreen(false);
       setLoginPage(false);
-      console.log("Clicked outside of div");
     }
   };
 
@@ -307,30 +308,18 @@ function Main() {
         <div
           className={
             showInfoMessageClose
-              ? `top_info_message_animation_close dflex algncenter jfycenter`
-              : `top_info_message_animation_open dflex algncenter jfycenter`
+              ? `top_info_message_animation_close dflex algncenter jfycenter w-100 z-9999 p-fix txt-alg-center`
+              : `top_info_message_animation_open dflex algncenter jfycenter w-100 z-9999 p-fix txt-alg-center`
           }
           style={{
-            width: "100%",
-            textAlign: "center",
-
-            position: "fixed",
             top: "45px",
-            zIndex: 9999,
-            // transform: "translateY(-40px)",
           }}
         >
           <div
-            className="chirp-medium-font dflex jfycenter algncenter"
+            className="chirp-medium-font dflex jfycenter algncenter fs-15 lh-20 border-r-4 bg-color-white p-12"
             style={{
               boxShadow:
                 "rgba(101, 119, 134, 0.2) 0px 0px 8px 0px, rgba(101, 119, 134, 0.25) 0px 1px 3px 1px",
-              fontSize: "15px",
-              lineHeight: "20px",
-              borderRadius: "4px",
-              padding: "12px",
-              backgroundColor: "white",
-
               gap: ".5em",
             }}
           >
@@ -358,7 +347,7 @@ function Main() {
       )}
       <div
         ref={divRef}
-        className={`color-white-text fs-15 lh-20 border-r-4 p-16 chirp-medium-font ${
+        className={`color-white-text fs-15 lh-20 border-r-4 p-16 chirp-medium-font p-fix z-1 ${
           !authModal && !showVerificationCodeScreen && !loginPage
             ? "sky-blue-btn-hover-effect pointer"
             : ""
@@ -369,20 +358,17 @@ function Main() {
           }
         }}
         style={{
-          position: "fixed",
           right: "15px",
           bottom: "15px",
           backgroundColor: "#37BCF8",
-          zIndex: 1, // Diğer içeriklerden üstte olacak
         }}
       >
         <div
-          style={{
-            pointerEvents:
-              authModal || showVerificationCodeScreen || loginPage
-                ? "none"
-                : "",
-          }}
+          className={
+            authModal || showVerificationCodeScreen || loginPage
+              ? "pointer-none"
+              : ""
+          }
         >
           Start for free
         </div>
@@ -396,11 +382,7 @@ function Main() {
           >
             <div style={{}} className="auth_signup_input">
               <label
-                className={`color-dark-text chirp-medium-font signup-input`}
-                style={{
-                  fontSize: "13px",
-                  lineHeight: "16px",
-                }}
+                className={`color-dark-text chirp-medium-font signup-input fs-13 lh-16`}
               >
                 Username
               </label>
@@ -412,24 +394,14 @@ function Main() {
               />
             </div>
             {usernameError && (
-              <div
-                style={{
-                  color: "rgba(244,39,49,255)",
-                  fontSize: "13px",
-                  lineHeight: "16px",
-                }}
-              >
+              <div className="fs-13 lh-16 err-color chirp-regular-font">
                 {usernameError}
               </div>
             )}
             <div style={{}} className="auth_signup_input">
               {" "}
               <label
-                className={`color-dark-text chirp-medium-font signup-input`}
-                style={{
-                  fontSize: "13px",
-                  lineHeight: "16px",
-                }}
+                className={`color-dark-text chirp-medium-font signup-input fs-13 lh-16`}
               >
                 Email
               </label>
@@ -441,24 +413,14 @@ function Main() {
               />
             </div>
             {emailError && (
-              <div
-                style={{
-                  color: "rgba(244,39,49,255)",
-                  fontSize: "13px",
-                  lineHeight: "16px",
-                }}
-              >
+              <div className="fs-13 lh-16 err-color chirp-regular-font">
                 {emailError}
               </div>
             )}
             <div style={{}} className="auth_signup_input">
               {" "}
               <label
-                className={`color-dark-text chirp-medium-font signup-input`}
-                style={{
-                  fontSize: "13px",
-                  lineHeight: "16px",
-                }}
+                className={`color-dark-text chirp-medium-font signup-input fs-13 lh-16`}
               >
                 Password
               </label>
@@ -470,13 +432,7 @@ function Main() {
               />
             </div>
             {passwordError && (
-              <div
-                style={{
-                  color: "rgba(244,39,49,255)",
-                  fontSize: "13px",
-                  lineHeight: "16px",
-                }}
-              >
+              <div className="fs-13 lh-16 err-color chirp-regular-font">
                 {passwordError}
               </div>
             )}
@@ -542,13 +498,7 @@ function Main() {
               )}
             </button>
             {emptyFieldsError && (
-              <div
-                style={{
-                  color: "rgba(244,39,49,255)",
-                  fontSize: "13px",
-                  lineHeight: "16px",
-                }}
-              >
+              <div className="fs-13 lh-16 err-color chirp-regular-font">
                 {emptyFieldsError}
               </div>
             )}
@@ -566,14 +516,13 @@ function Main() {
                 setLoading(false);
                 setLoginPage(true);
               }}
-              className={`color-white-text chirp-medium-font fs-15 border-r-4 sky-blue-btn-hover-effect ${
+              className={`color-white-text chirp-medium-font fs-15 border-r-4 sky-blue-btn-hover-effect b-none ${
                 !loading && "pointer"
               }`}
               style={{
                 width: "120px",
                 height: "40px",
                 backgroundColor: "#37BCF8",
-                border: "none",
                 marginTop: "4px",
                 pointerEvents: loading && "none",
               }}
@@ -585,11 +534,8 @@ function Main() {
           <>
             <>
               <div
-                className="border-r-4 parent_shadow_div auth_modal_open_active"
+                className="border-r-4 parent_shadow_div auth_modal_open_active cursor-def"
                 onClick={handleChildClick}
-                style={{
-                  cursor: "default",
-                }}
               >
                 {loading ? (
                   <LoadingSpinner
@@ -601,13 +547,7 @@ function Main() {
                     <div className="chirp-bold-font color-dark-text">
                       We sent you a code
                     </div>
-                    <div
-                      className="chirp-regular-font color-dark-text"
-                      style={{
-                        fontSize: "15px",
-                        lineHeight: "20px",
-                      }}
-                    >
+                    <div className="chirp-regular-font color-dark-text fs-15 lh-20">
                       Enter it below to verify{" "}
                       <span>
                         {formData?.email ? formData.email.toLowerCase() : ""}
@@ -615,11 +555,7 @@ function Main() {
                     </div>
                     <div style={{}} className="auth_signup_input">
                       <label
-                        className={`color-dark-text chirp-medium-font signup-input`}
-                        style={{
-                          fontSize: "13px",
-                          lineHeight: "16px",
-                        }}
+                        className={`color-dark-text chirp-medium-font signup-input fs-13 lh-16`}
                       >
                         Verification code
                       </label>
@@ -636,21 +572,11 @@ function Main() {
                       />
                     </div>
                     {invalidCodeError && verificationCode?.length && (
-                      <div
-                        style={{
-                          color: "rgba(244,39,49,255)",
-                          fontSize: "13px",
-                          lineHeight: "16px",
-                        }}
-                      >
+                      <div className="fs-13 lh-16 err-color chirp-regular-font">
                         {invalidCodeError}
                       </div>
                     )}
-                    <div
-                      style={{
-                        display: "inline",
-                      }}
-                    >
+                    <div className="d-inline">
                       <span
                         style={{
                           pointerEvents: pointerEvent,
@@ -672,7 +598,7 @@ function Main() {
                           setInvalidCodeError("Invalid verification code.");
                         }
                       }}
-                      className={`color-white-text chirp-medium-font fs-15 border-r-4   
+                      className={`color-white-text chirp-medium-font fs-15 border-r-4 b-none   
                       ${
                         verificationCode?.length
                           ? "sky-blue-btn-hover-effect pointer"
@@ -682,7 +608,6 @@ function Main() {
                         width: "120px",
                         height: "40px",
                         backgroundColor: "#37BCF8",
-                        border: "none",
                         marginTop: "36px",
                         pointerEvents: pointerEvent,
                       }}
@@ -704,13 +629,9 @@ function Main() {
                   cursor: "default",
                 }}
               >
-                <div style={{}} className="auth_signup_input">
+                <div className="auth_signup_input">
                   <label
-                    className={`color-dark-text chirp-medium-font signup-input`}
-                    style={{
-                      fontSize: "13px",
-                      lineHeight: "16px",
-                    }}
+                    className={`color-dark-text chirp-medium-font signup-input fs-13 lh-16`}
                   >
                     Username or email
                   </label>
@@ -721,15 +642,16 @@ function Main() {
                     onChange={handleChangeLoginFormData}
                   />
                 </div>
+                {LOG_INusernameOrEmailErr && (
+                  <div className="fs-13 lh-16 err-color chirp-regular-font">
+                    {LOG_INusernameOrEmailErr}
+                  </div>
+                )}
 
-                <div style={{}} className="auth_signup_input">
+                <div className="auth_signup_input">
                   {" "}
                   <label
-                    className={`color-dark-text chirp-medium-font signup-input`}
-                    style={{
-                      fontSize: "13px",
-                      lineHeight: "16px",
-                    }}
+                    className={`color-dark-text chirp-medium-font signup-input fs-13 lh-16`}
                   >
                     Password
                   </label>
@@ -740,14 +662,18 @@ function Main() {
                     onChange={handleChangeLoginFormData}
                   />
                 </div>
+                {LOG_INpasswordError && (
+                  <div className="fs-13 lh-16 err-color chirp-regular-font">
+                    {LOG_INpasswordError}
+                  </div>
+                )}
                 <button
                   onClick={handleLogin}
-                  className="color-white-text chirp-medium-font fs-15 border-r-4 pointer sky-blue-btn-hover-effect"
+                  className="color-white-text chirp-medium-font fs-15 border-r-4 pointer sky-blue-btn-hover-effect b-none"
                   style={{
                     width: "120px",
                     height: "40px",
                     backgroundColor: "#37BCF8",
-                    border: "none",
                     marginTop: "36px",
                   }}
                 >
@@ -762,7 +688,7 @@ function Main() {
                   Don't you have an account yet?
                 </div>
                 <button
-                  className="color-white-text chirp-medium-font fs-15 border-r-4 pointer dark-btn-hover-effect "
+                  className="color-white-text chirp-medium-font fs-15 border-r-4 pointer dark-btn-hover-effect b-none"
                   onClick={() => {
                     setAuthModal(true);
                     setLoginPage(false);
@@ -772,7 +698,6 @@ function Main() {
                     width: "120px",
                     height: "40px",
                     backgroundColor: "#10172A",
-                    border: "none",
                     marginTop: "4px",
                   }}
                 >
@@ -784,12 +709,10 @@ function Main() {
         ) : null}
       </div>
       <div
-        className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none p-16 chirp-regular-font`}
+        className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none p-16 chirp-regular-font p-fix z-1`}
         style={{
-          position: "fixed",
           left: "15px",
           bottom: "15px",
-          zIndex: 1, // Diğer içeriklerden üstte olacak
         }}
       >
         © Aykut Kav 2024
@@ -799,11 +722,7 @@ function Main() {
           setAuthModal(false);
         }}
       >
-        <div
-          style={{
-            width: "100%",
-          }}
-        >
+        <div className="w-100">
           <div
             className="chirp-heavy-font color-dark-text"
             style={{
@@ -862,7 +781,7 @@ function Main() {
           </div>
         </div>
         <img
-          className="p-abs"
+          className="p-abs h-100"
           src="https://tailwindui.com/img/beams-home@95.jpg"
           alt=""
           style={{
@@ -870,8 +789,7 @@ function Main() {
             width: "163rem",
             top: "-1rem",
             left: "50%",
-            height: "100%",
-            zIndex: -1, // Diğer içeriklerin altında olacak
+            zIndex: -1,
             maxWidth: "100%",
           }}
         />

@@ -1,11 +1,9 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// new conversation
 const addConversation = async (req, res) => {
   try {
     const { user1Id, user2Id } = req.body;
-    console.log("User1:", user1Id, "User2:", user2Id);
 
     if (!user1Id || !user2Id) {
       return res
@@ -13,7 +11,6 @@ const addConversation = async (req, res) => {
         .json({ error: "Both user1Id and user2Id are required." });
     }
 
-    // Check if the conversation already exists
     const existingConversation = await prisma.conversation.findFirst({
       where: {
         AND: [
@@ -39,7 +36,6 @@ const addConversation = async (req, res) => {
       return res.status(200).json(existingConversation);
     }
 
-    // Create a new conversation with members
     const newConversation = await prisma.conversation.create({
       data: {
         members: {
@@ -57,8 +53,6 @@ const addConversation = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-//get con of a user
 const getConversations = async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -87,13 +81,9 @@ const getConversations = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-// get conv includes two userId
 const getConversation = async (req, res) => {
   try {
     const { user1Id, user2Id } = req.params;
-    console.log("User1:", typeof user1Id, "User2:", typeof user2Id);
-    console.log("User1:", user1Id, "User2:", user2Id);
 
     if (!user1Id || !user2Id) {
       return res
@@ -101,7 +91,6 @@ const getConversation = async (req, res) => {
         .json({ error: "Both user1Id and user2Id are required." });
     }
 
-    // Check if the conversation already exists
     const existingConversation = await prisma.conversation.findFirst({
       where: {
         AND: [

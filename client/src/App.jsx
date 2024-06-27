@@ -1,9 +1,5 @@
-import { Suspense, lazy } from "react";
+import { Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
-
-// const Main = lazy(() => import("./pages/main/Main"));
-// const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
-
 import Sidebar from "./Components/Sidebar/Sidebar";
 import LoadingSpinner from "./Components/LoadingSpinner/LoadingSpinner";
 import { SocketProvider } from "./context/SocketContext";
@@ -11,22 +7,12 @@ import { ThemeProvider } from "./context/ThemeContext";
 import Main from "./pages/main/Main";
 import Dashboard from "./pages/dashboard/Dashboard";
 
-const API_URL = "http://localhost:3000";
-
 function App() {
   return (
     <>
       <ThemeProvider>
         <SocketProvider>
-          <div
-            style={{
-              width: "100%",
-              height: "100dvh",
-              colorScheme: "light",
-              overflowY: "auto",
-              overflowX: "hidden",
-            }}
-          >
+          <div className="w-100 h-100dvh ov-x-hid ov-y-auto color-schm-l">
             {" "}
             <Sidebar />
             <Suspense

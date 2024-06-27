@@ -1,31 +1,18 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// get all users
 const getAllUsers = async (req, res) => {
   try {
-    const users = await prisma.user.findMany();
-
-    res.status(200).json(users);
-  } catch (error) {
-    console.error("Error while fetching users:", error);
-    res.status(500).json({
-      message:
-        "An error occurred while fetching users . Please try again later.",
-    });
-  }
-};
-
-// get user
-const getUser = async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const user = await prisma.user.findUnique({
-      where: {
-        id: parseInt(userId),
-      },
-
-      include: {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        active: true,
+        createdAt: true,
+        updatedAt: true,
+        conversations: true,
+        profilePicture: true,
         sentCoworkerRequests: {
           include: {
             recipient: true,
@@ -52,11 +39,78 @@ const getUser = async (req, res) => {
         },
         coworkers: {
           include: {
+            coworker: true,
             user: true,
           },
         },
         friends: {
           include: {
+            friend: true,
+            user: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error while fetching users:", error);
+    res.status(500).json({
+      message:
+        "An error occurred while fetching users . Please try again later.",
+    });
+  }
+};
+const getUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: parseInt(userId),
+      },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        active: true,
+        createdAt: true,
+        updatedAt: true,
+        conversations: true,
+        profilePicture: true,
+        sentCoworkerRequests: {
+          include: {
+            recipient: true,
+            requester: true,
+          },
+        },
+        receivedCoworkerRequests: {
+          include: {
+            recipient: true,
+            requester: true,
+          },
+        },
+        sentFriendRequests: {
+          include: {
+            recipient: true,
+            requester: true,
+          },
+        },
+        receivedFriendRequests: {
+          include: {
+            recipient: true,
+            requester: true,
+          },
+        },
+        coworkers: {
+          include: {
+            coworker: true,
+            user: true,
+          },
+        },
+        friends: {
+          include: {
+            friend: true,
             user: true,
           },
         },

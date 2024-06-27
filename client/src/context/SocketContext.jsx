@@ -1,21 +1,20 @@
 import { createContext, useContext, useEffect } from "react";
 import { io } from "socket.io-client";
+import config from "../config/config";
 const SocketContext = createContext();
 
 export const useSocket = () => {
   return useContext(SocketContext);
 };
 
-const socket = io("http://localhost:3000");
+const socket = io(config.backendUrl);
 
 export const SocketProvider = ({ children }) => {
   useEffect(() => {
-    // Socket ile bağlantı kurulduğunda yapılacak işlemler
     socket.on("connect", () => {
       console.log("Connected to socket server:", socket.id);
     });
 
-    // Socket bağlantısı kesildiğinde yapılacak işlemler
     socket.on("disconnect", () => {
       console.log("Disconnected from socket server");
     });

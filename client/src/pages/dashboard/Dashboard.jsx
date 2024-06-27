@@ -7,11 +7,13 @@ import { Avatar, AvatarGroup, Popover, Modal } from "@mui/material";
 import PopupState, { bindTrigger, bindPopover } from "material-ui-popup-state";
 import { ThemeContext } from "../../context/ThemeContext";
 import { useAntdMessageHandler } from "../../utils/useAntdMessageHandler";
-
-const API_URL = "http://localhost:3000";
+import useWindowDimensions from "../../utils/window-dimensions";
+import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
+import config from "../../config/config";
+const API_URL = config.backendUrl;
 
 function Dashboard() {
-  const { user } = useUser();
+  const { user, refreshUser } = useUser();
   const { showCustomMessage, contextHolder } = useAntdMessageHandler();
   const navigate = useNavigate();
   useEffect(() => {
@@ -24,6 +26,7 @@ function Dashboard() {
   const [searchInput, setSearchInput] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState("");
+  const { width } = useWindowDimensions();
   // chatting conversation start to check
 
   const getAllUsers = async () => {
@@ -31,7 +34,6 @@ function Dashboard() {
       const result = await axios.get(`${API_URL}/users`, {
         withCredentials: true,
       });
-
       setUsers(result.data);
     } catch (error) {
       console.error("error:", error);
@@ -41,8 +43,6 @@ function Dashboard() {
 
   const filterUsers = (array, searchStr) => {
     const toLowerCaseSearchStr = searchStr.toLowerCase();
-    console.log("search str:", toLowerCaseSearchStr);
-    console.log("user coworkers:", user.coworkers);
     if (showSearchPeopleModal) {
       const filteredArray = array.filter((eachUser) => {
         return (
@@ -79,6 +79,7 @@ function Dashboard() {
   }, [searchInput]);
 
   useEffect(() => {
+    refreshUser();
     getAllUsers();
   }, []);
 
@@ -128,9 +129,12 @@ function Dashboard() {
           withCredentials: true,
         }
       );
+      if (user?.id) {
+        getConversations();
+      }
+
       getMessages();
       setMessage("");
-
       socket.emit("sendMessage", {
         senderId: user?.id,
         receiverId: selectedUser?.id,
@@ -143,12 +147,13 @@ function Dashboard() {
   };
 
   // get conversations
+  const [loading, setLoading] = useState(null);
   const getConversations = async () => {
     try {
       const result = await axios.get(`${API_URL}/conversations/${user?.id}`, {
         withCredentials: true,
       });
-
+      setLoading(false);
       setConversations(result.data);
     } catch (error) {
       console.log("error:", error);
@@ -157,10 +162,24 @@ function Dashboard() {
   };
 
   useEffect(() => {
+    setLoading(true);
     if (user?.id) {
       getConversations();
     }
   }, [user?.id]);
+
+  useEffect(() => {
+    if (user?.id) {
+      refreshUser();
+      getConversations();
+      const interval = setInterval(() => {
+        refreshUser();
+        getConversations();
+      }, 30000);
+
+      return () => clearInterval(interval);
+    }
+  }, []);
 
   const findMemberNotEqualUser = (array) => {
     const filteredArray = array?.filter((eachMember) => {
@@ -172,6 +191,13 @@ function Dashboard() {
 
   // get conv includes two userId
   const getConversation = async (selectedUser) => {
+    if (!selectedUser) {
+      console.error(
+        "selectedUser is null or undefined, cannot fetch conversation."
+      );
+      return;
+    }
+
     try {
       const result = await axios.get(
         `${API_URL}/conversations/find/${user?.id}/${selectedUser?.id}`,
@@ -197,6 +223,9 @@ function Dashboard() {
           withCredentials: true,
         }
       );
+      if (user?.id) {
+        getConversations();
+      }
       setConversation(result.data);
     } catch (error) {
       console.log("error:", error);
@@ -253,7 +282,7 @@ function Dashboard() {
   }, [arrivalMessage]);
 
   // show search input modal
-  const [show, setShow] = useState(null);
+  const [show, setShow] = useState(false);
   const [index, setIndex] = useState(1);
   const [arrowAnimationStatusForward, setArrowAnimationStatusForward] =
     useState(false);
@@ -311,75 +340,43 @@ function Dashboard() {
   }, [count, toggleTheme]);
 
   // search user modal
-  const [showSearchPeopleModal, setShowSearchPeopleModal] = useState(null);
+  const [showSearchPeopleModal, setShowSearchPeopleModal] = useState(false);
   const searchPeopleModal = () => {
+    refreshUser();
+    getAllUsers();
     setShowSearchPeopleModal(true);
   };
   const handleCloseSearchPeopleModal = () => {
     setShowSearchPeopleModal(false);
     setFilteredUsers(null);
+    setSearchInput("");
   };
 
   // search coworker modal
-  const [showSearchCoworkerModal, setShowSearchCoworkerModal] = useState(null);
+  const [showSearchCoworkerModal, setShowSearchCoworkerModal] = useState(false);
   const searchCoworkerModal = () => {
     setShowSearchCoworkerModal(true);
   };
   const handleCloseSearchCoworkerModal = () => {
     setShowSearchCoworkerModal(false);
     setFilteredUsers(null);
+    setSearchInput("");
   };
 
   // search friend modal
-  const [showSearchFriendModal, setShowSearchFriendModal] = useState(null);
+  const [showSearchFriendModal, setShowSearchFriendModal] = useState(false);
   const searchFriendModal = () => {
     setShowSearchFriendModal(true);
   };
   const handleCloseSearchFriendModal = () => {
     setShowSearchFriendModal(false);
     setFilteredUsers(null);
+    setSearchInput("");
   };
 
   // manage request start to check
-  // ui setting / request options
-  const [requests, setRequests] = useState({
-    sentCoworkerRequests: [],
-    sentFriendRequests: [],
-  });
   const [hovered, setHovered] = useState(null);
 
-  const requestedCoworkerUserIds = () => {
-    return requests?.sentCoworkerRequests?.map((eachRequest) => {
-      return eachRequest.recipientId;
-    });
-  };
-
-  const requestedFriendUserIds = () => {
-    return requests?.sentFriendRequests?.map((eachRequest) => {
-      return eachRequest.recipientId;
-    });
-  };
-
-  // get coworker requests
-  const getSentCoworkerRequests = async () => {
-    try {
-      const result = await axios.get(
-        `${API_URL}/${user?.id}/coworker-requests`,
-        {
-          withCredentials: true,
-        }
-      );
-      console.log("Sent coworker requests:", result.data);
-      const { sentCoworkerRequests } = result?.data;
-      setRequests((prev) => ({
-        ...prev,
-        sentCoworkerRequests: sentCoworkerRequests,
-      }));
-    } catch (error) {
-      console.error("error:", error);
-      throw error;
-    }
-  };
   // send coworker request
   const sendCoworkerRequest = async (requesterId, recipientId) => {
     try {
@@ -393,7 +390,6 @@ function Dashboard() {
           withCredentials: true,
         }
       );
-      getSentCoworkerRequests();
       const { status, message, reverseRequest } = result.data;
       if (status === "reverse_request_accepted") {
         setShowSearchPeopleModal(false);
@@ -402,6 +398,8 @@ function Dashboard() {
           6
         );
       }
+      refreshUser();
+      getAllUsers();
     } catch (error) {
       console.error("error:", error);
       throw error;
@@ -409,62 +407,41 @@ function Dashboard() {
   };
   // cancel coworker request
   const [showCancelCoworkerReqModal, setShowCancelCoworkerReqModal] =
-    useState(null);
+    useState(false);
   const [recipientInfoCancelCReq, setRecipientInfoCancelCReq] = useState(null);
-  const [requestId, setRequestId] = useState(null);
+  const [recipientId, setRecipientId] = useState(null);
   const openCancelCReqModal = (recipient) => {
     setShowCancelFriendReqModal(false);
     setShowCancelCoworkerReqModal(true);
+    setRecipientInfoCancelFReq(null);
     setRecipientInfoCancelCReq(recipient);
+    setRecipientId(recipient.id);
   };
   const closeCancelCreqModal = () => {
     setShowCancelCoworkerReqModal(false);
   };
-  const cancelCoworkerRequest = async (requestId) => {
-    if (!requestId) {
-      console.error("No requestId provided for canceling coworker request");
-      return;
-    }
+
+  const coworkerRequestId = user?.sentCoworkerRequests?.filter((eachReq) => {
+    return eachReq.recipientId === recipientId;
+  });
+
+  const cancelCoworkerRequest = async () => {
     try {
-      const result = await axios.delete(
-        `${API_URL}/coworker-requests/${requestId}`
+      await axios.delete(
+        `${API_URL}/coworker-requests/${coworkerRequestId[0]?.id}`
       );
-      console.log("canceling coworker request with ID:", requestId);
-      console.log("result:", result);
-      setRequestId(null);
+      setShowCancelFriendReqModal(false);
       setShowCancelCoworkerReqModal(false);
-      getSentCoworkerRequests();
+      setRecipientInfoCancelCReq(null);
+      setRecipientInfoCancelFReq(null);
+      refreshUser();
+      getAllUsers();
     } catch (error) {
       console.error("error:", error);
       throw error;
     }
   };
 
-  const findRequestIdInSentCRequests = () => {
-    const foundRequest = requests?.sentCoworkerRequests?.find(
-      (request) => request.recipientId === recipientInfoCancelCReq.id
-    );
-    console.log("found request c:", foundRequest);
-    setRequestId(foundRequest?.id);
-  };
-
-  // get friend requests
-  const getSentFriendRequests = async () => {
-    try {
-      const result = await axios.get(`${API_URL}/${user?.id}/friend-requests`, {
-        withCredentials: true,
-      });
-      console.log("Sent friend requests:", result.data);
-      const { sentFriendRequests } = result?.data;
-      setRequests((prev) => ({
-        ...prev,
-        sentFriendRequests: sentFriendRequests,
-      }));
-    } catch (error) {
-      console.error("error:", error);
-      throw error;
-    }
-  };
   // send friend request
   const sendFriendRequest = async (requesterId, recipientId) => {
     try {
@@ -478,7 +455,7 @@ function Dashboard() {
           withCredentials: true,
         }
       );
-      getSentFriendRequests();
+
       const { status, message, reverseRequest } = result.data;
       if (status === "reverse_request_accepted") {
         setShowSearchPeopleModal(false);
@@ -487,6 +464,8 @@ function Dashboard() {
           6
         );
       }
+      refreshUser();
+      getAllUsers();
     } catch (error) {
       console.error("error:", error);
       throw error;
@@ -495,87 +474,56 @@ function Dashboard() {
   // cancel friend request
   const [recipientInfoCancelFReq, setRecipientInfoCancelFReq] = useState(null);
   const [showCancelFriendReqModal, setShowCancelFriendReqModal] =
-    useState(null);
+    useState(false);
+  const [recipientIdF, setRecipientIdF] = useState(null);
 
   const openCancelFReqModal = (recipient) => {
     setShowCancelFriendReqModal(true);
     setShowCancelCoworkerReqModal(false);
+    setRecipientInfoCancelCReq(null);
     setRecipientInfoCancelFReq(recipient);
+    setRecipientIdF(recipient.id);
   };
   const closeCancelFReqModal = () => {
     setShowCancelFriendReqModal(false);
   };
-  const cancelFriendRequest = async (requestId) => {
-    if (!requestId) {
-      console.error("No requestId provided for canceling friend request");
-      return;
-    }
-    try {
-      const result = await axios.delete(
-        `${API_URL}/friend-requests/${requestId}`
-      );
-      console.log("canceling coworker request with ID:", requestId);
-      console.log("result:", result);
 
-      setRequestId(null);
+  const friendRequestId = user?.sentFriendRequests?.filter((eachReq) => {
+    return eachReq.recipientId === recipientIdF;
+  });
+  const cancelFriendRequest = async () => {
+    try {
+      await axios.delete(
+        `${API_URL}/friend-requests/${friendRequestId[0]?.id}`
+      );
       setShowCancelFriendReqModal(false);
-      getSentFriendRequests();
+      setShowCancelCoworkerReqModal(false);
+      setRecipientInfoCancelCReq(null);
+      setRecipientInfoCancelFReq(null);
+      refreshUser();
+      getAllUsers();
     } catch (error) {
       console.error("error:", error);
       throw error;
     }
   };
 
-  console.log("requestid:", requestId);
-
-  const findRequestIdInSentFRequests = () => {
-    const foundRequest = requests?.sentFriendRequests?.find(
-      (request) => request.recipientId === recipientInfoCancelFReq.id
-    );
-    console.log("found request f:", foundRequest);
-    setRequestId(foundRequest?.id);
-  };
-
-  useEffect(() => {
-    if (recipientInfoCancelFReq) {
-      findRequestIdInSentFRequests();
-      console.log("friend request id:", requestId);
-    } else if (recipientInfoCancelCReq) {
-      findRequestIdInSentCRequests();
-      console.log("coworker request id:", requestId);
-    }
-  }, [recipientInfoCancelFReq, recipientInfoCancelCReq, requestId]);
   // manage request finish to check
-
-  console.log("state requests sent:", requests);
-
-  useEffect(() => {
-    if (user?.id) {
-      getSentCoworkerRequests();
-      getSentFriendRequests();
-    }
-  }, [user?.id]);
 
   // friends list management
   const [coworkerIds, setCoworkerIds] = useState([]);
+  const [friendIds, setFriendIds] = useState([]);
   const getCoworkerIds = () => {
     const coworkerIds = user?.coworkers?.map((eachCoworker) => {
       return eachCoworker.coworkerId;
     });
-    console.log("coworkerids:", coworkerIds);
-    if (coworkerIds) {
-      setCoworkerIds(coworkerIds);
-    }
+    return coworkerIds;
   };
-  const [friendIds, setFriendIds] = useState([]);
   const getFriendIds = () => {
     const friendIds = user?.friends?.map((eachFriend) => {
       return eachFriend.friendId;
     });
-    console.log("friendids:", friendIds);
-    if (friendIds) {
-      setFriendIds(friendIds);
-    }
+    return friendIds;
   };
 
   useEffect(() => {
@@ -587,41 +535,320 @@ function Dashboard() {
     }
   }, [user?.coworkers, user?.friends]);
 
+  // remove coworker
+  const [showRemoveCoworkerModal, setShowRemoveCoworkerModal] = useState(false);
+  const [coworkerToRemove, setCoworkerToRemove] = useState(false);
+
+  const openRemoveCoworkerModal = (userToRemove) => {
+    setShowRemoveCoworkerModal(true);
+    setCoworkerToRemove(userToRemove);
+  };
+  const closeRemoveCoworkerModal = () => {
+    setShowRemoveCoworkerModal(false);
+    setCoworkerToRemove(null);
+  };
+
+  const removeCoworker = async (userId) => {
+    try {
+      await axios.delete(`${API_URL}/coworker/${userId}/users/${user?.id}`);
+      setShowRemoveCoworkerModal(false);
+      setCoworkerToRemove(null);
+      refreshUser();
+      getAllUsers();
+    } catch (error) {
+      console.error("error:", error);
+      throw error;
+    }
+  };
+
+  // remove friend
+  const [showRemoveFriendModal, setShowRemoveFriendModal] = useState(false);
+  const [friendToRemove, setFriendToRemove] = useState(false);
+
+  const openRemoveFriendModal = (userToRemove) => {
+    setShowRemoveFriendModal(true);
+    setFriendToRemove(userToRemove);
+  };
+  const closeRemoveFriendModal = () => {
+    setShowRemoveFriendModal(false);
+    setFriendToRemove(null);
+  };
+
+  const removeFriend = async (userId) => {
+    try {
+      await axios.delete(`${API_URL}/friend/${userId}/users/${user?.id}`);
+      setShowRemoveFriendModal(false);
+      setFriendToRemove(null);
+      refreshUser();
+      getAllUsers();
+    } catch (error) {
+      console.error("error:", error);
+      throw error;
+    }
+  };
+
+  // useEffect(() => {
+  //   getAllUsers();
+  // }, [user]);
+
+  // find pending requests
+  const requestedCoworkerUserIdsStatusPENDING = () => {
+    return user?.sentCoworkerRequests
+      ?.filter((eachRequest) => {
+        return (
+          eachRequest.requesterId === user.id &&
+          eachRequest.status === "pending"
+        );
+      })
+      .map((eachRequest) => eachRequest.recipientId);
+  };
+
+  const requestedFriendUserIdsStatusPENDING = () => {
+    return user?.sentFriendRequests
+      ?.filter((eachRequest) => {
+        return (
+          eachRequest.requesterId === user.id &&
+          eachRequest.status === "pending"
+        );
+      })
+      .map((eachRequest) => eachRequest.recipientId);
+  };
+
   return (
     <>
       {" "}
       {contextHolder}
+      {/* showRemoveCoworkerModal */}
+      <>
+        <Modal
+          className="z-9999 p-0 m-0"
+          open={showRemoveCoworkerModal}
+          onClose={closeRemoveCoworkerModal}
+          sx={{
+            "& > .MuiBackdrop-root": {
+              opacity: "0.8 !important",
+            },
+          }}
+        >
+          <div
+            className="shadow_div_white p-abs border-r-4 none-outline border-r-16"
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              maxWidth: 320,
+            }}
+          >
+            <div className="dflex fdir-column p-32">
+              <span
+                style={{
+                  marginBottom: "8px",
+                }}
+                className="fs-20 lh-24 chirp-bold-font"
+              >
+                Remove coworker?
+              </span>
+              <div
+                className="fs-15 lh-20 chirp-regular-font w-100 txt-alg-left"
+                style={{
+                  color: "rgb(83, 100, 113)",
+                }}
+              >
+                <span
+                  style={{
+                    wordWrap: "break-word",
+                    textOverflow: "unset",
+                    minWidth: "0px",
+                    textAlign: "inherit",
+                    whiteSpace: "break-spaces",
+                  }}
+                >
+                  Are you sure you want to remove @{coworkerToRemove?.username}{" "}
+                  from your coworkers list? This will delete the coworker
+                  relationship, and you both will no longer see each other in
+                  your coworkers list.
+                </span>
+              </div>
+              <div
+                className="dflex jfycenter algncenter fdir-column"
+                style={{
+                  marginTop: "24px",
+                }}
+              >
+                <button
+                  onClick={() => {
+                    removeCoworker(coworkerToRemove?.id);
+                  }}
+                  style={{
+                    marginBottom: "12px",
+                    minHeight: "44px",
+                    minWidth: "44px",
+                    paddingLeft: "24px",
+                    paddingRight: "24px",
+                    backgroundColor: "rgb(244,33,45)",
+                    color: "rgb(231, 233, 234)",
+                    border: "1px solid rgb(207, 217, 222)",
+                  }}
+                  className="w-100 border-r-999 fs-15 lh-20 chirp-bold-font red-btn-hover-effect pointer"
+                >
+                  <div className="w-100 txt-alg-center">Remove</div>
+                </button>
+                <button
+                  onClick={() => {
+                    closeRemoveCoworkerModal();
+                  }}
+                  style={{
+                    marginBottom: "12px",
+                    minHeight: "44px",
+                    minWidth: "44px",
+                    paddingLeft: "24px",
+                    paddingRight: "24px",
+                    backgroundColor: "transparent",
+                    color: "rgb(16, 23, 42)",
+                    border: "1px solid rgb(207, 217, 222)",
+                  }}
+                  className="w-100 border-r-999 fs-15 lh-20 chirp-bold-font cancel_btn_hover_effect pointer"
+                >
+                  <div className="w-100 txt-alg-center">Cancel</div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      </>
+      {/* showRemoveCoworkerModal */}
+      {/* showRemoveFriendModal */}
+      <>
+        <Modal
+          className="z-9999 p-0 m-0"
+          open={showRemoveFriendModal}
+          onClose={closeRemoveFriendModal}
+          sx={{
+            "& > .MuiBackdrop-root": {
+              opacity: "0.8 !important",
+            },
+          }}
+        >
+          <div
+            className="shadow_div_white p-abs border-r-4 none-outline border-r-16"
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              maxWidth: 320,
+            }}
+          >
+            <div className="dflex fdir-column p-32">
+              <span
+                style={{
+                  marginBottom: "8px",
+                }}
+                className="fs-20 lh-24 chirp-bold-font"
+              >
+                Remove friend?
+              </span>
+              <div
+                className="fs-15 lh-20 chirp-regular-font w-100 txt-alg-left"
+                style={{
+                  color: "rgb(83, 100, 113)",
+                }}
+              >
+                <span
+                  style={{
+                    wordWrap: "break-word",
+                    textOverflow: "unset",
+                    minWidth: "0px",
+                    textAlign: "inherit",
+                    whiteSpace: "break-spaces",
+                  }}
+                >
+                  Are you sure you want to remove @{friendToRemove?.username}{" "}
+                  from your friends list? This will delete your friendship, and
+                  you both will no longer see each other in your friends list.
+                </span>
+              </div>
+              <div
+                className="dflex jfycenter algncenter fdir-column"
+                style={{
+                  marginTop: "24px",
+                }}
+              >
+                <button
+                  onClick={() => {
+                    removeFriend(friendToRemove?.id);
+                  }}
+                  style={{
+                    marginBottom: "12px",
+                    minHeight: "44px",
+                    minWidth: "44px",
+                    paddingLeft: "24px",
+                    paddingRight: "24px",
+                    backgroundColor: "rgb(244,33,45)",
+                    color: "rgb(231, 233, 234)",
+                    border: "1px solid rgb(207, 217, 222)",
+                  }}
+                  className="w-100 border-r-999 fs-15 lh-20 chirp-bold-font red-btn-hover-effect pointer"
+                >
+                  <div className="w-100 txt-alg-center">Remove</div>
+                </button>
+                <button
+                  onClick={() => {
+                    closeRemoveFriendModal();
+                  }}
+                  style={{
+                    marginBottom: "12px",
+                    minHeight: "44px",
+                    minWidth: "44px",
+                    paddingLeft: "24px",
+                    paddingRight: "24px",
+                    backgroundColor: "transparent",
+                    color: "rgb(16, 23, 42)",
+                    border: "1px solid rgb(207, 217, 222)",
+                  }}
+                  className="w-100 border-r-999 fs-15 lh-20 chirp-bold-font cancel_btn_hover_effect pointer"
+                >
+                  <div className="w-100 txt-alg-center">Cancel</div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      </>
+      {/* showRemoveFriendModal */}
       {/* showCancelFriendReqModal */}
       <>
         <Modal
           className="z-9999 p-0 m-0"
           open={showCancelFriendReqModal}
           onClose={closeCancelFReqModal}
+          sx={{
+            "& > .MuiBackdrop-root": {
+              opacity: "0.8 !important",
+            },
+          }}
         >
           <div
-            className="shadow_div_white p-abs border-r-4 none-outline"
+            className="shadow_div_white p-abs border-r-4 none-outline border-r-16"
             style={{
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
               maxWidth: 320,
-              maxHeight: 280,
             }}
           >
-            <div
-              className="dflex fdir-column"
-              style={{
-                padding: "32px",
-              }}
-            >
-              <span className="fs-20 lh-24 chirp-bold-font">
+            <div className="dflex fdir-column p-32">
+              <span
+                style={{
+                  marginBottom: "8px",
+                }}
+                className="fs-20 lh-24 chirp-bold-font"
+              >
                 Discard friend request?
               </span>
               <div
-                className="fs-15 lh-20 chirp-regular-font w-100"
+                className="fs-15 lh-20 chirp-regular-font w-100 txt-alg-left"
                 style={{
                   color: "rgb(83, 100, 113)",
-                  textAlign: "left",
                 }}
               >
                 <span
@@ -645,13 +872,12 @@ function Dashboard() {
               >
                 <button
                   onClick={() => {
-                    cancelFriendRequest(requestId);
+                    cancelFriendRequest();
                   }}
                   style={{
                     marginBottom: "12px",
                     minHeight: "44px",
                     minWidth: "44px",
-                    borderRadius: "9999px",
                     paddingLeft: "24px",
                     paddingRight: "24px",
                     backgroundColor: "#0F141A",
@@ -660,17 +886,15 @@ function Dashboard() {
                   }}
                   className="w-100 border-r-999 fs-15 lh-20 chirp-bold-font dark_btn_hover_effect pointer"
                 >
-                  <div
-                    style={{
-                      width: "100%",
-                      textAlign: "center",
-                    }}
-                  >
-                    Discard
-                  </div>
+                  <div className="w-100 txt-alg-center">Discard</div>
                 </button>
                 <button
-                  onClick={() => setShowCancelFriendReqModal(false)}
+                  onClick={() => {
+                    setShowCancelFriendReqModal(false);
+                    setShowCancelCoworkerReqModal(false);
+                    setRecipientInfoCancelCReq(null);
+                    setRecipientInfoCancelFReq(null);
+                  }}
                   style={{
                     marginBottom: "12px",
                     minHeight: "44px",
@@ -683,14 +907,7 @@ function Dashboard() {
                   }}
                   className="w-100 border-r-999 fs-15 lh-20 chirp-bold-font cancel_btn_hover_effect pointer"
                 >
-                  <div
-                    style={{
-                      width: "100%",
-                      textAlign: "center",
-                    }}
-                  >
-                    Cancel
-                  </div>
+                  <div className="w-100 txt-alg-center">Cancel</div>
                 </button>
               </div>
             </div>
@@ -703,31 +920,34 @@ function Dashboard() {
           className="z-9999 p-0 m-0"
           open={showCancelCoworkerReqModal}
           onClose={closeCancelCreqModal}
+          sx={{
+            "& > .MuiBackdrop-root": {
+              opacity: "0.8 !important",
+            },
+          }}
         >
           <div
-            className="shadow_div_white p-abs border-r-4 none-outline"
+            className="shadow_div_white p-abs border-r-4 none-outline border-r-16"
             style={{
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
               maxWidth: 320,
-              maxHeight: 280,
             }}
           >
-            <div
-              className="dflex fdir-column"
-              style={{
-                padding: "32px",
-              }}
-            >
-              <span className="fs-20 lh-24 chirp-bold-font">
+            <div className="dflex fdir-column p-32">
+              <span
+                style={{
+                  marginBottom: "8px",
+                }}
+                className="fs-20 lh-24 chirp-bold-font"
+              >
                 Discard coworker request?
               </span>
               <div
-                className="fs-15 lh-20 chirp-regular-font w-100"
+                className="fs-15 lh-20 chirp-regular-font w-100 txt-alg-left"
                 style={{
                   color: "rgb(83, 100, 113)",
-                  textAlign: "left",
                 }}
               >
                 <span
@@ -751,13 +971,12 @@ function Dashboard() {
               >
                 <button
                   onClick={() => {
-                    cancelCoworkerRequest(requestId);
+                    cancelCoworkerRequest();
                   }}
                   style={{
                     marginBottom: "12px",
                     minHeight: "44px",
                     minWidth: "44px",
-                    borderRadius: "9999px",
                     paddingLeft: "24px",
                     paddingRight: "24px",
                     backgroundColor: "#0F141A",
@@ -766,17 +985,15 @@ function Dashboard() {
                   }}
                   className="w-100 border-r-999 fs-15 lh-20 chirp-bold-font dark_btn_hover_effect pointer"
                 >
-                  <div
-                    style={{
-                      width: "100%",
-                      textAlign: "center",
-                    }}
-                  >
-                    Discard
-                  </div>
+                  <div className="w-100 txt-alg-center">Discard</div>
                 </button>
                 <button
-                  onClick={() => setShowCancelCoworkerReqModal(false)}
+                  onClick={() => {
+                    setShowCancelFriendReqModal(false);
+                    setShowCancelCoworkerReqModal(false);
+                    setRecipientInfoCancelCReq(null);
+                    setRecipientInfoCancelFReq(null);
+                  }}
                   style={{
                     marginBottom: "12px",
                     minHeight: "44px",
@@ -789,14 +1006,7 @@ function Dashboard() {
                   }}
                   className="w-100 border-r-999 fs-15 lh-20 chirp-bold-font cancel_btn_hover_effect pointer"
                 >
-                  <div
-                    style={{
-                      width: "100%",
-                      textAlign: "center",
-                    }}
-                  >
-                    Cancel
-                  </div>
+                  <div className="w-100 txt-alg-center">Cancel</div>
                 </button>
               </div>
             </div>
@@ -809,6 +1019,11 @@ function Dashboard() {
           className="z-9999 p-0 m-0"
           open={showSearchPeopleModal}
           onClose={handleCloseSearchPeopleModal}
+          sx={{
+            "& > .MuiBackdrop-root": {
+              opacity: "0.8 !important",
+            },
+          }}
         >
           <div
             className="shadow_div_white p-abs border-r-4 none-outline"
@@ -816,31 +1031,25 @@ function Dashboard() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              width: 600,
-              height: 600,
+              width: width <= 768 ? "100%" : 600,
+              height: width <= 768 ? "100%" : 600,
             }}
           >
             <div
-              className="shadow_div_white p-16 p-abs border-r-4"
+              className="shadow_div_white p-16 p-abs border-r-4 p-fix z-9999 border-r-16"
               style={{
-                width: "600px",
-                maxWidth: "600px",
-                height: "600px",
-                position: "fixed",
+                width: width <= 768 ? "100%" : "600px",
+                height: width <= 768 ? "100%" : "600px",
+                maxWidth: width <= 768 ? "100%" : "600px",
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 minWidth: "fit-content",
-                zIndex: 9999, // Ensure it's above other elements
               }}
             >
               <div
+                className="p-abs border-r-50 pointer"
                 onClick={handleCloseSearchPeopleModal}
-                style={{
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                  position: "absolute",
-                }}
               >
                 <div
                   className="dflex jfycenter algncenter border-r-50 hover_close_btn"
@@ -927,34 +1136,26 @@ function Dashboard() {
                                 {eachUser.profilePicture !==
                                 "default_profile_picture_url" ? (
                                   <div
+                                    className="dflex jfycenter algncenter border-r-50"
                                     style={{
                                       width: "44px",
                                       height: "44px",
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      borderRadius: "50%",
                                     }}
                                   >
                                     <img
+                                      className="border-r-50"
                                       src={eachUser.profilePicture}
                                       width={40}
                                       height={40}
                                       alt=""
-                                      style={{
-                                        borderRadius: "50%",
-                                      }}
                                     />{" "}
                                   </div>
                                 ) : (
                                   <div
+                                    className="dflex jfycenter algncenter border-r-50"
                                     style={{
                                       width: "44px",
                                       height: "44px",
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      borderRadius: "50%",
                                     }}
                                     href=""
                                   >
@@ -963,10 +1164,7 @@ function Dashboard() {
                                       width="40"
                                       height="40"
                                       fill={"rgb(83, 100, 113)"}
-                                      style={{
-                                        borderRadius: "50%",
-                                      }}
-                                      className="bi bi-person-circle"
+                                      className="bi bi-person-circle border-r-50"
                                       viewBox="0 0 16 16"
                                     >
                                       <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
@@ -991,43 +1189,44 @@ function Dashboard() {
                                     setHovered({
                                       id: eachUser.id,
                                       option: "coworker",
-                                      isAlreadyCoworker: coworkerIds.includes(
-                                        eachUser.id
-                                      ),
+                                      isAlreadyCoworker:
+                                        getCoworkerIds().includes(eachUser.id),
                                       itemIndex: itemIndex,
                                     })
                                   }
                                   onMouseLeave={() => setHovered(null)}
                                   onClick={() => {
                                     if (
-                                      !requestedCoworkerUserIds().includes(
+                                      !requestedCoworkerUserIdsStatusPENDING().includes(
                                         eachUser.id
                                       ) &&
-                                      !coworkerIds.includes(eachUser.id)
+                                      !getCoworkerIds().includes(eachUser.id)
                                     ) {
                                       sendCoworkerRequest(
                                         user?.id,
                                         eachUser.id
                                       );
                                     } else if (
-                                      coworkerIds.includes(eachUser.id)
+                                      getCoworkerIds().includes(eachUser.id)
                                     ) {
-                                      // openRemoveCoworkerModal()
+                                      openRemoveCoworkerModal(eachUser);
                                     } else {
                                       openCancelCReqModal(eachUser);
                                     }
                                   }}
                                   className={`fs-14 lh-16 chirp-bold-font jfycenter algncenter pointer circle_hover_accept ${
-                                    (requestedCoworkerUserIds().includes(
+                                    (requestedCoworkerUserIdsStatusPENDING().includes(
                                       eachUser.id
                                     ) ||
-                                      coworkerIds.includes(eachUser.id)) &&
+                                      getCoworkerIds().includes(eachUser.id)) &&
                                     !hovered?.isAlreadyCoworker
                                       ? "cancel_btn_hover_effect"
-                                      : (requestedCoworkerUserIds().includes(
+                                      : (requestedCoworkerUserIdsStatusPENDING().includes(
                                           eachUser.id
                                         ) ||
-                                          coworkerIds.includes(eachUser.id)) &&
+                                          getCoworkerIds().includes(
+                                            eachUser.id
+                                          )) &&
                                         hovered?.isAlreadyCoworker
                                       ? "circle_hover_reject"
                                       : "dark_btn_hover_effect"
@@ -1047,58 +1246,80 @@ function Dashboard() {
                                     minHeight: "32px",
                                     padding: "0px 16px",
                                     color:
-                                      (requestedCoworkerUserIds().includes(
+                                      (requestedCoworkerUserIdsStatusPENDING().includes(
                                         eachUser.id
                                       ) ||
-                                        coworkerIds.includes(eachUser.id)) &&
+                                        getCoworkerIds().includes(
+                                          eachUser.id
+                                        )) &&
                                       !hovered?.isAlreadyCoworker
                                         ? "rgb(16, 23, 42)"
-                                        : (requestedCoworkerUserIds().includes(
+                                        : (requestedCoworkerUserIdsStatusPENDING().includes(
                                             eachUser.id
                                           ) ||
-                                            coworkerIds.includes(
+                                            getCoworkerIds().includes(
                                               eachUser.id
                                             )) &&
                                           hovered?.isAlreadyCoworker &&
                                           hovered?.itemIndex === itemIndex
                                         ? "rgb(244, 33, 46)"
                                         : hovered?.itemIndex !== itemIndex &&
-                                          requestedCoworkerUserIds().includes(
+                                          requestedCoworkerUserIdsStatusPENDING().includes(
                                             eachUser.id
                                           )
                                         ? "rgb(16, 23, 42)"
+                                        : getCoworkerIds().includes(eachUser.id)
+                                        ? "rgb(16, 23, 42)"
                                         : "rgb(231, 233, 234)",
                                     backgroundColor:
-                                      requestedCoworkerUserIds().includes(
+                                      requestedCoworkerUserIdsStatusPENDING().includes(
                                         eachUser.id
-                                      ) || coworkerIds.includes(eachUser.id)
+                                      ) ||
+                                      getCoworkerIds().includes(eachUser.id)
                                         ? "transparent"
                                         : "#0F141A",
+                                    overflow: "hidden",
+                                    position: "relative",
+                                    minWidth: "166px",
+                                    boxSizing: "border-box",
                                   }}
                                 >
-                                  {coworkerIds.includes(eachUser.id) &&
-                                  !hovered?.isAlreadyCoworker
-                                    ? "Already a Coworker"
-                                    : coworkerIds.includes(eachUser.id) &&
-                                      hovered?.isAlreadyCoworker
-                                    ? "Remove"
-                                    : requestedCoworkerUserIds().includes(
-                                        eachUser.id
+                                  {!getCoworkerIds().includes(eachUser.id) ? (
+                                    <>
+                                      {!getCoworkerIds().includes(
+                                        eachUser?.id
                                       ) &&
-                                      hovered?.id !== eachUser.id &&
-                                      hovered?.option !== "coworker"
-                                    ? "Pending"
-                                    : requestedCoworkerUserIds().includes(
-                                        eachUser.id
-                                      ) &&
-                                      hovered?.id === eachUser.id &&
-                                      hovered?.option === "coworker"
-                                    ? "Cancel"
-                                    : !requestedCoworkerUserIds().includes(
-                                        eachUser.id
+                                      !requestedCoworkerUserIdsStatusPENDING().includes(
+                                        eachUser?.id
                                       )
-                                    ? "Add Coworker"
-                                    : "Pending"}
+                                        ? "Add Coworker"
+                                        : requestedCoworkerUserIdsStatusPENDING().includes(
+                                            eachUser?.id
+                                          ) &&
+                                          hovered?.itemIndex !== itemIndex &&
+                                          hovered?.option !== "coworker"
+                                        ? "Pending"
+                                        : hovered.option === "coworker" &&
+                                          hovered?.itemIndex === itemIndex
+                                        ? "Cancel"
+                                        : hovered?.option === "friend"
+                                        ? "Pending"
+                                        : "Pending"}
+                                    </>
+                                  ) : (
+                                    <>
+                                      {getCoworkerIds().includes(
+                                        eachUser?.id
+                                      ) &&
+                                      hovered?.itemIndex !== itemIndex &&
+                                      hovered?.option !== "coworker"
+                                        ? "Already a Coworker"
+                                        : hovered?.option === "friend" ||
+                                          hovered?.itemIndex !== itemIndex
+                                        ? "Already a Coworker"
+                                        : "Remove"}
+                                    </>
+                                  )}
                                 </div>
 
                                 <div
@@ -1106,7 +1327,7 @@ function Dashboard() {
                                     setHovered({
                                       id: eachUser.id,
                                       option: "friend",
-                                      isAlreadyFriend: friendIds.includes(
+                                      isAlreadyFriend: getFriendIds().includes(
                                         eachUser.id
                                       ),
                                       itemIndex: itemIndex,
@@ -1115,31 +1336,33 @@ function Dashboard() {
                                   onMouseLeave={() => setHovered(null)}
                                   onClick={() => {
                                     if (
-                                      !requestedFriendUserIds().includes(
+                                      !requestedFriendUserIdsStatusPENDING().includes(
                                         eachUser.id
                                       ) &&
-                                      !friendIds.includes(eachUser.id)
+                                      !getFriendIds().includes(eachUser.id)
                                     ) {
                                       sendFriendRequest(user?.id, eachUser.id);
                                     } else if (
-                                      friendIds.includes(eachUser.id)
+                                      getFriendIds().includes(eachUser.id)
                                     ) {
-                                      // openRemoveFriendModal()
+                                      openRemoveFriendModal(eachUser);
                                     } else {
                                       openCancelFReqModal(eachUser);
                                     }
                                   }}
                                   className={`fs-14 lh-16 chirp-bold-font jfycenter algncenter pointer circle_hover_accept ${
-                                    (requestedFriendUserIds().includes(
+                                    (requestedFriendUserIdsStatusPENDING().includes(
                                       eachUser.id
                                     ) ||
-                                      friendIds.includes(eachUser.id)) &&
+                                      getFriendIds().includes(eachUser.id)) &&
                                     !hovered?.isAlreadyFriend
                                       ? "cancel_btn_hover_effect"
-                                      : (requestedFriendUserIds().includes(
+                                      : (requestedFriendUserIdsStatusPENDING().includes(
                                           eachUser.id
                                         ) ||
-                                          friendIds.includes(eachUser.id)) &&
+                                          getFriendIds().includes(
+                                            eachUser.id
+                                          )) &&
                                         hovered?.isAlreadyFriend
                                       ? "circle_hover_reject"
                                       : "dark_btn_hover_effect"
@@ -1159,56 +1382,73 @@ function Dashboard() {
                                     minHeight: "32px",
                                     padding: "0px 16px",
                                     color:
-                                      (requestedFriendUserIds().includes(
+                                      (requestedFriendUserIdsStatusPENDING().includes(
                                         eachUser.id
                                       ) ||
-                                        friendIds.includes(eachUser.id)) &&
+                                        getFriendIds().includes(eachUser.id)) &&
                                       !hovered?.isAlreadyFriend
                                         ? "rgb(16, 23, 42)"
-                                        : (requestedFriendUserIds().includes(
+                                        : (requestedFriendUserIdsStatusPENDING().includes(
                                             eachUser.id
                                           ) ||
-                                            friendIds.includes(eachUser.id)) &&
+                                            getFriendIds().includes(
+                                              eachUser.id
+                                            )) &&
                                           hovered?.isAlreadyFriend &&
                                           hovered?.itemIndex === itemIndex
                                         ? "rgb(244, 33, 46)"
                                         : hovered?.itemIndex !== itemIndex &&
-                                          requestedFriendUserIds().includes(
+                                          requestedFriendUserIdsStatusPENDING().includes(
                                             eachUser.id
                                           )
                                         ? "rgb(16, 23, 42)"
+                                        : getFriendIds().includes(eachUser.id)
+                                        ? "rgb(16, 23, 42)"
                                         : "rgb(231, 233, 234)",
                                     backgroundColor:
-                                      requestedFriendUserIds().includes(
+                                      requestedFriendUserIdsStatusPENDING().includes(
                                         eachUser.id
-                                      ) || friendIds.includes(eachUser.id)
+                                      ) || getFriendIds().includes(eachUser.id)
                                         ? "transparent"
                                         : "#0F141A",
+                                    overflow: "hidden",
+                                    position: "relative",
+                                    minWidth: "166px",
+                                    boxSizing: "border-box",
                                   }}
                                 >
-                                  {friendIds.includes(eachUser.id) &&
-                                  !hovered?.isAlreadyFriend
-                                    ? "Already a Friend"
-                                    : friendIds.includes(eachUser.id) &&
-                                      hovered?.isAlreadyFriend
-                                    ? "Remove"
-                                    : requestedFriendUserIds().includes(
-                                        eachUser.id
-                                      ) &&
-                                      hovered?.id !== eachUser.id &&
-                                      hovered?.option !== "friend"
-                                    ? "Pending"
-                                    : requestedFriendUserIds().includes(
-                                        eachUser.id
-                                      ) &&
-                                      hovered?.id === eachUser.id &&
-                                      hovered?.option === "friend"
-                                    ? "Cancel"
-                                    : !requestedFriendUserIds().includes(
-                                        eachUser.id
+                                  {!getFriendIds().includes(eachUser.id) ? (
+                                    <>
+                                      {!getFriendIds().includes(eachUser?.id) &&
+                                      !requestedFriendUserIdsStatusPENDING().includes(
+                                        eachUser?.id
                                       )
-                                    ? "Add Friend"
-                                    : "Pending"}
+                                        ? "Add Friend"
+                                        : requestedFriendUserIdsStatusPENDING().includes(
+                                            eachUser?.id
+                                          ) &&
+                                          hovered?.itemIndex !== itemIndex &&
+                                          hovered?.option !== "friend"
+                                        ? "Pending"
+                                        : hovered.option === "friend" &&
+                                          hovered?.itemIndex === itemIndex
+                                        ? "Cancel"
+                                        : hovered?.option === "coworker"
+                                        ? "Pending"
+                                        : "Pending"}
+                                    </>
+                                  ) : (
+                                    <>
+                                      {getFriendIds().includes(eachUser?.id) &&
+                                      hovered?.itemIndex !== itemIndex &&
+                                      hovered?.option !== "friend"
+                                        ? "Already a Friend"
+                                        : hovered?.option === "coworker" ||
+                                          hovered?.itemIndex !== itemIndex
+                                        ? "Already a Friend"
+                                        : "Remove"}
+                                    </>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -1229,6 +1469,11 @@ function Dashboard() {
           className="z-9999 p-0 m-0"
           open={showSearchCoworkerModal}
           onClose={handleCloseSearchCoworkerModal}
+          sx={{
+            "& > .MuiBackdrop-root": {
+              opacity: "0.8 !important",
+            },
+          }}
         >
           <div
             className="shadow_div_white p-abs border-r-4 none-outline"
@@ -1236,185 +1481,197 @@ function Dashboard() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              width: 600,
-              height: 600,
+              width: width <= 768 ? "100%" : 600,
+              height: width <= 768 ? "100%" : 600,
             }}
           >
-            <div>Search coworker</div>
-
+            {" "}
             <div
-              className="shadow_div_white p-16 p-abs border-r-4"
+              className="shadow_div_white p-16 p-abs border-r-16 z-9999 p-fix"
               style={{
-                width: "600px",
-                maxWidth: "600px",
-                height: "600px",
-                position: "fixed",
+                width: width <= 768 ? "100%" : "600px",
+                height: width <= 768 ? "100%" : "600px",
+                maxWidth: width <= 768 ? "100%" : "600px",
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 minWidth: "fit-content",
-                zIndex: 9999, // Ensure it's above other elements
               }}
             >
-              <div
-                onClick={handleCloseSearchCoworkerModal}
-                style={{
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                  position: "absolute",
-                }}
-              >
-                <div
-                  className="dflex jfycenter algncenter border-r-50 hover_close_btn"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                  }}
-                >
-                  {/* close signin modal icon start to check  */}
-                  <svg
-                    style={{
-                      border: "none",
-                      margin: "5px",
-                    }}
-                    width={20}
-                    height={20}
-                    color={"rgb(15,20,25)"}
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    className={` r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-z80fyv r-19wmn03`}
+              {user?.coworkers?.length > 0 ? (
+                <>
+                  <div
+                    className="p-abs border-r-50 pointer"
+                    onClick={handleCloseSearchCoworkerModal}
                   >
-                    <g>
-                      <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
-                    </g>
-                  </svg>{" "}
-                  {/* close signin modal icon finish to check  */}
-                </div>
-              </div>{" "}
-              <div
-                style={{
-                  paddingTop: "60px",
-                }}
-              >
-                <div
-                  style={{
-                    marginBottom: "12px",
-                  }}
-                >
-                  <AvatarGroup total={user?.coworkers?.length}>
-                    {user?.coworkers?.map((eachUser) => {
-                      return (
-                        <Avatar
-                          key={eachUser.user.id}
-                          alt={eachUser.user.username}
-                          src={eachUser.user.profilePicture}
-                        />
-                      );
-                    })}
-                  </AvatarGroup>
-                </div>
-                <input
-                  placeholder="Search for a coworker..."
-                  type="text"
-                  className="w-100 border-r-999 border-1px fs-15 lh-20 chirp-regular-font"
-                  style={{
-                    borderRadius: "9999px",
-                    height: "42px",
-                    outlineStyle: "none",
-                  }}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                />
-              </div>
-              <div>
-                {filteredUsers?.length > 0 && (
+                    <div
+                      className="dflex jfycenter algncenter border-r-50 hover_close_btn"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                      }}
+                    >
+                      {/* close signin modal icon start to check  */}
+                      <svg
+                        style={{
+                          border: "none",
+                          margin: "5px",
+                        }}
+                        width={20}
+                        height={20}
+                        color={"rgb(15,20,25)"}
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        className={` r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-z80fyv r-19wmn03`}
+                      >
+                        <g>
+                          <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                        </g>
+                      </svg>{" "}
+                      {/* close signin modal icon finish to check  */}
+                    </div>
+                  </div>{" "}
                   <div
                     style={{
-                      marginTop: "12px",
+                      paddingTop: "60px",
                     }}
                   >
-                    {filteredUsers?.map((eachUser) => {
-                      return (
-                        <>
-                          {eachUser?.user?.id !== user.id && (
-                            <div
-                              onClick={() => {
-                                handleCloseSearchCoworkerModal();
-                                addConversation(eachUser?.user);
-                                setFilteredUsers(null);
-                              }}
-                              className="p-16 border-r-4 dflex algncenter each-message-parent-div pointer"
-                              style={{
-                                justifyContent: "flex-start",
-                                gap: "12px",
-                              }}
-                              key={eachUser?.user?.id}
-                            >
-                              <div>
-                                {eachUser?.user?.profilePicture !==
-                                "default_profile_picture_url" ? (
-                                  <div
-                                    style={{
-                                      width: "44px",
-                                      height: "44px",
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      borderRadius: "50%",
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    <img
-                                      src={eachUser?.user?.profilePicture}
-                                      width={40}
-                                      height={40}
-                                      alt=""
-                                      style={{
-                                        borderRadius: "50%",
-                                      }}
-                                    />{" "}
-                                  </div>
-                                ) : (
-                                  <div
-                                    style={{
-                                      width: "44px",
-                                      height: "44px",
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      borderRadius: "50%",
-                                      cursor: "pointer",
-                                    }}
-                                    href=""
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      width="40"
-                                      height="40"
-                                      fill={"rgb(83, 100, 113)"}
-                                      style={{
-                                        borderRadius: "50%",
-                                      }}
-                                      className="bi bi-person-circle"
-                                      viewBox="0 0 16 16"
-                                    >
-                                      <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                                      <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
-                                    </svg>{" "}
-                                  </div>
-                                )}
-                              </div>
-                              <div className="fs-15 lh-20 chirp-medium-font color-dark-text">
-                                {eachUser?.user?.username}
-                              </div>
-                            </div>
-                          )}
-                        </>
-                      );
-                    })}
+                    <div
+                      style={{
+                        marginBottom: "12px",
+                      }}
+                    >
+                      <AvatarGroup total={user?.coworkers?.length}>
+                        {user?.coworkers?.map((eachUser) => {
+                          return (
+                            <Avatar
+                              key={eachUser.user.id}
+                              alt={eachUser.user.username}
+                              src={eachUser.user.profilePicture}
+                            />
+                          );
+                        })}
+                      </AvatarGroup>
+                    </div>
+                    <input
+                      placeholder="Search for a coworker..."
+                      type="text"
+                      className="w-100 border-r-999 border-1px fs-15 lh-20 chirp-regular-font"
+                      style={{
+                        height: "42px",
+                        outlineStyle: "none",
+                      }}
+                      onChange={(e) => setSearchInput(e.target.value)}
+                    />
                   </div>
-                )}
-              </div>
+                  <div>
+                    {filteredUsers?.length > 0 && (
+                      <div
+                        style={{
+                          marginTop: "12px",
+                        }}
+                      >
+                        {filteredUsers?.map((eachUser) => {
+                          return (
+                            <>
+                              {eachUser?.user?.id !== user.id && (
+                                <div
+                                  onClick={() => {
+                                    handleCloseSearchCoworkerModal();
+                                    addConversation(eachUser?.user);
+                                    setFilteredUsers(null);
+                                  }}
+                                  className="p-16 border-r-4 dflex algncenter each-message-parent-div pointer"
+                                  style={{
+                                    justifyContent: "flex-start",
+                                    gap: "12px",
+                                  }}
+                                  key={eachUser?.user?.id}
+                                >
+                                  <div>
+                                    {eachUser?.user?.profilePicture !==
+                                    "default_profile_picture_url" ? (
+                                      <div
+                                        className="dflex jfycenter algncenter pointer border-r-50"
+                                        style={{
+                                          width: "44px",
+                                          height: "44px",
+                                        }}
+                                      >
+                                        <img
+                                          className="border-r-50"
+                                          src={eachUser?.user?.profilePicture}
+                                          width={40}
+                                          height={40}
+                                          alt=""
+                                        />{" "}
+                                      </div>
+                                    ) : (
+                                      <div
+                                        className="dflex jfycenter algncenter border-r-50 pointer"
+                                        style={{
+                                          width: "44px",
+                                          height: "44px",
+                                        }}
+                                        href=""
+                                      >
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          width="40"
+                                          height="40"
+                                          fill={"rgb(83, 100, 113)"}
+                                          className="bi bi-person-circle border-r-50"
+                                          viewBox="0 0 16 16"
+                                        >
+                                          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                                          <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                                        </svg>{" "}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="fs-15 lh-20 chirp-medium-font color-dark-text">
+                                    {eachUser?.user?.username}
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="dflex jfycenter p-32">
+                  <div
+                    style={{
+                      maxWidth: "350px",
+                    }}
+                  >
+                    <div
+                      className="chirp-heavy-font"
+                      style={{
+                        fontSize: "31px",
+                        lineHeight: "36px",
+                        margin: "10px",
+                      }}
+                    >
+                      Looking for coworkers?
+                    </div>
+                    <div
+                      className="chirp-regular-font fs-15 lh-20"
+                      style={{
+                        color: "rgb(83, 100, 113)",
+                        margin: "10px",
+                      }}
+                    >
+                      Currently, there are no coworkers added to your list. You
+                      can add coworkers by using the 'Add Coworker' button.
+                    </div>
+                  </div>
+                </div>
+              )}{" "}
             </div>
           </div>
         </Modal>
@@ -1425,6 +1682,11 @@ function Dashboard() {
           className="z-9999 p-0 m-0"
           open={showSearchFriendModal}
           onClose={handleCloseSearchFriendModal}
+          sx={{
+            "& > .MuiBackdrop-root": {
+              opacity: "0.8 !important",
+            },
+          }}
         >
           <div
             className="shadow_div_white p-abs border-r-4 none-outline"
@@ -1432,184 +1694,198 @@ function Dashboard() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              width: 600,
-              height: 600,
+              width: width <= 768 ? "100%" : 600,
+              height: width <= 768 ? "100%" : 600,
             }}
           >
-            <div>Search friend</div>
             <div
-              className="shadow_div_white p-16 p-abs border-r-4"
+              className="shadow_div_white p-16 p-abs border-r-16 p-fix z-9999"
               style={{
-                width: "600px",
-                maxWidth: "600px",
-                height: "600px",
-                position: "fixed",
+                width: width <= 768 ? "100%" : "600px",
+                height: width <= 768 ? "100%" : "600px",
+                maxWidth: width <= 768 ? "100%" : "600px",
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 minWidth: "fit-content",
-                zIndex: 9999, // Ensure it's above other elements
               }}
             >
-              <div
-                onClick={handleCloseSearchFriendModal}
-                style={{
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                  position: "absolute",
-                }}
-              >
-                <div
-                  className="dflex jfycenter algncenter border-r-50 hover_close_btn"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                  }}
-                >
-                  {/* close signin modal icon start to check  */}
-                  <svg
-                    style={{
-                      border: "none",
-                      margin: "5px",
-                    }}
-                    width={20}
-                    height={20}
-                    color={"rgb(15,20,25)"}
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    className={` r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-z80fyv r-19wmn03`}
+              {user?.friends?.length > 0 ? (
+                <>
+                  <div
+                    className="border-r-50 pointer p-abs"
+                    onClick={handleCloseSearchFriendModal}
                   >
-                    <g>
-                      <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
-                    </g>
-                  </svg>{" "}
-                  {/* close signin modal icon finish to check  */}
-                </div>
-              </div>{" "}
-              <div
-                style={{
-                  paddingTop: "60px",
-                }}
-              >
-                <div
-                  style={{
-                    marginBottom: "12px",
-                  }}
-                >
-                  <AvatarGroup total={user?.friends?.length}>
-                    {user?.friends?.map((eachUser) => {
-                      return (
-                        <Avatar
-                          key={eachUser.user.id}
-                          alt={eachUser.user.username}
-                          src={eachUser.user.profilePicture}
-                        />
-                      );
-                    })}
-                  </AvatarGroup>
-                </div>
-                <input
-                  placeholder="Search for a friend..."
-                  type="text"
-                  className="w-100 border-r-999 border-1px fs-15 lh-20 chirp-regular-font"
-                  style={{
-                    borderRadius: "9999px",
-                    height: "42px",
-                    outlineStyle: "none",
-                  }}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                />
-              </div>
-              <div>
-                {filteredUsers?.length > 0 && (
+                    <div
+                      className="dflex jfycenter algncenter border-r-50 hover_close_btn"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                      }}
+                    >
+                      {/* close signin modal icon start to check  */}
+                      <svg
+                        style={{
+                          border: "none",
+                          margin: "5px",
+                        }}
+                        width={20}
+                        height={20}
+                        color={"rgb(15,20,25)"}
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        className={` r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-z80fyv r-19wmn03`}
+                      >
+                        <g>
+                          <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                        </g>
+                      </svg>{" "}
+                      {/* close signin modal icon finish to check  */}
+                    </div>
+                  </div>{" "}
                   <div
                     style={{
-                      marginTop: "12px",
+                      paddingTop: "60px",
                     }}
                   >
-                    {filteredUsers?.map((eachUser) => {
-                      return (
-                        <>
-                          {eachUser?.user?.id !== user.id && (
-                            <div
-                              onClick={() => {
-                                handleCloseSearchFriendModal();
-                                addConversation(eachUser.user);
-                                setFilteredUsers(null);
-                              }}
-                              className="p-16 border-r-4 dflex algncenter each-message-parent-div pointer"
-                              style={{
-                                justifyContent: "flex-start",
-                                gap: "12px",
-                              }}
-                              key={eachUser?.user?.id}
-                            >
-                              <div>
-                                {eachUser?.user?.profilePicture !==
-                                "default_profile_picture_url" ? (
-                                  <div
-                                    style={{
-                                      width: "44px",
-                                      height: "44px",
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      borderRadius: "50%",
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    <img
-                                      src={eachUser?.user?.profilePicture}
-                                      width={40}
-                                      height={40}
-                                      alt=""
-                                      style={{
-                                        borderRadius: "50%",
-                                      }}
-                                    />{" "}
-                                  </div>
-                                ) : (
-                                  <div
-                                    style={{
-                                      width: "44px",
-                                      height: "44px",
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      borderRadius: "50%",
-                                      cursor: "pointer",
-                                    }}
-                                    href=""
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      width="40"
-                                      height="40"
-                                      fill={"rgb(83, 100, 113)"}
-                                      style={{
-                                        borderRadius: "50%",
-                                      }}
-                                      className="bi bi-person-circle"
-                                      viewBox="0 0 16 16"
-                                    >
-                                      <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                                      <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
-                                    </svg>{" "}
-                                  </div>
-                                )}
-                              </div>
-                              <div className="fs-15 lh-20 chirp-medium-font color-dark-text">
-                                {eachUser?.user?.username}
-                              </div>
-                            </div>
-                          )}
-                        </>
-                      );
-                    })}
+                    <div
+                      style={{
+                        marginBottom: "12px",
+                      }}
+                    >
+                      <AvatarGroup total={user?.friends?.length}>
+                        {user?.friends?.map((eachUser) => {
+                          return (
+                            <Avatar
+                              key={eachUser.user.id}
+                              alt={eachUser.user.username}
+                              src={eachUser.user.profilePicture}
+                            />
+                          );
+                        })}
+                      </AvatarGroup>
+                    </div>
+                    <input
+                      placeholder="Search for a friend..."
+                      type="text"
+                      className="w-100 border-r-999 border-1px fs-15 lh-20 chirp-regular-font"
+                      style={{
+                        height: "42px",
+                        outlineStyle: "none",
+                      }}
+                      onChange={(e) => setSearchInput(e.target.value)}
+                    />
                   </div>
-                )}
-              </div>
+                  <div>
+                    {filteredUsers?.length > 0 && (
+                      <div
+                        style={{
+                          marginTop: "12px",
+                        }}
+                      >
+                        {filteredUsers?.map((eachUser) => {
+                          return (
+                            <>
+                              {eachUser?.user?.id !== user.id && (
+                                <div
+                                  onClick={() => {
+                                    handleCloseSearchFriendModal();
+                                    addConversation(eachUser.user);
+                                    setFilteredUsers(null);
+                                  }}
+                                  className="p-16 border-r-4 dflex algncenter each-message-parent-div pointer"
+                                  style={{
+                                    justifyContent: "flex-start",
+                                    gap: "12px",
+                                  }}
+                                  key={eachUser?.user?.id}
+                                >
+                                  <div>
+                                    {eachUser?.user?.profilePicture !==
+                                    "default_profile_picture_url" ? (
+                                      <div
+                                        className="dflex jfycenter algncenter border-r-50 pointer"
+                                        style={{
+                                          width: "44px",
+                                          height: "44px",
+                                        }}
+                                      >
+                                        <img
+                                          className="border-r-50"
+                                          src={eachUser?.user?.profilePicture}
+                                          width={40}
+                                          height={40}
+                                          alt=""
+                                        />{" "}
+                                      </div>
+                                    ) : (
+                                      <div
+                                        className="dflex jfycenter algncenter border-r-50 pointer"
+                                        style={{
+                                          width: "44px",
+                                          height: "44px",
+                                        }}
+                                        href=""
+                                      >
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          width="40"
+                                          height="40"
+                                          fill={"rgb(83, 100, 113)"}
+                                          className="bi bi-person-circle border-r-50"
+                                          viewBox="0 0 16 16"
+                                        >
+                                          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                                          <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                                        </svg>{" "}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="fs-15 lh-20 chirp-medium-font color-dark-text">
+                                    {eachUser?.user?.username}
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="dflex jfycenter p-32">
+                    <div
+                      style={{
+                        maxWidth: "350px",
+                      }}
+                    >
+                      <div
+                        className="chirp-heavy-font"
+                        style={{
+                          fontSize: "31px",
+                          lineHeight: "36px",
+                          margin: "10px",
+                        }}
+                      >
+                        Looking for friends?
+                      </div>
+                      <div
+                        className="chirp-regular-font fs-15 lh-20"
+                        style={{
+                          color: "rgb(83, 100, 113)",
+                          margin: "10px",
+                        }}
+                      >
+                        Currently, there are no friends added to your list. You
+                        can add friends by using the 'Add Friend' button.
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </Modal>
@@ -1623,26 +1899,15 @@ function Dashboard() {
       >
         Chats
       </div>
-      <div
-        className="h-100 dflex algncenter"
-        style={{
-          justifyContent: "flex-start",
-        }}
-      >
+      <div className="bt-1px h-100 w-100 dflex">
         {" "}
         <div
-          className="bt-1px"
+          className="h-100 border-box"
           style={{
-            maxWidth: "350px",
-            width: "25%",
-            height: "100%",
+            flex: 1,
           }}
         >
-          <div
-            style={{
-              marginTop: "12px",
-            }}
-          >
+          <div>
             <div>
               {conversations?.length ? (
                 <div>
@@ -1676,15 +1941,10 @@ function Dashboard() {
                                   .profilePicture !==
                                 "default_profile_picture_url" ? (
                                   <div
-                                    className="image-hover-effect"
+                                    className="image-hover-effect dflex jfycenter algncenter border-r-50 pointer"
                                     style={{
                                       width: "44px",
                                       height: "44px",
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      borderRadius: "50%",
-                                      cursor: "pointer",
                                     }}
                                   >
                                     <img
@@ -1696,21 +1956,15 @@ function Dashboard() {
                                       width={40}
                                       height={40}
                                       alt=""
-                                      style={{
-                                        borderRadius: "50%",
-                                      }}
+                                      className="border-r-50"
                                     />{" "}
                                   </div>
                                 ) : (
                                   <div
+                                    className="dflex jfycenter algncenter border-r-50 pointer"
                                     style={{
                                       width: "44px",
                                       height: "44px",
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      borderRadius: "50%",
-                                      cursor: "pointer",
                                     }}
                                     href=""
                                   >
@@ -1719,10 +1973,7 @@ function Dashboard() {
                                       width="40"
                                       height="40"
                                       fill={"rgb(83, 100, 113)"}
-                                      style={{
-                                        borderRadius: "50%",
-                                      }}
-                                      className="bi bi-person-circle"
+                                      className="bi bi-person-circle border-r-50"
                                       viewBox="0 0 16 16"
                                     >
                                       <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
@@ -1757,6 +2008,12 @@ function Dashboard() {
                       </div>
                     );
                   })}
+                </div>
+              ) : loading ? (
+                <div className="p-16">
+                  <LoadingSpinner
+                    strokeColor={"rgb(29, 155, 240)"}
+                  ></LoadingSpinner>{" "}
                 </div>
               ) : (
                 <PopupState variant="popover" popupId="demo-popup-popover">
@@ -1828,9 +2085,8 @@ function Dashboard() {
                       >
                         <div
                           onClick={countHandler}
-                          className="chirp-extended-heavy fs-15 lh-20 pointer"
+                          className="chirp-extended-heavy fs-15 lh-20 pointer p-abs"
                           style={{
-                            position: "absolute",
                             right: "15px",
                             bottom: "15px",
                             color:
@@ -1952,7 +2208,7 @@ function Dashboard() {
                         ) : index === 2 ? (
                           <div className="p-16">
                             <div
-                              className="dflex "
+                              className="dflex"
                               style={{
                                 justifyContent: "flex-start",
                                 gap: "12px",
@@ -2509,13 +2765,13 @@ function Dashboard() {
           </div>
         </div>
         <div
-          className="bl-1px bt-1px h-100"
+          className="bl-1px h-100"
           style={{
-            minWidth: "350px",
-            width: "50%",
             maxHeight: "100vh",
             overflowY: "auto",
             position: "relative",
+            flex: 2,
+            boxSizing: "border-box",
           }}
         >
           {selectedUser && (
@@ -2525,16 +2781,40 @@ function Dashboard() {
                 gap: "12px",
                 position: "sticky",
                 right: "0px",
-                // top: "53px",
                 top: "0px",
                 width: "100%",
                 justifyContent: "flex-start",
                 height: "53px",
                 backgroundColor: "rgba(255, 255, 255, 0.85)",
                 backdropFilter: "blur(12px)",
-                zIndex: 9999,
               }}
             >
+              <div
+                onClick={() => setSelectedUser(null)}
+                style={{
+                  width: "36px",
+                  height: " 36px",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginLeft: "4px",
+                }}
+              >
+                <svg
+                  fill="currentColor"
+                  width={20}
+                  height={20}
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  className="r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-z80fyv r-19wmn03"
+                >
+                  <g>
+                    <path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"></path>
+                  </g>
+                </svg>
+              </div>
               <div className="dflex">
                 {selectedUser?.profilePicture !==
                 "default_profile_picture_url" ? (
@@ -2543,9 +2823,6 @@ function Dashboard() {
                     width={32}
                     height={32}
                     alt=""
-                    style={{
-                      paddingLeft: "12px",
-                    }}
                   />
                 ) : (
                   <svg
@@ -2553,9 +2830,6 @@ function Dashboard() {
                     width="32"
                     height="32"
                     fill={"rgb(83, 100, 113)"}
-                    style={{
-                      paddingLeft: "12px",
-                    }}
                     className="bi bi-person-circle"
                     viewBox="0 0 16 16"
                   >
@@ -2576,13 +2850,13 @@ function Dashboard() {
                   {conversation?.Message.map((eachMessage) => {
                     return (
                       <div
+                        className="w-100"
                         ref={scrollRef}
                         style={{
                           textAlign:
                             eachMessage?.sender?.id === user?.id
                               ? "right"
                               : "left",
-                          width: "100%",
                         }}
                         key={eachMessage?.id}
                       >
@@ -2644,6 +2918,11 @@ function Dashboard() {
                         onChange={(e) => setMessage(e.target.value)}
                         value={message}
                         autoFocus={true}
+                        onKeyPress={(event) => {
+                          if (event.key === "Enter") {
+                            sendMessage();
+                          }
+                        }}
                       />
                       <svg
                         style={{
@@ -2695,93 +2974,83 @@ function Dashboard() {
           )}
         </div>
         <div
-          className="bl-1px bt-1px h-100"
           style={{
-            minWidth: "25%",
-            width: "25%",
+            flex: 1,
+            boxSizing: "border-box",
+            display: width <= 768 && "none",
           }}
+          className="bl-1px h-100"
         >
           <div
             style={{
-              marginTop: "12px",
-              marginLeft: "12px",
-              marginRight: "12px",
+              gap: "12px",
             }}
+            onClick={searchCoworkerModal}
+            className="color-dark-text fs-23 lh-28 chirp-extended-heavy pointer dflex p-16"
           >
-            <div
-              onClick={searchCoworkerModal}
-              style={{
-                marginTop: "60px",
-                gap: "25px",
-              }}
-              className="color-dark-text fs-23 lh-28 chirp-extended-heavy pointer dflex"
-            >
-              <span>
-                <svg
-                  width={40}
-                  height={40}
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <g>
-                    <path d="M7.501 19.917L7.471 21H.472l.029-1.027c.184-6.618 3.736-8.977 7-8.977.963 0 1.95.212 2.87.672-.444.478-.851 1.03-1.212 1.656-.507-.204-1.054-.329-1.658-.329-2.767 0-4.57 2.223-4.938 6.004H7.56c-.023.302-.05.599-.059.917zm15.998.056L23.528 21H9.472l.029-1.027c.184-6.618 3.736-8.977 7-8.977s6.816 2.358 7 8.977zM21.437 19c-.367-3.781-2.17-6.004-4.938-6.004s-4.57 2.223-4.938 6.004h9.875zm-4.938-9c-.799 0-1.527-.279-2.116-.73-.836-.64-1.384-1.638-1.384-2.77 0-1.93 1.567-3.5 3.5-3.5s3.5 1.57 3.5 3.5c0 1.132-.548 2.13-1.384 2.77-.589.451-1.317.73-2.116.73zm-1.5-3.5c0 .827.673 1.5 1.5 1.5s1.5-.673 1.5-1.5-.673-1.5-1.5-1.5-1.5.673-1.5 1.5zM7.5 3C9.433 3 11 4.57 11 6.5S9.433 10 7.5 10 4 8.43 4 6.5 5.567 3 7.5 3zm0 2C6.673 5 6 5.673 6 6.5S6.673 8 7.5 8 9 7.327 9 6.5 8.327 5 7.5 5z"></path>
-                  </g>
-                </svg>
-              </span>
-              <span>Connect and Collaborate with Your Coworkers</span>
-            </div>
-            <div
-              onClick={searchFriendModal}
-              style={{
-                marginTop: "60px",
-                gap: "25px",
-              }}
-              className="color-dark-text fs-23 lh-28 chirp-extended-heavy pointer dflex"
-            >
-              <span>
-                <svg
-                  width={40}
-                  height={40}
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <g>
-                    <path d="M10.25 3.75c-3.59 0-6.5 2.91-6.5 6.5s2.91 6.5 6.5 6.5c1.795 0 3.419-.726 4.596-1.904 1.178-1.177 1.904-2.801 1.904-4.596 0-3.59-2.91-6.5-6.5-6.5zm-8.5 6.5c0-4.694 3.806-8.5 8.5-8.5s8.5 3.806 8.5 8.5c0 1.986-.682 3.815-1.824 5.262l4.781 4.781-1.414 1.414-4.781-4.781c-1.447 1.142-3.276 1.824-5.262 1.824-4.694 0-8.5-3.806-8.5-8.5z"></path>
-                  </g>
-                </svg>
-              </span>
-              <span>Find Friends and Start Conversations Instantly</span>
-            </div>
-            <div
-              style={{
-                marginTop: "60px",
-                gap: "25px",
-              }}
-              className="color-dark-text fs-23 lh-28 chirp-extended-heavy  dflex"
-            >
-              <span>
-                <svg
-                  width={40}
-                  height={40}
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <g>
-                    <path d="M1.998 5.5c0-1.381 1.119-2.5 2.5-2.5h15c1.381 0 2.5 1.119 2.5 2.5v13c0 1.381-1.119 2.5-2.5 2.5h-15c-1.381 0-2.5-1.119-2.5-2.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v2.764l8 3.638 8-3.636V5.5c0-.276-.224-.5-.5-.5h-15zm15.5 5.463l-8 3.636-8-3.638V18.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5v-8.037z"></path>
-                  </g>
-                </svg>
-              </span>
-              <div>
-                <div>To start chatting, add your friends or coworkers.</div>
-                <div
-                  onClick={searchPeopleModal}
-                  className="text_decoration_underline pointer fs-15 lh-20 chirp-regular-font fs-15 lh-20 "
-                  style={{
-                    color: "#36bbf7",
-                  }}
-                >
-                  Click here to see the search input.{" "}
-                </div>
+            <span>
+              <svg
+                width={40}
+                height={40}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <g>
+                  <path d="M7.501 19.917L7.471 21H.472l.029-1.027c.184-6.618 3.736-8.977 7-8.977.963 0 1.95.212 2.87.672-.444.478-.851 1.03-1.212 1.656-.507-.204-1.054-.329-1.658-.329-2.767 0-4.57 2.223-4.938 6.004H7.56c-.023.302-.05.599-.059.917zm15.998.056L23.528 21H9.472l.029-1.027c.184-6.618 3.736-8.977 7-8.977s6.816 2.358 7 8.977zM21.437 19c-.367-3.781-2.17-6.004-4.938-6.004s-4.57 2.223-4.938 6.004h9.875zm-4.938-9c-.799 0-1.527-.279-2.116-.73-.836-.64-1.384-1.638-1.384-2.77 0-1.93 1.567-3.5 3.5-3.5s3.5 1.57 3.5 3.5c0 1.132-.548 2.13-1.384 2.77-.589.451-1.317.73-2.116.73zm-1.5-3.5c0 .827.673 1.5 1.5 1.5s1.5-.673 1.5-1.5-.673-1.5-1.5-1.5-1.5.673-1.5 1.5zM7.5 3C9.433 3 11 4.57 11 6.5S9.433 10 7.5 10 4 8.43 4 6.5 5.567 3 7.5 3zm0 2C6.673 5 6 5.673 6 6.5S6.673 8 7.5 8 9 7.327 9 6.5 8.327 5 7.5 5z"></path>
+                </g>
+              </svg>
+            </span>
+            <span>Connect and Collaborate with Your Coworkers</span>
+          </div>
+          <div
+            style={{
+              gap: "12px",
+            }}
+            onClick={searchFriendModal}
+            className="color-dark-text fs-23 lh-28 chirp-extended-heavy pointer dflex p-16"
+          >
+            <span>
+              <svg
+                width={40}
+                height={40}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <g>
+                  <path d="M10.25 3.75c-3.59 0-6.5 2.91-6.5 6.5s2.91 6.5 6.5 6.5c1.795 0 3.419-.726 4.596-1.904 1.178-1.177 1.904-2.801 1.904-4.596 0-3.59-2.91-6.5-6.5-6.5zm-8.5 6.5c0-4.694 3.806-8.5 8.5-8.5s8.5 3.806 8.5 8.5c0 1.986-.682 3.815-1.824 5.262l4.781 4.781-1.414 1.414-4.781-4.781c-1.447 1.142-3.276 1.824-5.262 1.824-4.694 0-8.5-3.806-8.5-8.5z"></path>
+                </g>
+              </svg>
+            </span>
+            <span>Find Friends and Start Conversations Instantly</span>
+          </div>
+          <div
+            style={{
+              gap: "12px",
+            }}
+            className="color-dark-text fs-23 lh-28 chirp-extended-heavy dflex p-16"
+          >
+            <span>
+              <svg
+                width={40}
+                height={40}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <g>
+                  <path d="M1.998 5.5c0-1.381 1.119-2.5 2.5-2.5h15c1.381 0 2.5 1.119 2.5 2.5v13c0 1.381-1.119 2.5-2.5 2.5h-15c-1.381 0-2.5-1.119-2.5-2.5v-13zm2.5-.5c-.276 0-.5.224-.5.5v2.764l8 3.638 8-3.636V5.5c0-.276-.224-.5-.5-.5h-15zm15.5 5.463l-8 3.636-8-3.638V18.5c0 .276.224.5.5.5h15c.276 0 .5-.224.5-.5v-8.037z"></path>
+                </g>
+              </svg>
+            </span>
+            <div>
+              <div>To start chatting, add your friends or coworkers.</div>
+              <div
+                onClick={searchPeopleModal}
+                className="text_decoration_underline pointer fs-15 lh-20 chirp-regular-font fs-15 lh-20 "
+                style={{
+                  color: "#36bbf7",
+                }}
+              >
+                Click here to see the search input.{" "}
               </div>
             </div>
           </div>

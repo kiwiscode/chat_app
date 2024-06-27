@@ -1,11 +1,9 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// add new message
 const addMessage = async (req, res) => {
   try {
     const { conversationId, senderId, message } = req.body;
-    console.log(conversationId, senderId, message);
     const newMessage = await prisma.message.create({
       data: {
         conversationId,
@@ -41,7 +39,6 @@ const addMessage = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-// get message
 const getMessages = async (req, res) => {
   try {
     const conversationId = req.params.conversationId;
@@ -62,7 +59,6 @@ const getMessages = async (req, res) => {
         },
       },
     });
-    console.log("message members:", messages.members);
 
     res.status(200).json(messages);
   } catch (error) {

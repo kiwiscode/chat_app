@@ -3,8 +3,9 @@ import { createContext, useState, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { verifyCookie, logout } from "../utils/verify-user";
+import config from "../config/config";
 const UserContext = createContext();
-const API_URL = "http://localhost:3000";
+const API_URL = config.backendUrl;
 export const UserProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(null);
   const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(false);
@@ -22,8 +23,6 @@ export const UserProvider = ({ children }) => {
           withCredentials: true,
         }
       );
-
-      console.log("result logout:", result);
 
       if (result?.status === 200) {
         setUser(null);
@@ -62,6 +61,28 @@ export const UserProvider = ({ children }) => {
       ...newUserInfo,
     }));
   };
+  const refreshUser = async () => {
+    try {
+      const result = await axios.get(
+        `${API_URL}/users/${user?.id}`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      setUser(result.data);
+    } catch (error) {
+      console.error("error:", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    if (user?.id) {
+      refreshUser();
+    }
+  }, [user?.id]);
 
   return (
     <UserContext.Provider
@@ -74,6 +95,7 @@ export const UserProvider = ({ children }) => {
         setIsAuthenticatedUser,
         updateUser,
         handleLogout,
+        refreshUser,
       }}
     >
       {children}{" "}

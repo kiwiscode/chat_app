@@ -1,14 +1,17 @@
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
+require("dotenv").config();
+
+const { createSecretToken } = require("../../util/SecretToken");
+
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const nodemailer = require("nodemailer");
-const jwt = require("jsonwebtoken");
-const { createSecretToken } = require("../../util/SecretToken");
-require("dotenv").config();
-let sendVerificationCodeToEmail;
-emailProcess();
 
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
+const nodemailer = require("nodemailer");
+let sendVerificationCodeToEmail;
+
+emailProcess();
 function emailProcess() {
   let transporter = nodemailer.createTransport({
     service: "gmail",
@@ -67,7 +70,6 @@ function emailProcess() {
   };
 }
 
-// check if the username already exists in the database
 const checkIfUsernameExists = async (req, res) => {
   try {
     const { username } = req.body;
@@ -86,8 +88,6 @@ const checkIfUsernameExists = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-// check if the email already exists in the database
 const checkIfEmailExists = async (req, res) => {
   try {
     const { email } = req.body;
@@ -106,7 +106,6 @@ const checkIfEmailExists = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 const handleEmailVerificationCode = (req, res) => {
   const { receiverEmail } = req.body;
 
@@ -124,33 +123,24 @@ const handleEmailVerificationCode = (req, res) => {
   for (let i = 0; i < 6; i++) {
     randomCode.push(characters[generateRandomCode()]);
   }
-
-  console.log("Random code =>", randomCode.join(""));
-
-  console.log("Email received =>", receiverEmail);
   sendVerificationCodeToEmail(receiverEmail.toLowerCase(), randomCode.join(""))
-    .then((result) => {
-      console.log("RESULT AFTER EMAIL VERIFICATION SEND =>", result);
-
+    .then(() => {
       res.status(201).json({
         code: randomCode.join(""),
         message: "Verification code to email sent",
       });
     })
-    .catch((error) => {
-      console.log("ERROR SENDING VERIFICATION EMAIL =>", error);
+    .catch(() => {
       res.status(500).json({
         errorMessage: "Error sending verification email.",
       });
     });
 };
-
 const authSignup = async (req, res) => {
   try {
     const { username, email, password } = req.body.formData;
     const checkUserName = username.toLowerCase();
     const checkEmail = email.toLowerCase();
-    console.log(username, email, password);
 
     if (!username || !email || !password) {
       res.status(403).json({
@@ -166,7 +156,6 @@ const authSignup = async (req, res) => {
       }
     }
 
-    // Check if username is valid
     if (username.length < 4 || username.length > 15 || /\s/.test(username)) {
       return res.status(400).json({
         errorMessage:
@@ -174,7 +163,6 @@ const authSignup = async (req, res) => {
       });
     }
 
-    // Check if username already exists
     const existingUser = await prisma.user.findUnique({
       where: {
         username: checkUserName,
@@ -188,7 +176,7 @@ const authSignup = async (req, res) => {
         usernameError: true,
       });
     }
-    // Check if email already exists
+
     const existingEmail = await prisma.user.findUnique({
       where: {
         email: checkEmail,
@@ -210,11 +198,9 @@ const authSignup = async (req, res) => {
       return;
     }
 
-    // Hash the password
     const salt = await bcrypt.genSalt(saltRounds);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user in database
     const user = await prisma.user.create({
       data: {
         username: username.toLowerCase(),
@@ -236,12 +222,10 @@ const authSignup = async (req, res) => {
     });
   }
 };
-
 const authLogin = async (req, res) => {
   try {
     const { authentication, password } = req.body.loginFormData;
 
-    console.log("password:", password);
     const authenticationExistWithEmail = await prisma.user.findUnique({
       where: {
         email: authentication,
@@ -256,14 +240,15 @@ const authLogin = async (req, res) => {
     const user =
       authenticationExistWithEmail || authenticationExistWithUsername;
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
     if (!user) {
       return res.status(401).json({
         authenticationError: true,
         message: "Invalid username or email",
       });
     }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
     if (!isPasswordValid) {
       return res
         .status(401)
@@ -292,7 +277,6 @@ const authLogin = async (req, res) => {
     console.error("Error:", error);
   }
 };
-
 const authLogout = async (req, res) => {
   try {
     const { id } = req.body;

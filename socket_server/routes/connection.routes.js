@@ -42,22 +42,4 @@ router.delete(
   ConnectionController.removeFriend
 );
 
-// test purposes
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
-
-router.get("/coworkers", async (req, res) => {
-  try {
-    const coworkers = await prisma.coworker.findMany({
-      include: {
-        user: true,
-      },
-    });
-    res.status(200).json(coworkers);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
 module.exports = router;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import "../../index.css";
@@ -7,16 +7,14 @@ import axios from "axios";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import useWindowDimensions from "../../utils/window-dimensions";
 import { Modal } from "@mui/material";
-const API_URL = "http://localhost:3000";
+import config from "../../config/config";
+const API_URL = config.backendUrl;
 
 function Sidebar() {
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
-  const { user, isAuthenticatedUser, handleLogout, updateUser } = useUser();
-  const [requests, setRequests] = useState({
-    coworkerRequests: [],
-    friendRequests: [],
-  });
+  const { user, isAuthenticatedUser, handleLogout, updateUser, refreshUser } =
+    useUser();
 
   const handleParentClick = () => {
     setShow(false);
@@ -25,7 +23,7 @@ function Sidebar() {
     event.stopPropagation();
   };
 
-  const [effect, setEffect] = useState(null);
+  const [effect, setEffect] = useState(false);
   // file upload
   const [profileImage, setprofileImage] = useState("");
   const [changingBar, setChangingBar] = useState(false);
@@ -74,61 +72,15 @@ function Sidebar() {
     }
   }, [profileImage]);
 
-  // get coworker requests
-  const getCoworkerRequests = async () => {
-    try {
-      const result = await axios.get(
-        `${API_URL}/${user?.id}/coworker-requests`,
-        {
-          withCredentials: true,
-        }
-      );
-      const { coworkerRequests } = result?.data;
-      setRequests((prev) => ({
-        ...prev,
-        coworkerRequests: coworkerRequests,
-      }));
-    } catch (error) {
-      console.error("error:", error);
-      throw error;
-    }
-  };
-
-  // get friend requests
-  const getFriendRequests = async () => {
-    try {
-      const result = await axios.get(`${API_URL}/${user?.id}/friend-requests`, {
-        withCredentials: true,
-      });
-      const { friendRequests } = result?.data;
-      setRequests((prev) => ({
-        ...prev,
-        friendRequests: friendRequests,
-      }));
-    } catch (error) {
-      console.error("error:", error);
-      throw error;
-    }
-  };
-
-  console.log("state requests:", requests);
-
-  useEffect(() => {
-    if (user?.id) {
-      getCoworkerRequests();
-      getFriendRequests();
-    }
-  }, [user?.id]);
-
   // coworkers && friends modal
   const { width } = useWindowDimensions();
 
-  const [showCRequestsModal, setShowCRequestsModal] = useState(null);
-  const [showFRequestsModal, setShowFRequestsModal] = useState(null);
-  const [showCoworkers, setShowCoworkers] = useState(true);
-  const [showCoworkerRequests, setShowCoworkerRequests] = useState(null);
-  const [showFriends, setShowFriends] = useState(true);
-  const [showFriendRequests, setShowFriendRequests] = useState(null);
+  const [showCRequestsModal, setShowCRequestsModal] = useState(false);
+  const [showFRequestsModal, setShowFRequestsModal] = useState(false);
+  const [showCoworkers, setShowCoworkers] = useState(false);
+  const [showCoworkerRequests, setShowCoworkerRequests] = useState(false);
+  const [showFriends, setShowFriends] = useState(false);
+  const [showFriendRequests, setShowFriendRequests] = useState(false);
 
   const handleOpenCReqModal = () => {
     setShowCRequestsModal(true);
@@ -157,6 +109,7 @@ function Sidebar() {
 
   // friends modal toggle view
   const toggleViewFriendsModal = (active) => {
+    refreshUser();
     if (active === "Friends") {
       setShowFriends(true);
       setShowFriendRequests(false);
@@ -174,21 +127,6 @@ function Sidebar() {
     recipientId
   ) => {
     try {
-      const coworkerRequestsCopy = [...requests.coworkerRequests];
-      const acceptedRequest = coworkerRequestsCopy.splice(itemIndex, 1)[0];
-      console.log("accepted request:", acceptedRequest);
-      setRequests((prev) => ({
-        ...prev,
-        coworkerRequests: coworkerRequestsCopy,
-      }));
-
-      const newData = {
-        coworkerId: acceptedRequest.requesterId,
-        id: null,
-        user: acceptedRequest.requester,
-        userId: user?.id,
-      };
-      updateUser({ coworkers: [newData, ...user.coworkers] });
       await axios.post(
         `${API_URL}/coworker-requests/${requestId}/accept`,
         {
@@ -197,6 +135,7 @@ function Sidebar() {
         },
         { withCredentials: true }
       );
+      refreshUser();
     } catch (error) {
       console.log("error:", error);
       throw error;
@@ -210,12 +149,6 @@ function Sidebar() {
     recipientId
   ) => {
     try {
-      const coworkerRequestsCopy = [...requests.coworkerRequests];
-      coworkerRequestsCopy.splice(itemIndex, 1);
-      setRequests((prev) => ({
-        ...prev,
-        coworkerRequests: coworkerRequestsCopy,
-      }));
       await axios.post(
         `${API_URL}/coworker-requests/${requestId}/reject`,
         {
@@ -224,6 +157,7 @@ function Sidebar() {
         },
         { withCredentials: true }
       );
+      refreshUser();
     } catch (error) {
       console.log("error:", error);
       throw error;
@@ -237,22 +171,6 @@ function Sidebar() {
     recipientId
   ) => {
     try {
-      const friendRequestsCopy = [...requests.friendRequests];
-      const acceptedRequest = friendRequestsCopy.splice(itemIndex, 1)[0];
-
-      console.log("accepted request:", acceptedRequest);
-
-      const newData = {
-        friendId: acceptedRequest.requesterId,
-        id: null,
-        user: acceptedRequest.requester,
-        userId: user?.id,
-      };
-      updateUser({ friends: [newData, ...user.friends] });
-      setRequests((prev) => ({
-        ...prev,
-        friendRequests: friendRequestsCopy,
-      }));
       await axios.post(
         `${API_URL}/friend-requests/${requestId}/accept`,
         {
@@ -261,6 +179,7 @@ function Sidebar() {
         },
         { withCredentials: true }
       );
+      refreshUser();
     } catch (error) {
       console.log("error:", error);
       throw error;
@@ -274,12 +193,6 @@ function Sidebar() {
     recipientId
   ) => {
     try {
-      const friendRequestsCopy = [...requests.coworkerRequests];
-      friendRequestsCopy.splice(itemIndex, 1);
-      setRequests((prev) => ({
-        ...prev,
-        friendRequests: friendRequestsCopy,
-      }));
       await axios.post(
         `${API_URL}/friend-requests/${requestId}/reject`,
         {
@@ -288,20 +201,331 @@ function Sidebar() {
         },
         { withCredentials: true }
       );
+      refreshUser();
     } catch (error) {
       console.log("error:", error);
       throw error;
     }
   };
 
+  const pendingCoworkerRequests =
+    user?.receivedCoworkerRequests?.filter(
+      (request) => request.status === "pending"
+    ) || [];
+  const pendingFriendRequests =
+    user?.receivedFriendRequests?.filter(
+      (request) => request.status === "pending"
+    ) || [];
+
+  // remove coworker
+  const [showRemoveCoworkerModal, setShowRemoveCoworkerModal] = useState(false);
+  const [coworkerToRemove, setCoworkerToRemove] = useState(false);
+  const openRemoveCoworkerModal = (userToRemove) => {
+    setShowRemoveCoworkerModal(true);
+    setCoworkerToRemove(userToRemove);
+  };
+  const closeRemoveCoworkerModal = () => {
+    setShowRemoveCoworkerModal(false);
+    setCoworkerToRemove(null);
+  };
+
+  const removeCoworker = async (userId) => {
+    try {
+      await axios.delete(`${API_URL}/coworker/${userId}/users/${user?.id}`);
+      setShowRemoveCoworkerModal(false);
+      setCoworkerToRemove(null);
+      refreshUser();
+      getAllUsers();
+    } catch (error) {
+      console.error("error:", error);
+      throw error;
+    }
+  };
+
+  // remove friend
+  const [showRemoveFriendModal, setShowRemoveFriendModal] = useState(false);
+  const [friendToRemove, setFriendToRemove] = useState(false);
+
+  const openRemoveFriendModal = (userToRemove) => {
+    setShowRemoveFriendModal(true);
+    setFriendToRemove(userToRemove);
+  };
+  const closeRemoveFriendModal = () => {
+    setShowRemoveFriendModal(false);
+    setFriendToRemove(null);
+  };
+
+  const removeFriend = async (userId) => {
+    try {
+      await axios.delete(`${API_URL}/friend/${userId}/users/${user?.id}`);
+      setShowRemoveFriendModal(false);
+      setFriendToRemove(null);
+      refreshUser();
+      getAllUsers();
+    } catch (error) {
+      console.error("error:", error);
+      throw error;
+    }
+  };
+
+  const [hovered_index, setHovered_index] = useState(null);
+  const [hovered_div, setHovered_div] = useState(null);
+
   return (
     <>
       <>
+        {/* showRemoveCoworkerModal */}
+        <>
+          <Modal
+            className="z-9999 p-0 m-0"
+            open={showRemoveCoworkerModal}
+            onClose={closeRemoveCoworkerModal}
+            sx={{
+              "& > .MuiBackdrop-root": {
+                opacity: "0.8 !important",
+              },
+            }}
+          >
+            <div
+              className="shadow_div_white p-abs border-r-4 none-outline"
+              style={{
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                maxWidth: 320,
+                borderRadius: "16px",
+              }}
+            >
+              <div
+                className="dflex fdir-column"
+                style={{
+                  padding: "32px",
+                }}
+              >
+                <span
+                  style={{
+                    marginBottom: "8px",
+                  }}
+                  className="fs-20 lh-24 chirp-bold-font"
+                >
+                  Remove coworker?
+                </span>
+                <div
+                  className="fs-15 lh-20 chirp-regular-font w-100"
+                  style={{
+                    color: "rgb(83, 100, 113)",
+                    textAlign: "left",
+                  }}
+                >
+                  <span
+                    style={{
+                      wordWrap: "break-word",
+                      textOverflow: "unset",
+                      minWidth: "0px",
+                      textAlign: "inherit",
+                      whiteSpace: "break-spaces",
+                    }}
+                  >
+                    Are you sure you want to remove @
+                    {coworkerToRemove?.username} from your coworkers list? This
+                    will delete the coworker relationship, and you both will no
+                    longer see each other in your coworkers list.
+                  </span>
+                </div>
+                <div
+                  className="dflex jfycenter algncenter fdir-column"
+                  style={{
+                    marginTop: "24px",
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      removeCoworker(coworkerToRemove?.id);
+                    }}
+                    style={{
+                      marginBottom: "12px",
+                      minHeight: "44px",
+                      minWidth: "44px",
+                      borderRadius: "9999px",
+                      paddingLeft: "24px",
+                      paddingRight: "24px",
+                      backgroundColor: "rgb(244,33,45)",
+                      color: "rgb(231, 233, 234)",
+                      border: "1px solid rgb(207, 217, 222)",
+                    }}
+                    className="w-100 border-r-999 fs-15 lh-20 chirp-bold-font red-btn-hover-effect pointer"
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        textAlign: "center",
+                      }}
+                    >
+                      Remove
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      closeRemoveCoworkerModal();
+                    }}
+                    style={{
+                      marginBottom: "12px",
+                      minHeight: "44px",
+                      minWidth: "44px",
+                      paddingLeft: "24px",
+                      paddingRight: "24px",
+                      backgroundColor: "transparent",
+                      color: "rgb(16, 23, 42)",
+                      border: "1px solid rgb(207, 217, 222)",
+                    }}
+                    className="w-100 border-r-999 fs-15 lh-20 chirp-bold-font cancel_btn_hover_effect pointer"
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        textAlign: "center",
+                      }}
+                    >
+                      Cancel
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Modal>
+        </>
+        {/* showRemoveCoworkerModal */}
+        {/* showRemoveFriendModal */}
+        <>
+          <Modal
+            className="z-9999 p-0 m-0"
+            open={showRemoveFriendModal}
+            onClose={closeRemoveFriendModal}
+            sx={{
+              "& > .MuiBackdrop-root": {
+                opacity: "0.8 !important",
+              },
+            }}
+          >
+            <div
+              className="shadow_div_white p-abs border-r-4 none-outline"
+              style={{
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                maxWidth: 320,
+                borderRadius: "16px",
+              }}
+            >
+              <div
+                className="dflex fdir-column"
+                style={{
+                  padding: "32px",
+                }}
+              >
+                <span
+                  style={{
+                    marginBottom: "8px",
+                  }}
+                  className="fs-20 lh-24 chirp-bold-font"
+                >
+                  Remove friend?
+                </span>
+                <div
+                  className="fs-15 lh-20 chirp-regular-font w-100"
+                  style={{
+                    color: "rgb(83, 100, 113)",
+                    textAlign: "left",
+                  }}
+                >
+                  <span
+                    style={{
+                      wordWrap: "break-word",
+                      textOverflow: "unset",
+                      minWidth: "0px",
+                      textAlign: "inherit",
+                      whiteSpace: "break-spaces",
+                    }}
+                  >
+                    Are you sure you want to remove @{friendToRemove?.username}{" "}
+                    from your friends list? This will delete your friendship,
+                    and you both will no longer see each other in your friends
+                    list.
+                  </span>
+                </div>
+                <div
+                  className="dflex jfycenter algncenter fdir-column"
+                  style={{
+                    marginTop: "24px",
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      removeFriend(friendToRemove?.id);
+                    }}
+                    style={{
+                      marginBottom: "12px",
+                      minHeight: "44px",
+                      minWidth: "44px",
+                      borderRadius: "9999px",
+                      paddingLeft: "24px",
+                      paddingRight: "24px",
+                      backgroundColor: "rgb(244,33,45)",
+                      color: "rgb(231, 233, 234)",
+                      border: "1px solid rgb(207, 217, 222)",
+                    }}
+                    className="w-100 border-r-999 fs-15 lh-20 chirp-bold-font red-btn-hover-effect pointer"
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        textAlign: "center",
+                      }}
+                    >
+                      Remove
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      closeRemoveFriendModal();
+                    }}
+                    style={{
+                      marginBottom: "12px",
+                      minHeight: "44px",
+                      minWidth: "44px",
+                      paddingLeft: "24px",
+                      paddingRight: "24px",
+                      backgroundColor: "transparent",
+                      color: "rgb(16, 23, 42)",
+                      border: "1px solid rgb(207, 217, 222)",
+                    }}
+                    className="w-100 border-r-999 fs-15 lh-20 chirp-bold-font cancel_btn_hover_effect pointer"
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        textAlign: "center",
+                      }}
+                    >
+                      Cancel
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Modal>
+        </>
+        {/* showRemoveFriendModal */}
         {/* coworkers modal */}
         <Modal
           className="z-9999 p-0 m-0"
           open={showCRequestsModal}
           onClose={handleCloseCReqModal}
+          sx={{
+            "& > .MuiBackdrop-root": {
+              opacity: "0.8 !important",
+            },
+          }}
         >
           <div
             className="shadow_div_white p-abs border-r-4 none-outline"
@@ -311,6 +535,7 @@ function Sidebar() {
               transform: "translate(-50%, -50%)",
               width: 600,
               height: 600,
+              borderRadius: "16px",
             }}
           >
             <div className="dflex">
@@ -319,7 +544,7 @@ function Sidebar() {
                 style={{
                   width: "50%",
                   height: "53px",
-                  borderTopLeftRadius: "4px",
+                  borderTopLeftRadius: "16px",
                 }}
                 onClick={() => toggleViewCoworkersModal("Coworkers")}
               >
@@ -361,7 +586,7 @@ function Sidebar() {
                 style={{
                   width: "50%",
                   height: "53px",
-                  borderTopRightRadius: "4px",
+                  borderTopRightRadius: "16px",
                 }}
                 onClick={() => toggleViewCoworkersModal("Requests")}
               >
@@ -402,6 +627,10 @@ function Sidebar() {
                       {user.coworkers.map((eachCoworker, itemIndex) => {
                         return (
                           <div
+                            onMouseEnter={() =>
+                              setHovered_index(eachCoworker?.id)
+                            }
+                            onMouseLeave={() => setHovered_index(null)}
                             className="p-16 border-r-4 dflex algncenter each-message-parent-div"
                             style={{
                               justifyContent: "flex-start",
@@ -466,27 +695,51 @@ function Sidebar() {
                             <div className="fs-15 lh-20 chirp-medium-font color-dark-text">
                               {eachCoworker?.user?.username}
                             </div>
+
                             <div
+                              onClick={() =>
+                                openRemoveCoworkerModal(eachCoworker?.user)
+                              }
                               className="dflex algncenter w-100"
                               style={{
                                 justifyContent: "flex-end",
                                 gap: "12px",
+                                display:
+                                  hovered_index === eachCoworker?.id
+                                    ? ""
+                                    : "none",
                               }}
                             >
                               <div
-                                className="fs-15 lh-20 chirp-bold-font jfycenter algncenter pointer circle_hover_accept"
+                                onMouseEnter={() =>
+                                  setHovered_div(eachCoworker?.id)
+                                }
+                                onMouseLeave={() => setHovered_div(null)}
+                                className="dflex algncenter jfycenter border-r-50 pointer"
                                 style={{
-                                  border: "1px solid rgb(207, 217, 222)",
-                                  display: "inline-flex",
-                                  borderRadius: "9999px",
-                                  minWidth: "32px",
-                                  minHeight: "32px",
-                                  padding: "0px 16px",
-                                  width: "80px",
-                                  color: "rgb(29, 155, 240)",
+                                  width: "40px",
+                                  height: "40px",
+                                  backgroundColor:
+                                    hovered_div === eachCoworker?.id &&
+                                    "#e4eef7",
+                                  transitionDuration: "0.2s",
                                 }}
                               >
-                                Options
+                                <svg
+                                  fill={
+                                    hovered_div === eachCoworker?.id
+                                      ? "rgb(29,155,240)"
+                                      : "rgb(83,100,113)"
+                                  }
+                                  width={`1.25em`}
+                                  height={`1.25em`}
+                                  viewBox="0 0 24 24"
+                                  aria-hidden="true"
+                                >
+                                  <g>
+                                    <path d="M3 12c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm9 2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm7 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
+                                  </g>
+                                </svg>
                               </div>
                             </div>
                           </div>
@@ -533,173 +786,222 @@ function Sidebar() {
             )}
             {showCoworkerRequests && (
               <>
-                {requests?.coworkerRequests?.length > 0 ? (
+                {user?.receivedCoworkerRequests?.length > 0 &&
+                pendingCoworkerRequests?.length ? (
                   <>
                     <div>
-                      {requests.coworkerRequests.map(
+                      {user.receivedCoworkerRequests.map(
                         (eachCRequest, itemIndex) => {
                           return (
-                            <div
-                              className="p-16 border-r-4 dflex algncenter each-message-parent-div"
-                              style={{
-                                justifyContent: "flex-start",
-                                gap: "12px",
-                                marginLeft: "16px",
-                                marginRight: "16px",
-                              }}
-                              key={eachCRequest.id}
-                            >
-                              <div>
-                                {eachCRequest?.requester?.profilePicture !==
-                                "default_profile_picture_url" ? (
+                            <>
+                              {eachCRequest?.status === "pending" ? (
+                                <>
                                   <div
+                                    className="p-16 border-r-4 dflex algncenter each-message-parent-div"
                                     style={{
-                                      width: "44px",
-                                      height: "44px",
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      borderRadius: "50%",
+                                      justifyContent: "flex-start",
+                                      gap: "12px",
+                                      marginLeft: "16px",
+                                      marginRight: "16px",
                                     }}
+                                    key={eachCRequest.id}
                                   >
-                                    <img
-                                      src={
-                                        eachCRequest?.requester?.profilePicture
-                                      }
-                                      width={40}
-                                      height={40}
-                                      alt=""
+                                    <div>
+                                      {eachCRequest?.requester
+                                        ?.profilePicture !==
+                                      "default_profile_picture_url" ? (
+                                        <div
+                                          style={{
+                                            width: "44px",
+                                            height: "44px",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            borderRadius: "50%",
+                                          }}
+                                        >
+                                          <img
+                                            src={
+                                              eachCRequest?.requester
+                                                ?.profilePicture
+                                            }
+                                            width={40}
+                                            height={40}
+                                            alt=""
+                                            style={{
+                                              borderRadius: "50%",
+                                            }}
+                                          />{" "}
+                                        </div>
+                                      ) : (
+                                        <div
+                                          style={{
+                                            width: "44px",
+                                            height: "44px",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            borderRadius: "50%",
+                                          }}
+                                          href=""
+                                        >
+                                          <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="40"
+                                            height="40"
+                                            fill={"rgb(83, 100, 113)"}
+                                            style={{
+                                              borderRadius: "50%",
+                                            }}
+                                            className="bi bi-person-circle"
+                                            viewBox="0 0 16 16"
+                                          >
+                                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                                            <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                                          </svg>{" "}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="fs-15 lh-20 chirp-medium-font color-dark-text">
+                                      {eachCRequest?.requester?.username}
+                                    </div>
+                                    <div
+                                      className="dflex algncenter w-100"
                                       style={{
-                                        borderRadius: "50%",
+                                        justifyContent: "flex-end",
+                                        gap: "12px",
                                       }}
-                                    />{" "}
-                                  </div>
-                                ) : (
-                                  <div
-                                    style={{
-                                      width: "44px",
-                                      height: "44px",
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      borderRadius: "50%",
-                                    }}
-                                    href=""
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      width="40"
-                                      height="40"
-                                      fill={"rgb(83, 100, 113)"}
-                                      style={{
-                                        borderRadius: "50%",
-                                      }}
-                                      className="bi bi-person-circle"
-                                      viewBox="0 0 16 16"
                                     >
-                                      <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                                      <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
-                                    </svg>{" "}
-                                  </div>
-                                )}
-                              </div>
-                              <div className="fs-15 lh-20 chirp-medium-font color-dark-text">
-                                {eachCRequest?.requester?.username}
-                              </div>
-                              <div
-                                className="dflex algncenter w-100"
-                                style={{
-                                  justifyContent: "flex-end",
-                                  gap: "12px",
-                                }}
-                              >
-                                <div
-                                  onClick={() => {
-                                    handleRejectCRequest(
-                                      itemIndex,
-                                      eachCRequest.id,
-                                      eachCRequest.requester.id,
-                                      eachCRequest.recipient.id
-                                    );
-                                  }}
-                                  className="fs-15 lh-20 chirp-bold-font jfycenter algncenter pointer circle_hover_reject"
-                                  style={{
-                                    display: "inline-flex",
-                                    border: "1px solid rgb(253, 201, 206)",
-                                    borderRadius: "9999px",
-                                    minWidth: "32px",
-                                    minHeight: "32px",
-                                    padding: "0px 16px",
-                                    width: "80px",
-                                    color: "rgb(244, 33, 46)",
-                                  }}
-                                >
-                                  Decline
-                                </div>
-                                <div
-                                  onClick={() => {
-                                    handleAcceptCRequest(
-                                      itemIndex,
-                                      eachCRequest.id,
-                                      eachCRequest.requester.id,
-                                      eachCRequest.recipient.id
-                                    );
-                                  }}
-                                  className="fs-15 lh-20 chirp-bold-font jfycenter algncenter pointer circle_hover_accept"
-                                  style={{
-                                    border: "1px solid rgb(207, 217, 222)",
-                                    display: "inline-flex",
-                                    borderRadius: "9999px",
-                                    minWidth: "32px",
-                                    minHeight: "32px",
-                                    padding: "0px 16px",
-                                    width: "80px",
-                                    color: "rgb(29, 155, 240)",
-                                  }}
-                                >
-                                  Accept
-                                </div>
-                              </div>
-                            </div>
+                                      <div
+                                        onClick={() => {
+                                          handleRejectCRequest(
+                                            itemIndex,
+                                            eachCRequest.id,
+                                            eachCRequest.requester.id,
+                                            eachCRequest.recipient.id
+                                          );
+                                        }}
+                                        className="fs-15 lh-20 chirp-bold-font jfycenter algncenter pointer circle_hover_reject"
+                                        style={{
+                                          display: "inline-flex",
+                                          border:
+                                            "1px solid rgb(253, 201, 206)",
+                                          borderRadius: "9999px",
+                                          minWidth: "32px",
+                                          minHeight: "32px",
+                                          padding: "0px 16px",
+                                          width: "80px",
+                                          color: "rgb(244, 33, 46)",
+                                        }}
+                                      >
+                                        Decline
+                                      </div>
+                                      <div
+                                        onClick={() => {
+                                          handleAcceptCRequest(
+                                            itemIndex,
+                                            eachCRequest.id,
+                                            eachCRequest.requester.id,
+                                            eachCRequest.recipient.id
+                                          );
+                                        }}
+                                        className="fs-15 lh-20 chirp-bold-font jfycenter algncenter pointer circle_hover_accept"
+                                        style={{
+                                          border:
+                                            "1px solid rgb(207, 217, 222)",
+                                          display: "inline-flex",
+                                          borderRadius: "9999px",
+                                          minWidth: "32px",
+                                          minHeight: "32px",
+                                          padding: "0px 16px",
+                                          width: "80px",
+                                          color: "rgb(29, 155, 240)",
+                                        }}
+                                      >
+                                        Accept
+                                      </div>
+                                    </div>
+                                  </div>{" "}
+                                </>
+                              ) : null}
+                            </>
                           );
                         }
                       )}
                     </div>
                   </>
-                ) : (
-                  <div
-                    className="dflex jfycenter"
-                    style={{
-                      padding: "32px",
-                    }}
-                  >
+                ) : !pendingCoworkerRequests?.length ? (
+                  <>
                     <div
+                      className="dflex jfycenter"
                       style={{
-                        maxWidth: "350px",
+                        padding: "32px",
                       }}
                     >
                       <div
-                        className="chirp-heavy-font"
                         style={{
-                          fontSize: "31px",
-                          lineHeight: "36px",
-                          margin: "10px",
+                          maxWidth: "350px",
                         }}
                       >
-                        Coworker Requests
-                      </div>
-                      <div
-                        className="chirp-regular-font fs-15 lh-20"
-                        style={{
-                          color: "rgb(83, 100, 113)",
-                          margin: "10px",
-                        }}
-                      >
-                        You currently have no coworker requests.If you receive a
-                        coworker request, it will be shown here.
+                        <div
+                          className="chirp-heavy-font"
+                          style={{
+                            fontSize: "31px",
+                            lineHeight: "36px",
+                            margin: "10px",
+                          }}
+                        >
+                          Coworker Requests
+                        </div>
+                        <div
+                          className="chirp-regular-font fs-15 lh-20"
+                          style={{
+                            color: "rgb(83, 100, 113)",
+                            margin: "10px",
+                          }}
+                        >
+                          You currently have no coworker requests.If you receive
+                          a coworker request, it will be shown here.
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </>
+                ) : (
+                  <>
+                    <div
+                      className="dflex jfycenter"
+                      style={{
+                        padding: "32px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          maxWidth: "350px",
+                        }}
+                      >
+                        <div
+                          className="chirp-heavy-font"
+                          style={{
+                            fontSize: "31px",
+                            lineHeight: "36px",
+                            margin: "10px",
+                          }}
+                        >
+                          Coworker Requests
+                        </div>
+                        <div
+                          className="chirp-regular-font fs-15 lh-20"
+                          style={{
+                            color: "rgb(83, 100, 113)",
+                            margin: "10px",
+                          }}
+                        >
+                          You currently have no coworker requests.If you receive
+                          a coworker request, it will be shown here.
+                        </div>
+                      </div>
+                    </div>
+                  </>
                 )}
               </>
             )}
@@ -721,6 +1023,7 @@ function Sidebar() {
               transform: "translate(-50%, -50%)",
               width: 600,
               height: 600,
+              borderRadius: "16px",
             }}
           >
             <div className="dflex">
@@ -729,7 +1032,7 @@ function Sidebar() {
                 style={{
                   width: "50%",
                   height: "53px",
-                  borderTopLeftRadius: "4px",
+                  borderTopLeftRadius: "16px",
                 }}
                 onClick={() => toggleViewFriendsModal("Friends")}
               >
@@ -771,7 +1074,7 @@ function Sidebar() {
                 style={{
                   width: "50%",
                   height: "53px",
-                  borderTopRightRadius: "4px",
+                  borderTopRightRadius: "16px",
                 }}
                 onClick={() => toggleViewFriendsModal("Requests")}
               >
@@ -812,6 +1115,10 @@ function Sidebar() {
                       {user.friends.map((eachFriend, itemIndex) => {
                         return (
                           <div
+                            onMouseEnter={() =>
+                              setHovered_index(eachFriend?.id)
+                            }
+                            onMouseLeave={() => setHovered_index(null)}
                             className="p-16 border-r-4 dflex algncenter each-message-parent-div"
                             style={{
                               justifyContent: "flex-start",
@@ -877,26 +1184,48 @@ function Sidebar() {
                               {eachFriend?.user?.username}
                             </div>
                             <div
+                              onClick={() =>
+                                openRemoveFriendModal(eachFriend?.user)
+                              }
                               className="dflex algncenter w-100"
                               style={{
                                 justifyContent: "flex-end",
                                 gap: "12px",
+                                display:
+                                  hovered_index === eachFriend?.id
+                                    ? ""
+                                    : "none",
                               }}
                             >
                               <div
-                                className="fs-15 lh-20 chirp-bold-font jfycenter algncenter pointer circle_hover_accept"
+                                onMouseEnter={() =>
+                                  setHovered_div(eachFriend?.id)
+                                }
+                                onMouseLeave={() => setHovered_div(null)}
+                                className="dflex algncenter jfycenter border-r-50 pointer"
                                 style={{
-                                  border: "1px solid rgb(207, 217, 222)",
-                                  display: "inline-flex",
-                                  borderRadius: "9999px",
-                                  minWidth: "32px",
-                                  minHeight: "32px",
-                                  padding: "0px 16px",
-                                  width: "80px",
-                                  color: "rgb(29, 155, 240)",
+                                  width: "40px",
+                                  height: "40px",
+                                  backgroundColor:
+                                    hovered_div === eachFriend?.id && "#e4eef7",
+                                  transitionDuration: "0.2s",
                                 }}
                               >
-                                Options
+                                <svg
+                                  fill={
+                                    hovered_div === eachFriend?.id
+                                      ? "rgb(29,155,240)"
+                                      : "rgb(83,100,113)"
+                                  }
+                                  width={`1.25em`}
+                                  height={`1.25em`}
+                                  viewBox="0 0 24 24"
+                                  aria-hidden="true"
+                                >
+                                  <g>
+                                    <path d="M3 12c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm9 2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm7 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
+                                  </g>
+                                </svg>
                               </div>
                             </div>
                           </div>
@@ -943,139 +1272,179 @@ function Sidebar() {
             )}
             {showFriendRequests && (
               <>
-                {requests?.friendRequests?.length > 0 ? (
+                {user?.receivedFriendRequests?.length > 0 &&
+                pendingFriendRequests?.length ? (
                   <>
                     <div>
-                      {requests.friendRequests.map(
+                      {user.receivedFriendRequests.map(
                         (eachCRequest, itemIndex) => {
                           return (
-                            <div
-                              className="p-16 border-r-4 dflex algncenter each-message-parent-div"
-                              style={{
-                                justifyContent: "flex-start",
-                                gap: "12px",
-                                marginLeft: "16px",
-                                marginRight: "16px",
-                              }}
-                              key={eachCRequest.id}
-                            >
-                              <div>
-                                {eachCRequest?.requester?.profilePicture !==
-                                "default_profile_picture_url" ? (
-                                  <div
-                                    style={{
-                                      width: "44px",
-                                      height: "44px",
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      borderRadius: "50%",
-                                    }}
-                                  >
-                                    <img
-                                      src={
-                                        eachCRequest?.requester?.profilePicture
-                                      }
-                                      width={40}
-                                      height={40}
-                                      alt=""
-                                      style={{
-                                        borderRadius: "50%",
-                                      }}
-                                    />{" "}
+                            <>
+                              {eachCRequest?.status === "pending" ? (
+                                <div
+                                  className="p-16 border-r-4 dflex algncenter each-message-parent-div"
+                                  style={{
+                                    justifyContent: "flex-start",
+                                    gap: "12px",
+                                    marginLeft: "16px",
+                                    marginRight: "16px",
+                                  }}
+                                  key={eachCRequest.id}
+                                >
+                                  <div>
+                                    {eachCRequest?.requester?.profilePicture !==
+                                    "default_profile_picture_url" ? (
+                                      <div
+                                        style={{
+                                          width: "44px",
+                                          height: "44px",
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          borderRadius: "50%",
+                                        }}
+                                      >
+                                        <img
+                                          src={
+                                            eachCRequest?.requester
+                                              ?.profilePicture
+                                          }
+                                          width={40}
+                                          height={40}
+                                          alt=""
+                                          style={{
+                                            borderRadius: "50%",
+                                          }}
+                                        />{" "}
+                                      </div>
+                                    ) : (
+                                      <div
+                                        style={{
+                                          width: "44px",
+                                          height: "44px",
+                                          display: "flex",
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          borderRadius: "50%",
+                                        }}
+                                        href=""
+                                      >
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          width="40"
+                                          height="40"
+                                          fill={"rgb(83, 100, 113)"}
+                                          style={{
+                                            borderRadius: "50%",
+                                          }}
+                                          className="bi bi-person-circle"
+                                          viewBox="0 0 16 16"
+                                        >
+                                          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                                          <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                                        </svg>{" "}
+                                      </div>
+                                    )}
                                   </div>
-                                ) : (
+                                  <div className="fs-15 lh-20 chirp-medium-font color-dark-text">
+                                    {eachCRequest?.requester?.username}
+                                  </div>
                                   <div
+                                    className="dflex algncenter w-100"
                                     style={{
-                                      width: "44px",
-                                      height: "44px",
-                                      display: "flex",
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      borderRadius: "50%",
+                                      justifyContent: "flex-end",
+                                      gap: "12px",
                                     }}
-                                    href=""
                                   >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      width="40"
-                                      height="40"
-                                      fill={"rgb(83, 100, 113)"}
-                                      style={{
-                                        borderRadius: "50%",
+                                    <div
+                                      onClick={() => {
+                                        handleRejectFRequest(
+                                          itemIndex,
+                                          eachCRequest.id,
+                                          eachCRequest.requester.id,
+                                          eachCRequest.recipient.id
+                                        );
                                       }}
-                                      className="bi bi-person-circle"
-                                      viewBox="0 0 16 16"
+                                      className="fs-15 lh-20 chirp-bold-font jfycenter algncenter pointer circle_hover_reject"
+                                      style={{
+                                        display: "inline-flex",
+                                        border: "1px solid rgb(253, 201, 206)",
+                                        borderRadius: "9999px",
+                                        minWidth: "32px",
+                                        minHeight: "32px",
+                                        padding: "0px 16px",
+                                        width: "80px",
+                                        color: "rgb(244, 33, 46)",
+                                      }}
                                     >
-                                      <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                                      <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
-                                    </svg>{" "}
+                                      Decline
+                                    </div>
+                                    <div
+                                      onClick={() => {
+                                        handleAcceptFRequest(
+                                          itemIndex,
+                                          eachCRequest.id,
+                                          eachCRequest.requester.id,
+                                          eachCRequest.recipient.id
+                                        );
+                                      }}
+                                      className="fs-15 lh-20 chirp-bold-font jfycenter algncenter pointer circle_hover_accept"
+                                      style={{
+                                        border: "1px solid rgb(207, 217, 222)",
+                                        display: "inline-flex",
+                                        borderRadius: "9999px",
+                                        minWidth: "32px",
+                                        minHeight: "32px",
+                                        padding: "0px 16px",
+                                        width: "80px",
+                                        color: "rgb(29, 155, 240)",
+                                      }}
+                                    >
+                                      Accept
+                                    </div>
                                   </div>
-                                )}
-                              </div>
-                              <div className="fs-15 lh-20 chirp-medium-font color-dark-text">
-                                {eachCRequest?.requester?.username}
-                              </div>
-                              <div
-                                className="dflex algncenter w-100"
-                                style={{
-                                  justifyContent: "flex-end",
-                                  gap: "12px",
-                                }}
-                              >
-                                <div
-                                  onClick={() => {
-                                    handleRejectFRequest(
-                                      itemIndex,
-                                      eachCRequest.id,
-                                      eachCRequest.requester.id,
-                                      eachCRequest.recipient.id
-                                    );
-                                  }}
-                                  className="fs-15 lh-20 chirp-bold-font jfycenter algncenter pointer circle_hover_reject"
-                                  style={{
-                                    display: "inline-flex",
-                                    border: "1px solid rgb(253, 201, 206)",
-                                    borderRadius: "9999px",
-                                    minWidth: "32px",
-                                    minHeight: "32px",
-                                    padding: "0px 16px",
-                                    width: "80px",
-                                    color: "rgb(244, 33, 46)",
-                                  }}
-                                >
-                                  Decline
                                 </div>
-                                <div
-                                  onClick={() => {
-                                    handleAcceptFRequest(
-                                      itemIndex,
-                                      eachCRequest.id,
-                                      eachCRequest.requester.id,
-                                      eachCRequest.recipient.id
-                                    );
-                                  }}
-                                  className="fs-15 lh-20 chirp-bold-font jfycenter algncenter pointer circle_hover_accept"
-                                  style={{
-                                    border: "1px solid rgb(207, 217, 222)",
-                                    display: "inline-flex",
-                                    borderRadius: "9999px",
-                                    minWidth: "32px",
-                                    minHeight: "32px",
-                                    padding: "0px 16px",
-                                    width: "80px",
-                                    color: "rgb(29, 155, 240)",
-                                  }}
-                                >
-                                  Accept
-                                </div>
-                              </div>
-                            </div>
+                              ) : null}
+                            </>
                           );
                         }
                       )}
                     </div>
                   </>
+                ) : !pendingFriendRequests?.length ? (
+                  <div
+                    className="dflex jfycenter"
+                    style={{
+                      padding: "32px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        maxWidth: "350px",
+                      }}
+                    >
+                      <div
+                        className="chirp-heavy-font"
+                        style={{
+                          fontSize: "31px",
+                          lineHeight: "36px",
+                          margin: "10px",
+                        }}
+                      >
+                        Friend Requests
+                      </div>
+                      <div
+                        className="chirp-regular-font fs-15 lh-20"
+                        style={{
+                          color: "rgb(83, 100, 113)",
+                          margin: "10px",
+                        }}
+                      >
+                        You currently have no friend requests.If you receive a
+                        friend request, it will be shown here.
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <div
                     className="dflex jfycenter"
@@ -1301,6 +1670,7 @@ function Sidebar() {
                   >
                     <div
                       onClick={() => {
+                        refreshUser();
                         setShow(false);
                       }}
                       className={
@@ -1321,7 +1691,10 @@ function Sidebar() {
                     </div>
                   </div>
                   <div
-                    onClick={handleOpenCReqModal}
+                    onClick={() => {
+                      refreshUser();
+                      handleOpenCReqModal();
+                    }}
                     style={{
                       width: "100%",
                       textAlign: "center",
@@ -1347,7 +1720,10 @@ function Sidebar() {
                     </div>
                   </div>
                   <div
-                    onClick={handleOpenFReqModal}
+                    onClick={() => {
+                      refreshUser();
+                      handleOpenFReqModal();
+                    }}
                     style={{
                       width: "100%",
                       marginTop: "16px",
