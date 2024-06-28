@@ -169,31 +169,6 @@ function Dashboard() {
     }
   }, [user?.id]);
 
-  useEffect(() => {
-    if (user?.id) {
-      refreshUser();
-      getConversations();
-      const interval = setInterval(() => {
-        refreshUser();
-        getConversations();
-      }, 30000);
-
-      return () => clearInterval(interval);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (user?.id) {
-      getConversations();
-      const interval = setInterval(() => {
-        refreshUser();
-        getConversations();
-      }, 1500);
-
-      return () => clearInterval(interval);
-    }
-  }, [arrivalMessage]);
-
   const findMemberNotEqualUser = (array) => {
     const filteredArray = array?.filter((eachMember) => {
       return eachMember?.id !== user?.id;
@@ -254,6 +229,31 @@ function Dashboard() {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const socket = useSocket();
+
+  useEffect(() => {
+    if (user?.id) {
+      refreshUser();
+      getConversations();
+      const interval = setInterval(() => {
+        refreshUser();
+        getConversations();
+      }, 30000);
+
+      return () => clearInterval(interval);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user?.id) {
+      getConversations();
+      const interval = setInterval(() => {
+        refreshUser();
+        getConversations();
+      }, 1500);
+
+      return () => clearInterval(interval);
+    }
+  }, [arrivalMessage]);
 
   useEffect(() => {
     socket.emit("addUser", user?.id);
