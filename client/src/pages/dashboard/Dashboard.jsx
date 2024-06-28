@@ -183,6 +183,18 @@ function Dashboard() {
     }
   }, []);
 
+  useEffect(() => {
+    if (user?.id) {
+      getConversations();
+      const interval = setInterval(() => {
+        refreshUser();
+        getConversations();
+      }, 1500);
+
+      return () => clearInterval(interval);
+    }
+  }, [arrivalMessage]);
+
   const findMemberNotEqualUser = (array) => {
     const filteredArray = array?.filter((eachMember) => {
       return eachMember?.id !== user?.id;
