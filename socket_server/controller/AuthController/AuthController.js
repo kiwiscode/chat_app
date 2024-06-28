@@ -71,9 +71,6 @@ function emailProcess() {
 const checkIfUsernameExists = async (req, res) => {
   try {
     const { username } = req.body;
-    if (!username) {
-      return res.status(400).json({ error: "Username is required" });
-    }
     const user = await prisma.user.findUnique({
       where: {
         username: username.toLowerCase(),
@@ -92,9 +89,6 @@ const checkIfUsernameExists = async (req, res) => {
 const checkIfEmailExists = async (req, res) => {
   try {
     const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ error: "Email is required" });
-    }
     const user = await prisma.user.findUnique({
       where: {
         email: email.toLowerCase(),
@@ -218,7 +212,7 @@ const authSignup = async (req, res) => {
       httpOnly: true,
     });
 
-    res.status(200).json({ message: "User created successfully", token });
+    res.status(200).json({ message: "User created successfully" });
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({
