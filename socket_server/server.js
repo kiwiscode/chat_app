@@ -10,7 +10,7 @@ const socketIo = require("socket.io");
 const http = require("http");
 const server = http.createServer(app);
 const FRONTEND_URL = "https://chat-app-psi-liart.vercel.app";
-
+//
 const corsOptions = {
   origin: FRONTEND_URL,
   methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
