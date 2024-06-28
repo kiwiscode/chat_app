@@ -92,6 +92,9 @@ const checkIfUsernameExists = async (req, res) => {
 const checkIfEmailExists = async (req, res) => {
   try {
     const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
     const user = await prisma.user.findUnique({
       where: {
         email: email.toLowerCase(),

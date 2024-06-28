@@ -69,6 +69,7 @@ function Main() {
       const response = await axios.post(`${API_URL}/auth/check-username`, {
         username: formData.username,
       });
+      console.log("result auth/check-username:", response);
       setUsernameError("");
     } catch (error) {
       console.error("Error:", error);
@@ -92,6 +93,8 @@ function Main() {
       const response = await axios.post(`${API_URL}/auth/check-email`, {
         email: formData.email,
       });
+      console.log("result auth/check-email:", response);
+
       setEmailError("");
     } catch (error) {
       console.error("Error:", error);
@@ -209,6 +212,8 @@ function Main() {
           withCredentials: true,
         }
       );
+
+      console.log("result auth/signup:", result);
 
       if (result) {
         setUsernameError("");
