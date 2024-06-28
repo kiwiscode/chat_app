@@ -1,7 +1,9 @@
 require("dotenv").config();
 
 const { createSecretToken } = require("../../util/SecretToken");
-const prisma = require("../../util/PrismaConfig");
+// const prisma = require("../../util/PrismaConfig");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
