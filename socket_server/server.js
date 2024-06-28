@@ -48,10 +48,6 @@ app.use("/conversations", conversationRoutes);
 app.use("/messages", messageRoutes);
 app.use("/", connectionRoutes);
 
-app.get("/api/hello", (req, res) => {
-  res.send("hello world");
-});
-
 let users = [];
 
 const addUser = (userId, socketId) => {

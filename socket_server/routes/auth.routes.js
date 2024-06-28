@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const AuthController = require("../controller/AuthController/AuthController");
 
-app.get("/hello", (req, res) => {
+router.get("/hello", (req, res) => {
   res.send("hello world auth !");
 });
 
