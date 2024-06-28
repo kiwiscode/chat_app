@@ -71,6 +71,9 @@ function emailProcess() {
 const checkIfUsernameExists = async (req, res) => {
   try {
     const { username } = req.body;
+    if (!username) {
+      return res.status(400).json({ error: "Username is required" });
+    }
     const user = await prisma.user.findUnique({
       where: {
         username: username.toLowerCase(),
