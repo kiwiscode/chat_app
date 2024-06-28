@@ -2,7 +2,7 @@ const router = require("express").Router();
 const AuthController = require("../controller/AuthController/AuthController");
 
 router.get("/hello", (req, res) => {
-  res.send("hello world auth !");
+  res.send("hello world auth routes !");
 });
 
 router.post("/check-username", AuthController.checkIfUsernameExists);

@@ -1,6 +1,10 @@
 const router = require("express").Router();
 const ConnectionController = require("../controller/ConnectionController/ConnectionController");
 
+router.get("/hello", (req, res) => {
+  res.send("hello world connection routes !");
+});
+
 router.get(
   "/:userId/coworker-requests",
   ConnectionController.getCoworkerRequests
