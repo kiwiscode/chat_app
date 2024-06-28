@@ -215,10 +215,10 @@ const authSignup = async (req, res) => {
     const token = createSecretToken(user.id);
     res.cookie("token", token, {
       withCredentials: true,
-      httpOnly: false,
+      httpOnly: true,
     });
 
-    res.status(200).json({ message: "User created successfully" });
+    res.status(200).json({ message: "User created successfully", token });
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({
@@ -271,7 +271,7 @@ const authLogin = async (req, res) => {
     const token = createSecretToken(user.id);
     res.cookie("token", token, {
       withCredentials: true,
-      httpOnly: false,
+      httpOnly: true,
     });
 
     return res

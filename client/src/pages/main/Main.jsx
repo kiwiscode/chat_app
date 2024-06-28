@@ -269,6 +269,8 @@ function Main() {
           withCredentials: true,
         }
       );
+
+      console.log("result auth/login:", result);
       if (result?.status === 200) {
         navigate("/dashboard");
         window.location.reload();
