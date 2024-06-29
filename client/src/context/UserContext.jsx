@@ -41,7 +41,7 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     console.log("Path:", path);
     console.log("Cookies:", cookies);
-
+    console.log("document.cookie:", document.cookie);
     if (cookies.token && cookies !== "undefined") {
       setAuthToken(cookies.token);
       setIsAuthenticatedUser(true);
