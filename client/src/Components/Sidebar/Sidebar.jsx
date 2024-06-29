@@ -57,9 +57,10 @@ function Sidebar() {
       updateUser({ profilePicture: result.data.imageInfo.url });
       if (result.data.imageInfo.url) {
         setChangingBar(false);
-      } else {
-        window.location.reload();
       }
+      // else {
+      //   window.location.reload();
+      // }
     } catch (error) {
       console.error("error:", error);
       throw error;

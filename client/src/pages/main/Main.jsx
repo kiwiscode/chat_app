@@ -275,7 +275,7 @@ function Main() {
         setLoading(true);
         setTimeout(() => {
           navigate("/dashboard");
-          window.location.reload();
+          // window.location.reload();
         }, 500);
         setTimeout(() => {
           setLoading(false);
