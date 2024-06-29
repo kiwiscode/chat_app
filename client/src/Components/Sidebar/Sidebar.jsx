@@ -51,7 +51,7 @@ function Sidebar() {
           image: profileImage,
         },
         {
-          withCredentials: true,
+          withCredentials: "include",
         }
       );
       updateUser({ profilePicture: result.data.imageInfo.url });
@@ -133,7 +133,9 @@ function Sidebar() {
           requesterId,
           recipientId,
         },
-        { withCredentials: true }
+        {
+          withCredentials: "include",
+        }
       );
       refreshUser();
     } catch (error) {
@@ -155,7 +157,9 @@ function Sidebar() {
           requesterId,
           recipientId,
         },
-        { withCredentials: true }
+        {
+          withCredentials: "include",
+        }
       );
       refreshUser();
     } catch (error) {
@@ -177,7 +181,9 @@ function Sidebar() {
           requesterId,
           recipientId,
         },
-        { withCredentials: true }
+        {
+          withCredentials: "include",
+        }
       );
       refreshUser();
     } catch (error) {
@@ -199,7 +205,9 @@ function Sidebar() {
           requesterId,
           recipientId,
         },
-        { withCredentials: true }
+        {
+          withCredentials: "include",
+        }
       );
       refreshUser();
     } catch (error) {

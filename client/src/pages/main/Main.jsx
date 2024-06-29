@@ -209,7 +209,7 @@ function Main() {
           formData,
         },
         {
-          withCredentials: true,
+          withCredentials: "include",
         }
       );
 

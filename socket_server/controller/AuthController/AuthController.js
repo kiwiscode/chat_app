@@ -208,11 +208,11 @@ const authSignup = async (req, res) => {
     });
     const token = createSecretToken(user.id);
     res.cookie("token", token, {
-      withCredentials: true,
       httpOnly: true,
-      secure: true,
+      secure: true, // Sadece production ortamında secure olacak
       sameSite: "none",
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
+      domain: ".xxxx.com", // Tüm alt alan adları ve ana alan adı için geçerli olacak
     });
     //
     res.status(200).json({ message: "User created successfully" });
@@ -267,13 +267,12 @@ const authLogin = async (req, res) => {
 
     const token = createSecretToken(user.id);
     res.cookie("token", token, {
-      withCredentials: true,
       httpOnly: true,
-      secure: true,
+      secure: true, // Sadece production ortamında secure olacak
       sameSite: "none",
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
+      domain: ".xxxx.com", // Tüm alt alan adları ve ana alan adı için geçerli olacak
     });
-
     return res
       .status(200)
       .json({ message: "User logged in successfully", token, user });

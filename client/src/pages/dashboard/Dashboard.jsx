@@ -32,7 +32,7 @@ function Dashboard() {
   const getAllUsers = async () => {
     try {
       const result = await axios.get(`${API_URL}/users`, {
-        withCredentials: true,
+        withCredentials: "include",
       });
       setUsers(result.data);
     } catch (error) {
@@ -101,7 +101,7 @@ function Dashboard() {
           user2Id: eachUser?.id,
         },
         {
-          withCredentials: true,
+          withCredentials: "include",
         }
       );
       setSelectedUser(eachUser);
@@ -128,7 +128,7 @@ function Dashboard() {
           message,
         },
         {
-          withCredentials: true,
+          withCredentials: "include",
         }
       );
       if (user?.id) {
@@ -153,7 +153,7 @@ function Dashboard() {
   const getConversations = async () => {
     try {
       const result = await axios.get(`${API_URL}/conversations/${user?.id}`, {
-        withCredentials: true,
+        withCredentials: "include",
       });
       setLoading(false);
       setConversations(result.data);
@@ -191,7 +191,7 @@ function Dashboard() {
       const result = await axios.get(
         `${API_URL}/conversations/find/${user?.id}/${selectedUser?.id}`,
         {
-          withCredentials: true,
+          withCredentials: "include",
         }
       );
 
@@ -209,7 +209,7 @@ function Dashboard() {
       const result = await axios.get(
         `${API_URL}/messages/${conversationId || conversation.id}`,
         {
-          withCredentials: true,
+          withCredentials: "include",
         }
       );
       if (user?.id) {
@@ -403,7 +403,7 @@ function Dashboard() {
           recipientId,
         },
         {
-          withCredentials: true,
+          withCredentials: "include",
         }
       );
       const { status, message, reverseRequest } = result.data;
@@ -472,7 +472,7 @@ function Dashboard() {
           recipientId,
         },
         {
-          withCredentials: true,
+          withCredentials: "include",
         }
       );
 

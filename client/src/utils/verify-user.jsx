@@ -16,7 +16,9 @@ export const verifyCookie = async (
     const { data } = await axios.post(
       `${API_URL}/user-verify`,
       {},
-      { withCredentials: true }
+      {
+        withCredentials: "include",
+      }
     );
     const { status, user } = data;
     setUsername(user);
