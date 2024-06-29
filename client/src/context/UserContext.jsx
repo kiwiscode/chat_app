@@ -55,7 +55,7 @@ export const UserProvider = ({ children }) => {
         setIsAuthenticatedUser(false);
         navigate("/");
       }
-    }, 2500);
+    }, 5000);
   }, [cookies]);
 
   const updateUser = (newUserInfo) => {
