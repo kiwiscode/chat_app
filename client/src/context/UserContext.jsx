@@ -6,7 +6,7 @@ import { verifyCookie } from "../utils/verify-user";
 
 import Cookies from "js-cookie";
 
-const API_URL = "https://chatswift-vvul5.ondigitalocean.app/";
+const API_URL = "https://chatswift-vvul5.ondigitalocean.app";
 
 const UserContext = createContext();
 

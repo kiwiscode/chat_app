@@ -6,7 +6,7 @@ export const useSocket = () => {
   return useContext(SocketContext);
 };
 
-const socket = io("https://chatswift-vvul5.ondigitalocean.app/");
+const socket = io("https://chatswift-vvul5.ondigitalocean.app");
 
 export const SocketProvider = ({ children }) => {
   useEffect(() => {

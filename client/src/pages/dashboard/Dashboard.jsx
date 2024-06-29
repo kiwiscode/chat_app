@@ -10,7 +10,7 @@ import { useAntdMessageHandler } from "../../utils/useAntdMessageHandler";
 import useWindowDimensions from "../../utils/window-dimensions";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
 
-const API_URL = "https://chatswift-vvul5.ondigitalocean.app/";
+const API_URL = "https://chatswift-vvul5.ondigitalocean.app";
 
 function Dashboard() {
   const { user, refreshUser } = useUser();

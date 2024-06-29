@@ -8,7 +8,7 @@ import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import useWindowDimensions from "../../utils/window-dimensions";
 import { Modal } from "@mui/material";
 
-const API_URL = "https://chatswift-vvul5.ondigitalocean.app/";
+const API_URL = "https://chatswift-vvul5.ondigitalocean.app";
 
 function Sidebar() {
   const [show, setShow] = useState(false);
