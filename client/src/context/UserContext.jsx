@@ -58,7 +58,9 @@ export const UserProvider = ({ children }) => {
     ) {
       setAuthToken(null);
       setIsAuthenticatedUser(false);
-      navigate("/");
+      setTimeout(() => {
+        navigate("/");
+      }, 15000);
       console.log("here is working 1");
     }
   }, [cookies, path, navigate, removeCookie, setUser, API_URL]);
