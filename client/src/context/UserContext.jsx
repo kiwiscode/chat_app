@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { verifyCookie } from "../utils/verify-user";
 
+import Cookies from "js-cookie";
+
 const API_URL = "https://chat-app-mpi2.onrender.com";
 
 const UserContext = createContext();
@@ -42,6 +44,8 @@ export const UserProvider = ({ children }) => {
     console.log("Path:", path);
     console.log("Cookies:", cookies);
     console.log("document.cookie:", document.cookie);
+    const token = Cookies.get("token");
+    console.log("Token from Cookies:", token);
     if (cookies.token && cookies !== "undefined") {
       setAuthToken(cookies.token);
       setIsAuthenticatedUser(true);
@@ -60,7 +64,7 @@ export const UserProvider = ({ children }) => {
       setIsAuthenticatedUser(false);
       setTimeout(() => {
         navigate("/");
-      }, 15000);
+      }, 50000);
       console.log("here is working 1");
     }
   }, [cookies, path, navigate, removeCookie, setUser, API_URL]);
