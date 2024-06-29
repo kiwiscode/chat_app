@@ -24,7 +24,7 @@ export const UserProvider = ({ children }) => {
         `${API_URL}/auth/logout`,
         { id: user.id },
         {
-          withCredentials: "include",
+          withCredentials: true,
         }
       );
 
@@ -82,7 +82,7 @@ export const UserProvider = ({ children }) => {
         `${API_URL}/users/${user?.id}`,
         {},
         {
-          withCredentials: "include",
+          withCredentials: true,
         }
       );
 

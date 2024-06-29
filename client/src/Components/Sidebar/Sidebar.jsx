@@ -51,7 +51,7 @@ function Sidebar() {
           image: profileImage,
         },
         {
-          withCredentials: "include",
+          withCredentials: true,
         }
       );
       updateUser({ profilePicture: result.data.imageInfo.url });
@@ -134,7 +134,7 @@ function Sidebar() {
           recipientId,
         },
         {
-          withCredentials: "include",
+          withCredentials: true,
         }
       );
       refreshUser();
@@ -158,7 +158,7 @@ function Sidebar() {
           recipientId,
         },
         {
-          withCredentials: "include",
+          withCredentials: true,
         }
       );
       refreshUser();
@@ -182,7 +182,7 @@ function Sidebar() {
           recipientId,
         },
         {
-          withCredentials: "include",
+          withCredentials: true,
         }
       );
       refreshUser();
@@ -206,7 +206,7 @@ function Sidebar() {
           recipientId,
         },
         {
-          withCredentials: "include",
+          withCredentials: true,
         }
       );
       refreshUser();

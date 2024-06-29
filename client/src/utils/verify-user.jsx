@@ -17,7 +17,7 @@ export const verifyCookie = async (
       `${API_URL}/user-verify`,
       {},
       {
-        withCredentials: "include",
+        withCredentials: true,
       }
     );
     const { status, user } = data;
