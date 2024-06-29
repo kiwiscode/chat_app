@@ -6,7 +6,7 @@ export const useSocket = () => {
   return useContext(SocketContext);
 };
 
-const socket = io("https://chat-app-mpi2.onrender.com");
+const socket = io("http://localhost:3000/");
 
 export const SocketProvider = ({ children }) => {
   useEffect(() => {

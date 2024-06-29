@@ -9,8 +9,7 @@ import { ThemeContext } from "../../context/ThemeContext";
 import { useAntdMessageHandler } from "../../utils/useAntdMessageHandler";
 import useWindowDimensions from "../../utils/window-dimensions";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
-import config from "../../config/config";
-const API_URL = config.backendUrl;
+const API_URL = "http://localhost:3000";
 
 function Dashboard() {
   const { user, refreshUser } = useUser();
