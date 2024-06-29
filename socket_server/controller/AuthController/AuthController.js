@@ -209,7 +209,10 @@ const authSignup = async (req, res) => {
     const token = createSecretToken(user.id);
     res.cookie("token", token, {
       withCredentials: true,
-      httpOnly: true,
+      httpOnly: false,
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: "none",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({ message: "User created successfully" });
@@ -265,7 +268,10 @@ const authLogin = async (req, res) => {
     const token = createSecretToken(user.id);
     res.cookie("token", token, {
       withCredentials: true,
-      httpOnly: true,
+      httpOnly: false,
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: "none",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
     return res

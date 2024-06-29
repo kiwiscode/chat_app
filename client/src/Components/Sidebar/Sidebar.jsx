@@ -7,6 +7,7 @@ import axios from "axios";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import useWindowDimensions from "../../utils/window-dimensions";
 import { Modal } from "@mui/material";
+
 const API_URL = "https://chat-app-mpi2.onrender.com";
 
 function Sidebar() {
