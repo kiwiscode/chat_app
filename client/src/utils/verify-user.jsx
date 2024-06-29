@@ -9,7 +9,7 @@ export const verifyCookie = async (
 ) => {
   if (!cookies.token) {
     navigate("/");
-    console.error("no cookies found");
+    console.error("here is working verify-user 1");
     return;
   }
   try {
@@ -23,10 +23,12 @@ export const verifyCookie = async (
     if (!status) {
       removeCookie("token");
       navigate("/");
+      console.error("here is working verify-user 2");
     }
   } catch (error) {
     console.error("Error verifying cookie:", error);
     removeCookie("token");
     navigate("/");
+    console.error("here is working verify-user 3");
   }
 };

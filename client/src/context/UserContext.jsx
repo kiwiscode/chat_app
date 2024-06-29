@@ -31,6 +31,7 @@ export const UserProvider = ({ children }) => {
         setAuthToken(null);
         setIsAuthenticatedUser(false);
         navigate("/");
+        console.log("here is working 4");
       }
     } catch (error) {
       console.error("error:", error);
@@ -38,24 +39,25 @@ export const UserProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      if (cookies.token && cookies !== "undefined") {
-        setAuthToken(cookies.token);
-        setIsAuthenticatedUser(true);
-        verifyCookie(cookies, path, navigate, removeCookie, setUser, API_URL);
-      }
-      if (path === "/" && cookies.token !== "undefined" && cookies.token) {
-        navigate("/dashboard");
-      }
-      if (
-        (path === "/" || path !== "/") &&
-        (cookies.token === "undefined" || !cookies.token)
-      ) {
-        setAuthToken(null);
-        setIsAuthenticatedUser(false);
-        navigate("/");
-      }
-    }, 5000);
+    if (cookies.token && cookies !== "undefined") {
+      setAuthToken(cookies.token);
+      setIsAuthenticatedUser(true);
+      verifyCookie(cookies, path, navigate, removeCookie, setUser, API_URL);
+      console.log("here is working 3");
+    }
+    if (path === "/" && cookies.token !== "undefined" && cookies.token) {
+      navigate("/dashboard");
+      console.log("here is working 2");
+    }
+    if (
+      (path === "/" || path !== "/") &&
+      (cookies.token === "undefined" || !cookies.token)
+    ) {
+      setAuthToken(null);
+      setIsAuthenticatedUser(false);
+      navigate("/");
+      console.log("here is working 1");
+    }
   }, [cookies]);
 
   const updateUser = (newUserInfo) => {
@@ -65,6 +67,8 @@ export const UserProvider = ({ children }) => {
     }));
   };
   const refreshUser = async () => {
+    console.log("here is working 4");
+
     try {
       const result = await axios.get(
         `${API_URL}/users/${user?.id}`,
@@ -75,6 +79,7 @@ export const UserProvider = ({ children }) => {
       );
 
       console.log("result:", result);
+      console.log("here is working 5");
 
       setUser(result.data);
     } catch (error) {
@@ -85,6 +90,7 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (user?.id) {
+      console.log("here is working 6");
       console.log("userid:", user.id);
       refreshUser();
     }
