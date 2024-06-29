@@ -39,6 +39,9 @@ export const UserProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    console.log("Path:", path);
+    console.log("Cookies:", cookies);
+
     if (cookies.token && cookies !== "undefined") {
       setAuthToken(cookies.token);
       setIsAuthenticatedUser(true);
@@ -58,7 +61,7 @@ export const UserProvider = ({ children }) => {
       navigate("/");
       console.log("here is working 1");
     }
-  }, [cookies]);
+  }, [cookies, path, navigate, removeCookie, setUser, API_URL]);
 
   const updateUser = (newUserInfo) => {
     setUser((prevUserInfo) => ({
