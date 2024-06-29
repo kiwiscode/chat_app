@@ -3,7 +3,7 @@ import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "https://chat-app-mpi2.onrender.com";
+const API_URL = "https://chatswift-vvul5.ondigitalocean.app/";
 
 function Main() {
   const [authModal, setAuthModal] = useState(null);
