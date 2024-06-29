@@ -210,7 +210,7 @@ const authSignup = async (req, res) => {
     res.cookie("token", token, {
       withCredentials: true,
       httpOnly: true,
-      secure: process.env.NODE_ENV !== "development",
+      secure: true,
       sameSite: "none",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
@@ -269,7 +269,7 @@ const authLogin = async (req, res) => {
     res.cookie("token", token, {
       withCredentials: true,
       httpOnly: true,
-      secure: process.env.NODE_ENV !== "development",
+      secure: true,
       sameSite: "none",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
