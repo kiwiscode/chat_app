@@ -2,7 +2,6 @@ import axios from "axios";
 
 export const verifyCookie = async (
   cookies,
-  path,
   navigate,
   removeCookie,
   setUsername,
@@ -10,6 +9,7 @@ export const verifyCookie = async (
 ) => {
   if (!cookies.token) {
     navigate("/");
+    console.error("no cookies found");
     return;
   }
   try {
@@ -29,9 +29,4 @@ export const verifyCookie = async (
     removeCookie("token");
     navigate("/");
   }
-};
-
-export const logout = (removeCookie, navigate) => {
-  removeCookie("token");
-  navigate("/");
 };

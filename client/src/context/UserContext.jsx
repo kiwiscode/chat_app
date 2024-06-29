@@ -38,23 +38,24 @@ export const UserProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (cookies.token && cookies !== "undefined") {
-      setAuthToken(cookies.token);
-      setIsAuthenticatedUser(true);
-      verifyCookie(cookies, path, navigate, removeCookie, setUser, API_URL);
-    }
-
-    if (path === "/" && cookies.token !== "undefined" && cookies.token) {
-      navigate("/dashboard");
-    }
-    if (
-      (path === "/" || path !== "/") &&
-      (cookies.token === "undefined" || !cookies.token)
-    ) {
-      setAuthToken(null);
-      setIsAuthenticatedUser(false);
-      navigate("/");
-    }
+    setTimeout(() => {
+      if (cookies.token && cookies !== "undefined") {
+        setAuthToken(cookies.token);
+        setIsAuthenticatedUser(true);
+        verifyCookie(cookies, path, navigate, removeCookie, setUser, API_URL);
+      }
+      if (path === "/" && cookies.token !== "undefined" && cookies.token) {
+        navigate("/dashboard");
+      }
+      if (
+        (path === "/" || path !== "/") &&
+        (cookies.token === "undefined" || !cookies.token)
+      ) {
+        setAuthToken(null);
+        setIsAuthenticatedUser(false);
+        navigate("/");
+      }
+    }, 2500);
   }, [cookies]);
 
   const updateUser = (newUserInfo) => {
