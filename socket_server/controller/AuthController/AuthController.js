@@ -210,7 +210,7 @@ const authSignup = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
-      sameSite: false,
+      sameSite: "none",
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
     });
     //
@@ -268,7 +268,7 @@ const authLogin = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
-      sameSite: false,
+      sameSite: "none",
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
     });
     return res
