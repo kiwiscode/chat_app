@@ -209,10 +209,9 @@ const authSignup = async (req, res) => {
     const token = createSecretToken(user.id);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // Sadece production ortamında secure olacak
+      secure: true,
       sameSite: "none",
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
-      domain: ".ondigitalocean.app", // Tüm alt alan adları ve ana alan adı için geçerli olacak
     });
     //
     res.status(200).json({ message: "User created successfully" });
@@ -268,10 +267,9 @@ const authLogin = async (req, res) => {
     const token = createSecretToken(user.id);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // Sadece production ortamında secure olacak
+      secure: true,
       sameSite: "none",
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
-      domain: ".ondigitalocean.app", // Tüm alt alan adları ve ana alan adı için geçerli olacak
     });
     return res
       .status(200)
