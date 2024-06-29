@@ -10,7 +10,7 @@ const socketIo = require("socket.io");
 const http = require("http");
 const server = http.createServer(app);
 const FRONTEND_URL = process.env.FRONTEND_URL;
-
+//
 const corsOptions = {
   origin: FRONTEND_URL,
   methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
