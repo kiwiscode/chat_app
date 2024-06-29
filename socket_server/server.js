@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 const socketIo = require("socket.io");
 const http = require("http");
 const server = http.createServer(app);
-const FRONTEND_URL = process.env.FRONTEND_URL;
+const FRONTEND_URL = "https://chatswift-lovat.vercel.app";
 //
 const corsOptions = {
   origin: FRONTEND_URL,
