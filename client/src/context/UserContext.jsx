@@ -3,6 +3,9 @@ import { createContext, useState, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { verifyCookie } from "../utils/verify-user";
+
+import Cookies from "js-cookie";
+
 const UserContext = createContext();
 const API_URL = "http://localhost:3000";
 
@@ -36,6 +39,10 @@ export const UserProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    const token = Cookies.get("token");
+    console.log("Token from cookies js-cookie package:", token);
+    console.log("Token from cookies document object:", document.cookie);
+    console.log("Token from cookies config:", cookies.token);
     if (cookies.token && cookies !== "undefined") {
       setAuthToken(cookies.token);
       setIsAuthenticatedUser(true);
