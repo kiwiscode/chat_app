@@ -210,7 +210,6 @@ const authSignup = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
-      domain: "chatswift-lovat.vercel.app",
       sameSite: false,
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
     });
@@ -269,7 +268,6 @@ const authLogin = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
-      domain: "chatswift-lovat.vercel.app",
       sameSite: false,
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
     });
