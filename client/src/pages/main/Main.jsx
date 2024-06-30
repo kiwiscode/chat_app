@@ -270,7 +270,10 @@ function Main() {
 
   const [LOG_INusernameOrEmailErr, setLOG_INusernameOrEmailErr] = useState("");
   const [LOG_INpasswordError, setLOG_INpasswordError] = useState("");
+  const [loginClicked, setloginClicked] = useState(null);
   const handleLogin = async () => {
+    setloginClicked(true);
+    setLoading(true);
     try {
       const result = await axios.post(`${API_URL}/auth/login`, {
         loginFormData,
@@ -282,6 +285,7 @@ function Main() {
       const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
 
       if (result?.status === 200) {
+        setLoading(false);
         localStorage.setItem("encryptedToken", encryptedToken);
         localStorage.setItem("userInfo", JSON.stringify(user));
         updateUser(user);
@@ -322,7 +326,7 @@ function Main() {
 
   return (
     <>
-      {loading && !notSignupClicked && !verifyClicked ? (
+      {loading && !notSignupClicked && !verifyClicked && !loginClicked ? (
         <div
           style={{
             width: "100%",
@@ -712,18 +716,37 @@ function Main() {
                         {LOG_INpasswordError}
                       </div>
                     )}
-                    <button
-                      onClick={handleLogin}
-                      className="color-white-text chirp-medium-font fs-15 border-r-4 pointer sky-blue-btn-hover-effect b-none"
-                      style={{
-                        width: "120px",
-                        height: "40px",
-                        backgroundColor: "#37BCF8",
-                        marginTop: "36px",
-                      }}
-                    >
-                      Log in
-                    </button>
+                    {loading && loginClicked ? (
+                      <button
+                        onClick={handleLogin}
+                        className="color-white-text chirp-medium-font fs-15 border-r-4 pointer sky-blue-btn-hover-effect b-none"
+                        style={{
+                          width: "120px",
+                          height: "40px",
+                          backgroundColor: "#37BCF8",
+                          marginTop: "36px",
+                          pointerEvents: loading && "none",
+                        }}
+                      >
+                        <LoadingSpinner
+                          fontSize={true}
+                          strokeColor={"rgb(231, 233, 234)"}
+                        ></LoadingSpinner>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleLogin}
+                        className="color-white-text chirp-medium-font fs-15 border-r-4 pointer sky-blue-btn-hover-effect b-none"
+                        style={{
+                          width: "120px",
+                          height: "40px",
+                          backgroundColor: "#37BCF8",
+                          marginTop: "36px",
+                        }}
+                      >
+                        Log in
+                      </button>
+                    )}
                     <div
                       className="color-dark-text fs-15 chirp-medium-font"
                       style={{
