@@ -273,7 +273,12 @@ function Main() {
   const [loginClicked, setloginClicked] = useState(null);
   const handleLogin = async () => {
     setloginClicked(true);
-    setLoading(true);
+    if (
+      loginFormData?.authentication.length > 0 &&
+      loginFormData?.password.length > 0
+    ) {
+      setLoading(true);
+    }
     try {
       const result = await axios.post(`${API_URL}/auth/login`, {
         loginFormData,
@@ -297,9 +302,11 @@ function Main() {
     } catch (error) {
       const { message } = error.response.data;
       if (error.response.data.passwordError && message) {
+        setLoading(false);
         setLOG_INpasswordError(message);
         setLOG_INusernameOrEmailErr("");
       } else if (error.response.data.authenticationError && message) {
+        setLoading(false);
         setLOG_INusernameOrEmailErr(message);
         setLOG_INpasswordError("");
       }
