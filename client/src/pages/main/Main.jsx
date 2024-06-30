@@ -2,9 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-const API_URL = "http://localhost:3000";
+import CryptoJS from "crypto-js";
+import { useUser } from "../../context/UserContext";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Main() {
+  const {
+    setUser,
+    isAuthenticatedUser,
+    setIsAuthenticatedUser,
+    user,
+    updateUser,
+  } = useUser();
   const [authModal, setAuthModal] = useState(null);
   const [formData, setFormData] = useState({
     username: "",
@@ -199,15 +209,9 @@ function Main() {
     setVerificationCode("");
     setemailVerificationCodeStatus(null);
     try {
-      const result = await axios.post(
-        `${API_URL}/auth/signup`,
-        {
-          formData,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      const result = await axios.post(`${API_URL}/auth/signup`, {
+        formData,
+      });
 
       if (result) {
         setUsernameError("");
@@ -242,6 +246,7 @@ function Main() {
     authentication: "",
     password: "",
   });
+
   const handleChangeLoginFormData = (e) => {
     const { name, value } = e.target;
     setLoginFormData({
@@ -254,16 +259,29 @@ function Main() {
   const [LOG_INpasswordError, setLOG_INpasswordError] = useState("");
   const handleLogin = async () => {
     try {
-      const result = await axios.post(
-        `${API_URL}/auth/login`,
-        {
-          loginFormData,
-        },
-        {
-          withCredentials: true,
-        }
+      const result = await axios.post(`${API_URL}/auth/login`, {
+        loginFormData,
+      });
+
+      const { user, token } = result.data;
+
+      const secretKey = import.meta.env.VITE_SECRET_KEY;
+      const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
+      console.log("result after login:", token);
+      console.log(
+        "secret key & api_url:",
+        import.meta.env.VITE_SECRET_KEY,
+        import.meta.env.VITE_API_URL
       );
+
+      console.log("result after token encrypted ... :", encryptedToken);
+      console.log("login result:", result);
       if (result?.status === 200) {
+        localStorage.setItem("encryptedToken", encryptedToken);
+        localStorage.setItem("userInfo", JSON.stringify(user));
+        updateUser(user);
+        setUser(user);
+        setIsAuthenticatedUser(true);
         navigate("/dashboard");
         window.location.reload();
       }

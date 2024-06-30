@@ -14,7 +14,6 @@ const FRONTEND_URL = "http://localhost:5173";
 const corsOptions = {
   origin: FRONTEND_URL,
   methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
-  credentials: true,
 };
 const io = socketIo(server, {
   cors: {

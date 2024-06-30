@@ -6,7 +6,7 @@ export const useSocket = () => {
   return useContext(SocketContext);
 };
 
-const socket = io("http://localhost:3000/");
+const socket = io(import.meta.env.VITE_API_URL);
 
 export const SocketProvider = ({ children }) => {
   useEffect(() => {

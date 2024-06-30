@@ -1,31 +1,34 @@
 import axios from "axios";
 import { createContext, useState, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useCookies } from "react-cookie";
-import { verifyCookie } from "../utils/verify-user";
-
-import Cookies from "js-cookie";
-
+import { createAuthHeader } from "../utils/apiUtils";
 const UserContext = createContext();
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const UserProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(null);
   const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(false);
   const [user, setUser] = useState(null);
-  const [cookies, removeCookie] = useCookies([]);
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname;
+
+  useEffect(() => {
+    const token = localStorage.getItem("encryptedToken");
+    if (token) {
+      setAuthToken(token);
+      setIsAuthenticatedUser(true);
+    }
+  }, []);
+
   const handleLogout = async (req, res) => {
     try {
-      const result = await axios.post(
-        `${API_URL}/auth/logout`,
-        { id: user.id },
-        {
-          withCredentials: true,
-        }
-      );
+      const result = await axios.post(`${API_URL}/auth/logout`, {
+        id: user.id,
+      });
+
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("encryptedToken");
 
       if (result?.status === 200) {
         setUser(null);
@@ -38,30 +41,6 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    const token = Cookies.get("token");
-    console.log("Token from cookies js-cookie package:", token);
-    console.log("Token from cookies document object:", document.cookie);
-    console.log("Token from cookies config:", cookies.token);
-    if (cookies.token && cookies !== "undefined") {
-      setAuthToken(cookies.token);
-      setIsAuthenticatedUser(true);
-      verifyCookie(cookies, path, navigate, removeCookie, setUser, API_URL);
-    }
-
-    if (path === "/" && cookies.token !== "undefined" && cookies.token) {
-      navigate("/dashboard");
-    }
-    if (
-      (path === "/" || path !== "/") &&
-      (cookies.token === "undefined" || !cookies.token)
-    ) {
-      setAuthToken(null);
-      setIsAuthenticatedUser(false);
-      navigate("/");
-    }
-  }, [cookies]);
-
   const updateUser = (newUserInfo) => {
     setUser((prevUserInfo) => ({
       ...prevUserInfo,
@@ -69,23 +48,38 @@ export const UserProvider = ({ children }) => {
     }));
   };
   const refreshUser = async () => {
+    console.log("refresh");
     try {
-      const result = await axios.get(
-        `${API_URL}/users/${user?.id}`,
-        {},
-        {
-          withCredentials: true,
-        }
-      );
-
+      const result = await axios.get(`${API_URL}/users/${user?.id}`, {
+        headers: createAuthHeader(),
+      });
+      const userR = result.data;
       console.log("result:", result);
-
-      setUser(result.data);
+      localStorage.setItem("userInfo", JSON.stringify(userR));
+      updateUser(userR);
+      setUser(userR);
     } catch (error) {
       console.error("error:", error);
       throw error;
     }
   };
+
+  const getToken = () => {
+    const encryptedToken = localStorage.getItem("encryptedToken");
+    const decryptedBytes = CryptoJS.AES.decrypt(
+      encryptedToken,
+      import.meta.env.VITE_SECRET_KEY
+    );
+    const decryptedToken = decryptedBytes.toString(CryptoJS.enc.Utf8);
+
+    return decryptedToken;
+  };
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+    if (user) {
+      setUser(user);
+    }
+  }, []);
 
   useEffect(() => {
     if (user?.id) {
@@ -106,6 +100,7 @@ export const UserProvider = ({ children }) => {
         updateUser,
         handleLogout,
         refreshUser,
+        getToken,
       }}
     >
       {children}{" "}
