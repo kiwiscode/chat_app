@@ -125,6 +125,12 @@ function Sidebar() {
     requesterId,
     recipientId
   ) => {
+    // optimistic ui for accept coworker request
+    const newArray = user?.receivedCoworkerRequests.filter((eachRequest) => {
+      return eachRequest.requester.id !== requesterId;
+    });
+
+    updateUser({ ...user, receivedCoworkerRequests: newArray });
     try {
       await axios.post(
         `${API_URL}/coworker-requests/${requestId}/accept`,
@@ -149,6 +155,11 @@ function Sidebar() {
     requesterId,
     recipientId
   ) => {
+    const newArray = user?.receivedCoworkerRequests.filter((eachRequest) => {
+      return eachRequest.requester.id !== requesterId;
+    });
+
+    updateUser({ ...user, receivedCoworkerRequests: newArray });
     try {
       await axios.post(
         `${API_URL}/coworker-requests/${requestId}/reject`,
@@ -173,6 +184,11 @@ function Sidebar() {
     requesterId,
     recipientId
   ) => {
+    const newArray = user?.receivedFriendRequests.filter((eachRequest) => {
+      return eachRequest.requester.id !== requesterId;
+    });
+
+    updateUser({ ...user, receivedFriendRequests: newArray });
     try {
       await axios.post(
         `${API_URL}/friend-requests/${requestId}/accept`,
@@ -197,6 +213,11 @@ function Sidebar() {
     requesterId,
     recipientId
   ) => {
+    const newArray = user?.receivedFriendRequests.filter((eachRequest) => {
+      return eachRequest.requester.id !== requesterId;
+    });
+
+    updateUser({ ...user, receivedFriendRequests: newArray });
     try {
       await axios.post(
         `${API_URL}/friend-requests/${requestId}/reject`,
@@ -567,6 +588,8 @@ function Sidebar() {
               width: 600,
               height: 600,
               borderRadius: "16px",
+              maxHeight: 600,
+              overflowY: "auto",
             }}
           >
             <div className="dflex">
@@ -1055,6 +1078,8 @@ function Sidebar() {
               width: 600,
               height: 600,
               borderRadius: "16px",
+              maxHeight: 600,
+              overflowY: "auto",
             }}
           >
             <div className="dflex">
