@@ -9,8 +9,9 @@ import { ThemeContext } from "../../context/ThemeContext";
 import { useAntdMessageHandler } from "../../utils/useAntdMessageHandler";
 import useWindowDimensions from "../../utils/window-dimensions";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
+import { createAuthHeader } from "../../utils/apiUtils";
 
-const API_URL = "https://chatswift-vvul5.ondigitalocean.app";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Dashboard() {
   const { user, refreshUser } = useUser();
@@ -32,8 +33,9 @@ function Dashboard() {
   const getAllUsers = async () => {
     try {
       const result = await axios.get(`${API_URL}/users`, {
-        withCredentials: true,
+        headers: createAuthHeader(),
       });
+      console.log("result:", result);
       setUsers(result.data);
     } catch (error) {
       console.error("error:", error);
@@ -101,7 +103,7 @@ function Dashboard() {
           user2Id: eachUser?.id,
         },
         {
-          withCredentials: true,
+          headers: createAuthHeader(),
         }
       );
       setSelectedUser(eachUser);
@@ -128,7 +130,7 @@ function Dashboard() {
           message,
         },
         {
-          withCredentials: true,
+          headers: createAuthHeader(),
         }
       );
       if (user?.id) {
@@ -153,10 +155,11 @@ function Dashboard() {
   const getConversations = async () => {
     try {
       const result = await axios.get(`${API_URL}/conversations/${user?.id}`, {
-        withCredentials: true,
+        headers: createAuthHeader(),
       });
       setLoading(false);
       setConversations(result.data);
+      console.log("result getconversation:", result);
     } catch (error) {
       console.log("error:", error);
       throw error;
@@ -169,6 +172,16 @@ function Dashboard() {
       getConversations();
     }
   }, [user?.id]);
+
+  useEffect(() => {
+    if (user?.id) {
+      refreshUser();
+      const interval = setInterval(() => {
+        refreshUser();
+      }, 30000);
+      return () => clearInterval(interval);
+    }
+  }, []);
 
   const findMemberNotEqualUser = (array) => {
     const filteredArray = array?.filter((eachMember) => {
@@ -191,12 +204,13 @@ function Dashboard() {
       const result = await axios.get(
         `${API_URL}/conversations/find/${user?.id}/${selectedUser?.id}`,
         {
-          withCredentials: true,
+          headers: createAuthHeader(),
         }
       );
 
       setSelectedUser(selectedUser);
       setConversation(result.data);
+      console.log("result find conversation:", result);
     } catch (error) {
       console.log("error:", error);
       throw error;
@@ -208,14 +222,13 @@ function Dashboard() {
     try {
       const result = await axios.get(
         `${API_URL}/messages/${conversationId || conversation.id}`,
-        {
-          withCredentials: true,
-        }
+        { headers: createAuthHeader() }
       );
       if (user?.id) {
         getConversations();
       }
       setConversation(result.data);
+      console.log("result messages:", result);
     } catch (error) {
       console.log("error:", error);
       throw error;
@@ -280,6 +293,12 @@ function Dashboard() {
       });
     });
   }, [socket, conversation, arrivalMessage]);
+
+  useEffect(() => {
+    if (arrivalMessage) {
+      getConversations();
+    }
+  }, [arrivalMessage]);
 
   useEffect(() => {
     if (
@@ -403,7 +422,7 @@ function Dashboard() {
           recipientId,
         },
         {
-          withCredentials: true,
+          headers: createAuthHeader(),
         }
       );
       const { status, message, reverseRequest } = result.data;
@@ -472,7 +491,7 @@ function Dashboard() {
           recipientId,
         },
         {
-          withCredentials: true,
+          headers: createAuthHeader(),
         }
       );
 
@@ -2872,7 +2891,7 @@ function Dashboard() {
             </div>
           )}
           {selectedUser ? (
-            <>
+            <div>
               {conversation?.Message?.length > 0 && (
                 <>
                   {conversation?.Message.map((eachMessage) => {
@@ -2908,75 +2927,7 @@ function Dashboard() {
                   })}
                 </>
               )}
-              {selectedUser && (
-                <div
-                  style={{
-                    position: "sticky",
-                    width: "100%",
-                    bottom: "0px",
-                    backgroundColor: "white",
-                    backgroundColor: "rgba(255, 255, 255, 0.85)",
-                    backdropFilter: "blur(12px)",
-                    height: "53px",
-                    maxHeight: "53px",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "relative",
-                      margin: "0px 12px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        marginTop: "4px",
-                      }}
-                      className="w-100 dflex jfycenter algncenter"
-                    >
-                      <input
-                        className="border-1px w-100 fs-15 lh-20 chirp-regular-font"
-                        style={{
-                          borderRadius: "9999px",
-                          height: "42px",
-                          outlineStyle: "none",
-                          paddingLeft: "15px",
-                          paddingRight: "36px",
-                        }}
-                        placeholder={"Start a new message"}
-                        onChange={(e) => setMessage(e.target.value)}
-                        value={message}
-                        autoFocus={true}
-                        onKeyPress={(event) => {
-                          if (event.key === "Enter") {
-                            sendMessage();
-                          }
-                        }}
-                      />
-                      <svg
-                        style={{
-                          right: "15px",
-                        }}
-                        onClick={() => {
-                          if (message.length) {
-                            sendMessage();
-                          }
-                        }}
-                        fill="#36bbf7"
-                        width={20}
-                        height={20}
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        className={` p-abs pointer r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-lrvibr r-m6rgpd r-z80fyv r-19wmn03`}
-                      >
-                        <g>
-                          <path d="M2.504 21.866l.526-2.108C3.04 19.719 4 15.823 4 12s-.96-7.719-.97-7.757l-.527-2.109L22.236 12 2.504 21.866zM5.981 13c-.072 1.962-.34 3.833-.583 5.183L17.764 12 5.398 5.818c.242 1.349.51 3.221.583 5.183H10v2H5.981z"></path>
-                        </g>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
+            </div>
           ) : (
             <>
               <div
@@ -2999,6 +2950,65 @@ function Dashboard() {
                 Start Private Conversations on chatswift...
               </div>
             </>
+          )}
+          {selectedUser && (
+            <div
+              style={{
+                position: "sticky",
+                width: "100%",
+                bottom: "0px",
+                backgroundColor: "white",
+                backgroundColor: "rgba(255, 255, 255, 0.85)",
+                backdropFilter: "blur(12px)",
+                height: "53px",
+                maxHeight: "53px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <div className="w-100 dflex jfycenter algncenter">
+                <input
+                  className="border-1px w-100 fs-15 lh-20 chirp-regular-font"
+                  style={{
+                    borderRadius: "9999px",
+                    height: "42px",
+                    outlineStyle: "none",
+                    paddingLeft: "15px",
+                    paddingRight: "36px",
+                  }}
+                  placeholder={"Start a new message"}
+                  onChange={(e) => setMessage(e.target.value)}
+                  value={message}
+                  autoFocus={true}
+                  onKeyPress={(event) => {
+                    if (event.key === "Enter") {
+                      sendMessage();
+                    }
+                  }}
+                />
+                <svg
+                  style={{
+                    right: "15px",
+                  }}
+                  onClick={() => {
+                    if (message.length) {
+                      sendMessage();
+                    }
+                  }}
+                  fill="#36bbf7"
+                  width={20}
+                  height={20}
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  className={` p-abs pointer r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-lrvibr r-m6rgpd r-z80fyv r-19wmn03`}
+                >
+                  <g>
+                    <path d="M2.504 21.866l.526-2.108C3.04 19.719 4 15.823 4 12s-.96-7.719-.97-7.757l-.527-2.109L22.236 12 2.504 21.866zM5.981 13c-.072 1.962-.34 3.833-.583 5.183L17.764 12 5.398 5.818c.242 1.349.51 3.221.583 5.183H10v2H5.981z"></path>
+                  </g>
+                </svg>
+              </div>
+            </div>
           )}
         </div>
         <div

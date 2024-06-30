@@ -2,7 +2,10 @@ const jwt = require("jsonwebtoken");
 const prisma = require("../util/PrismaConfig");
 
 module.exports.userVerification = (req, res) => {
-  const token = req.cookies.token;
+  const authHeader = req.headers.authorization;
+
+  const token = authHeader && authHeader.split(" ")[1];
+
   if (!token) {
     return res.json({ status: false });
   }

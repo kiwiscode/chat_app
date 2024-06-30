@@ -7,8 +7,7 @@ import axios from "axios";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import useWindowDimensions from "../../utils/window-dimensions";
 import { Modal } from "@mui/material";
-
-const API_URL = "https://chatswift-vvul5.ondigitalocean.app";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Sidebar() {
   const [show, setShow] = useState(false);
@@ -49,9 +48,6 @@ function Sidebar() {
         `${API_URL}/users/${user?.id}/change_profile_image`,
         {
           image: profileImage,
-        },
-        {
-          withCredentials: true,
         }
       );
       updateUser({ profilePicture: result.data.imageInfo.url });
@@ -128,16 +124,10 @@ function Sidebar() {
     recipientId
   ) => {
     try {
-      await axios.post(
-        `${API_URL}/coworker-requests/${requestId}/accept`,
-        {
-          requesterId,
-          recipientId,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      await axios.post(`${API_URL}/coworker-requests/${requestId}/accept`, {
+        requesterId,
+        recipientId,
+      });
       refreshUser();
     } catch (error) {
       console.log("error:", error);
@@ -152,16 +142,10 @@ function Sidebar() {
     recipientId
   ) => {
     try {
-      await axios.post(
-        `${API_URL}/coworker-requests/${requestId}/reject`,
-        {
-          requesterId,
-          recipientId,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      await axios.post(`${API_URL}/coworker-requests/${requestId}/reject`, {
+        requesterId,
+        recipientId,
+      });
       refreshUser();
     } catch (error) {
       console.log("error:", error);
@@ -176,16 +160,10 @@ function Sidebar() {
     recipientId
   ) => {
     try {
-      await axios.post(
-        `${API_URL}/friend-requests/${requestId}/accept`,
-        {
-          requesterId,
-          recipientId,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      await axios.post(`${API_URL}/friend-requests/${requestId}/accept`, {
+        requesterId,
+        recipientId,
+      });
       refreshUser();
     } catch (error) {
       console.log("error:", error);
@@ -200,16 +178,10 @@ function Sidebar() {
     recipientId
   ) => {
     try {
-      await axios.post(
-        `${API_URL}/friend-requests/${requestId}/reject`,
-        {
-          requesterId,
-          recipientId,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      await axios.post(`${API_URL}/friend-requests/${requestId}/reject`, {
+        requesterId,
+        recipientId,
+      });
       refreshUser();
     } catch (error) {
       console.log("error:", error);

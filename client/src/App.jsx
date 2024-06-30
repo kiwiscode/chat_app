@@ -1,13 +1,18 @@
 import { Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Sidebar from "./Components/Sidebar/Sidebar";
 import LoadingSpinner from "./Components/LoadingSpinner/LoadingSpinner";
 import { SocketProvider } from "./context/SocketContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import Main from "./pages/main/Main";
 import Dashboard from "./pages/dashboard/Dashboard";
+import { useUser } from "./context/UserContext";
 
 function App() {
+  console.log(import.meta.env.VITE_SECRET_KEY);
+  console.log(import.meta.env.VITE_API_URL);
+  const { isAuthenticatedUser } = useUser();
+
   return (
     <>
       <ThemeProvider>
@@ -23,8 +28,22 @@ function App() {
               }
             >
               <Routes>
-                <Route path="/" element={<Main />} />
-                <Route path="/dashboard" element={<Dashboard />} />
+                <Route
+                  path="/"
+                  element={
+                    isAuthenticatedUser ? (
+                      <Navigate to="/dashboard" />
+                    ) : (
+                      <Main />
+                    )
+                  }
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    isAuthenticatedUser ? <Dashboard /> : <Navigate to="/" />
+                  }
+                />
               </Routes>
             </Suspense>
           </div>

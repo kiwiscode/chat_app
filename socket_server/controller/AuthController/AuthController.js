@@ -208,6 +208,8 @@ const authSignup = async (req, res) => {
     });
     const token = createSecretToken(user.id);
     res.cookie("token", token, {
+      withCredentials: true,
+      httpOnly: false,
       sameSite: "none",
       secure: true,
       httpOnly: true,
@@ -266,10 +268,10 @@ const authLogin = async (req, res) => {
 
     const token = createSecretToken(user.id);
     res.cookie("token", token, {
+      withCredentials: true,
+      httpOnly: false,
       sameSite: "none",
-      secure: true,
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000, // expiresIn 30 days
+      maxAge: 30 * 24 * 60 * 60 * 1000,
     });
     return res
       .status(200)
