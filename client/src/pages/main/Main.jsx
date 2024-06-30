@@ -273,7 +273,12 @@ function Main() {
   const [loginClicked, setloginClicked] = useState(null);
   const handleLogin = async () => {
     setloginClicked(true);
-    setLoading(true);
+    if (
+      loginFormData?.authentication.length > 0 &&
+      loginFormData?.password.length > 0
+    ) {
+      setLoading(true);
+    }
     try {
       const result = await axios.post(`${API_URL}/auth/login`, {
         loginFormData,
