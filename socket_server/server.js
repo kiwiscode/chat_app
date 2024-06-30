@@ -11,13 +11,13 @@ const server = http.createServer(app);
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
 const corsOptions = {
-  origin: "https://chatswift-lovat.vercel.app",
+  origin: FRONTEND_URL,
   methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
 };
 
 const io = socketIo(server, {
   cors: {
-    origin: "https://chatswift-lovat.vercel.app",
+    origin: FRONTEND_URL,
     methods: ["GET", "POST"],
   },
 });
