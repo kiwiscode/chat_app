@@ -14,7 +14,7 @@ import { createAuthHeader } from "../../utils/apiUtils";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Dashboard() {
-  const { user, refreshUser } = useUser();
+  const { user, refreshUser, updateUser, setUser } = useUser();
   const { showCustomMessage, contextHolder } = useAntdMessageHandler();
   const navigate = useNavigate();
   useEffect(() => {
@@ -35,7 +35,6 @@ function Dashboard() {
       const result = await axios.get(`${API_URL}/users`, {
         headers: createAuthHeader(),
       });
-      console.log("result:", result);
       setUsers(result.data);
     } catch (error) {
       console.error("error:", error);
@@ -159,7 +158,6 @@ function Dashboard() {
       });
       setLoading(false);
       setConversations(result.data);
-      console.log("result getconversation:", result);
     } catch (error) {
       console.log("error:", error);
       throw error;
@@ -210,7 +208,6 @@ function Dashboard() {
 
       setSelectedUser(selectedUser);
       setConversation(result.data);
-      console.log("result find conversation:", result);
     } catch (error) {
       console.log("error:", error);
       throw error;
@@ -228,7 +225,6 @@ function Dashboard() {
         getConversations();
       }
       setConversation(result.data);
-      console.log("result messages:", result);
     } catch (error) {
       console.log("error:", error);
       throw error;
@@ -413,6 +409,23 @@ function Dashboard() {
 
   // send coworker request
   const sendCoworkerRequest = async (requesterId, recipientId) => {
+    // optimistic ui for send coworker request
+    const foundRecipient = filteredUsers?.filter((eachUser) => {
+      return eachUser.id === recipientId;
+    })[0];
+    const lastId =
+      user.sentCoworkerRequests[user.sentCoworkerRequests.length - 1]?.id + 1 ||
+      1;
+    const data = {
+      id: lastId,
+      requester: user,
+      recipient: foundRecipient,
+      requesterId: requesterId,
+      recipientId: recipientId,
+      status: "pending",
+    };
+    const newList = [...user.sentCoworkerRequests, data];
+    updateUser({ ...user, sentCoworkerRequests: newList });
     try {
       const result = await axios.post(
         `${API_URL}/coworker-requests`,
@@ -441,6 +454,7 @@ function Dashboard() {
       throw error;
     }
   };
+
   // cancel coworker request
   const [showCancelCoworkerReqModal, setShowCancelCoworkerReqModal] =
     useState(false);
@@ -462,6 +476,14 @@ function Dashboard() {
   });
 
   const cancelCoworkerRequest = async () => {
+    // optimistic ui for cancel coworker request
+    const newArray = user.sentCoworkerRequests?.filter((eachRequest) => {
+      return eachRequest.recipient.id !== coworkerRequestId[0]?.recipient.id;
+    });
+
+    setShowCancelFriendReqModal(false);
+    setShowCancelCoworkerReqModal(false);
+    updateUser({ ...user, sentCoworkerRequests: newArray });
     try {
       await axios.delete(
         `${API_URL}/coworker-requests/${coworkerRequestId[0]?.id}`,
@@ -469,8 +491,7 @@ function Dashboard() {
           headers: createAuthHeader(),
         }
       );
-      setShowCancelFriendReqModal(false);
-      setShowCancelCoworkerReqModal(false);
+
       setRecipientInfoCancelCReq(null);
       setRecipientInfoCancelFReq(null);
       if (user?.id) {
@@ -485,6 +506,22 @@ function Dashboard() {
 
   // send friend request
   const sendFriendRequest = async (requesterId, recipientId) => {
+    // optimistic ui for send friend request
+    const foundRecipient = filteredUsers?.filter((eachUser) => {
+      return eachUser.id === recipientId;
+    })[0];
+    const lastId =
+      user.sentFriendRequests[user.sentFriendRequests.length - 1]?.id + 1 || 1;
+    const data = {
+      id: lastId,
+      requester: user,
+      recipient: foundRecipient,
+      requesterId: requesterId,
+      recipientId: recipientId,
+      status: "pending",
+    };
+    const newList = [...user.sentFriendRequests, data];
+    updateUser({ ...user, sentFriendRequests: newList });
     try {
       const result = await axios.post(
         `${API_URL}/friend-requests`,
@@ -535,6 +572,14 @@ function Dashboard() {
     return eachReq.recipientId === recipientIdF;
   });
   const cancelFriendRequest = async () => {
+    // optimistic ui for cancel friend request
+    const newArray = user.sentFriendRequests?.filter((eachRequest) => {
+      return eachRequest.recipient.id !== friendRequestId[0]?.recipient.id;
+    });
+
+    setShowCancelFriendReqModal(false);
+    setShowCancelCoworkerReqModal(false);
+    updateUser({ ...user, sentFriendRequests: newArray });
     try {
       await axios.delete(
         `${API_URL}/friend-requests/${friendRequestId[0]?.id}`,
@@ -597,6 +642,13 @@ function Dashboard() {
   };
 
   const removeCoworker = async (userId) => {
+    // optimistic ui for remove coworker
+    const newArray = user.coworkers?.filter((eachCoworker) => {
+      return eachCoworker.coworkerId !== userId;
+    });
+
+    setShowRemoveCoworkerModal(false);
+    updateUser({ ...user, coworkers: newArray });
     try {
       await axios.delete(`${API_URL}/coworker/${userId}/users/${user?.id}`, {
         headers: createAuthHeader(),
@@ -627,6 +679,13 @@ function Dashboard() {
   };
 
   const removeFriend = async (userId) => {
+    // optimistic ui for remove friend
+    const newArray = user.friends?.filter((eachFriend) => {
+      return eachFriend.friendId !== userId;
+    });
+
+    setShowRemoveFriendModal(false);
+    updateUser({ ...user, friends: newArray });
     try {
       await axios.delete(`${API_URL}/friend/${userId}/users/${user?.id}`, {
         headers: createAuthHeader(),
@@ -643,9 +702,9 @@ function Dashboard() {
     }
   };
 
-  // useEffect(() => {
-  //   getAllUsers();
-  // }, [user]);
+  useEffect(() => {
+    getAllUsers();
+  }, [user]);
 
   // find pending requests
   const requestedCoworkerUserIdsStatusPENDING = () => {
@@ -2879,6 +2938,9 @@ function Dashboard() {
                     width={32}
                     height={32}
                     alt=""
+                    style={{
+                      borderRadius: "50%",
+                    }}
                   />
                 ) : (
                   <svg
