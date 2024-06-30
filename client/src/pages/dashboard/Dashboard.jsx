@@ -258,10 +258,9 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && arrivalMessage) {
       getConversations();
       const interval = setInterval(() => {
-        refreshUser();
         getConversations();
       }, 1500);
 
@@ -465,7 +464,10 @@ function Dashboard() {
   const cancelCoworkerRequest = async () => {
     try {
       await axios.delete(
-        `${API_URL}/coworker-requests/${coworkerRequestId[0]?.id}`
+        `${API_URL}/coworker-requests/${coworkerRequestId[0]?.id}`,
+        {
+          headers: createAuthHeader(),
+        }
       );
       setShowCancelFriendReqModal(false);
       setShowCancelCoworkerReqModal(false);
@@ -535,7 +537,10 @@ function Dashboard() {
   const cancelFriendRequest = async () => {
     try {
       await axios.delete(
-        `${API_URL}/friend-requests/${friendRequestId[0]?.id}`
+        `${API_URL}/friend-requests/${friendRequestId[0]?.id}`,
+        {
+          headers: createAuthHeader(),
+        }
       );
       setShowCancelFriendReqModal(false);
       setShowCancelCoworkerReqModal(false);
@@ -593,7 +598,9 @@ function Dashboard() {
 
   const removeCoworker = async (userId) => {
     try {
-      await axios.delete(`${API_URL}/coworker/${userId}/users/${user?.id}`);
+      await axios.delete(`${API_URL}/coworker/${userId}/users/${user?.id}`, {
+        headers: createAuthHeader(),
+      });
       setShowRemoveCoworkerModal(false);
       setCoworkerToRemove(null);
       if (user?.id) {
@@ -621,7 +628,9 @@ function Dashboard() {
 
   const removeFriend = async (userId) => {
     try {
-      await axios.delete(`${API_URL}/friend/${userId}/users/${user?.id}`);
+      await axios.delete(`${API_URL}/friend/${userId}/users/${user?.id}`, {
+        headers: createAuthHeader(),
+      });
       setShowRemoveFriendModal(false);
       setFriendToRemove(null);
       if (user?.id) {

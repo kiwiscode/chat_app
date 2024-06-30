@@ -127,7 +127,9 @@ function Main() {
   useEffect(() => {
     setInvalidCodeError(null);
   }, [verificationCode]);
+  const [notSignupClicked, setnotSignupClicked] = useState(null);
   const sendEmailVerificationCode = async (recipientEmail) => {
+    setnotSignupClicked(true);
     const validation = validateEmail(formData.email);
     if (!validation) {
       setEmailError("Please enter a valid email.");
@@ -152,6 +154,9 @@ function Main() {
           setTimeout(() => {
             setLoading(false);
           }, 400);
+          setTimeout(() => {
+            setnotSignupClicked(false);
+          }, 600);
         }
       } catch (error) {
         console.error("Error:", error);
@@ -207,7 +212,10 @@ function Main() {
     }
   };
 
+  const [verifyClicked, setverifyClicked] = useState(null);
+
   const handleSignup = async () => {
+    setverifyClicked(true);
     setLoading(true);
     setVerificationCode("");
     setemailVerificationCodeStatus(null);
@@ -242,6 +250,10 @@ function Main() {
       setTimeout(() => {
         setLoading(false);
       }, 400);
+
+      setTimeout(() => {
+        setverifyClicked(false);
+      }, 600);
     } catch (error) {
       console.error("Error:", error.response);
     }
@@ -322,14 +334,16 @@ function Main() {
 
   return (
     <>
-      {loading ? (
+      {loading && !notSignupClicked && !verifyClicked ? (
         <div
           style={{
             width: "100%",
-            height: "100%",
+            height: "90%",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            position: "relative",
+            bottom: "53px",
           }}
         >
           <LoadingSpinner

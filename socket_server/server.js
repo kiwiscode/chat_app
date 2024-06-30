@@ -5,12 +5,11 @@ const logger = require("morgan");
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const cookieParser = require("cookie-parser");
 const socketIo = require("socket.io");
 const http = require("http");
 const server = http.createServer(app);
-const FRONTEND_URL = "https://chatswift-lovat.vercel.app";
-//
+const FRONTEND_URL = process.env.FRONTEND_URL;
+
 const corsOptions = {
   origin: FRONTEND_URL,
   methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
@@ -23,7 +22,6 @@ const io = socketIo(server, {
 });
 
 app.use(cors(corsOptions));
-app.use(cookieParser());
 app.use(logger("dev"));
 app.use(
   express.json({

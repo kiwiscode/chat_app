@@ -23,9 +23,15 @@ export const UserProvider = ({ children }) => {
 
   const handleLogout = async (req, res) => {
     try {
-      const result = await axios.post(`${API_URL}/auth/logout`, {
-        id: user.id,
-      });
+      const result = await axios.post(
+        `${API_URL}/auth/logout`,
+        {
+          id: user.id,
+        },
+        {
+          headers: createAuthHeader(),
+        }
+      );
 
       localStorage.removeItem("userInfo");
       localStorage.removeItem("encryptedToken");
