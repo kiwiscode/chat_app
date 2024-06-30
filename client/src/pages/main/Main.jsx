@@ -302,9 +302,11 @@ function Main() {
     } catch (error) {
       const { message } = error.response.data;
       if (error.response.data.passwordError && message) {
+        setLoading(false);
         setLOG_INpasswordError(message);
         setLOG_INusernameOrEmailErr("");
       } else if (error.response.data.authenticationError && message) {
+        setLoading(false);
         setLOG_INusernameOrEmailErr(message);
         setLOG_INpasswordError("");
       }
