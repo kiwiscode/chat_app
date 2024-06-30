@@ -7,6 +7,7 @@ import axios from "axios";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import useWindowDimensions from "../../utils/window-dimensions";
 import { Modal } from "@mui/material";
+import { createAuthHeader } from "../../utils/apiUtils";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Sidebar() {
@@ -48,6 +49,9 @@ function Sidebar() {
         `${API_URL}/users/${user?.id}/change_profile_image`,
         {
           image: profileImage,
+        },
+        {
+          headers: createAuthHeader(),
         }
       );
       updateUser({ profilePicture: result.data.imageInfo.url });
@@ -124,10 +128,16 @@ function Sidebar() {
     recipientId
   ) => {
     try {
-      await axios.post(`${API_URL}/coworker-requests/${requestId}/accept`, {
-        requesterId,
-        recipientId,
-      });
+      await axios.post(
+        `${API_URL}/coworker-requests/${requestId}/accept`,
+        {
+          requesterId,
+          recipientId,
+        },
+        {
+          headers: createAuthHeader(),
+        }
+      );
       refreshUser();
     } catch (error) {
       console.log("error:", error);
@@ -142,10 +152,16 @@ function Sidebar() {
     recipientId
   ) => {
     try {
-      await axios.post(`${API_URL}/coworker-requests/${requestId}/reject`, {
-        requesterId,
-        recipientId,
-      });
+      await axios.post(
+        `${API_URL}/coworker-requests/${requestId}/reject`,
+        {
+          requesterId,
+          recipientId,
+        },
+        {
+          headers: createAuthHeader(),
+        }
+      );
       refreshUser();
     } catch (error) {
       console.log("error:", error);
@@ -160,10 +176,16 @@ function Sidebar() {
     recipientId
   ) => {
     try {
-      await axios.post(`${API_URL}/friend-requests/${requestId}/accept`, {
-        requesterId,
-        recipientId,
-      });
+      await axios.post(
+        `${API_URL}/friend-requests/${requestId}/accept`,
+        {
+          requesterId,
+          recipientId,
+        },
+        {
+          headers: createAuthHeader(),
+        }
+      );
       refreshUser();
     } catch (error) {
       console.log("error:", error);
@@ -178,10 +200,16 @@ function Sidebar() {
     recipientId
   ) => {
     try {
-      await axios.post(`${API_URL}/friend-requests/${requestId}/reject`, {
-        requesterId,
-        recipientId,
-      });
+      await axios.post(
+        `${API_URL}/friend-requests/${requestId}/reject`,
+        {
+          requesterId,
+          recipientId,
+        },
+        {
+          headers: createAuthHeader(),
+        }
+      );
       refreshUser();
     } catch (error) {
       console.log("error:", error);
@@ -212,7 +240,9 @@ function Sidebar() {
 
   const removeCoworker = async (userId) => {
     try {
-      await axios.delete(`${API_URL}/coworker/${userId}/users/${user?.id}`);
+      await axios.delete(`${API_URL}/coworker/${userId}/users/${user?.id}`, {
+        headers: createAuthHeader(),
+      });
       setShowRemoveCoworkerModal(false);
       setCoworkerToRemove(null);
       refreshUser();
@@ -238,7 +268,9 @@ function Sidebar() {
 
   const removeFriend = async (userId) => {
     try {
-      await axios.delete(`${API_URL}/friend/${userId}/users/${user?.id}`);
+      await axios.delete(`${API_URL}/friend/${userId}/users/${user?.id}`, {
+        headers: createAuthHeader(),
+      });
       setShowRemoveFriendModal(false);
       setFriendToRemove(null);
       refreshUser();
@@ -1807,7 +1839,7 @@ function Sidebar() {
                     flexDirection: "column",
                   }}
                 >
-                  <div
+                  {/* <div
                     style={{
                       width: "100%",
                       textAlign: "center",
@@ -1879,6 +1911,31 @@ function Sidebar() {
                       }}
                     >
                       Something 3
+                    </div>
+                  </div> */}
+                  <div
+                    onClick={() => navigate("/")}
+                    style={{
+                      width: "100%",
+                      marginTop: "16px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div
+                      className={
+                        "color-white-text border-r-4 fs-15 pointer p-16 sky-blue-btn-hover-effect"
+                      }
+                      onClick={() => {
+                        setShow(false);
+                      }}
+                      style={{
+                        transition: "transform 0.3s ease",
+                        backgroundColor: "green",
+                        lineHeight: "20px",
+                        backgroundColor: "#37BCF8",
+                      }}
+                    >
+                      Sign in
                     </div>
                   </div>
                   <div

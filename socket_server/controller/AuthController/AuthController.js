@@ -206,16 +206,7 @@ const authSignup = async (req, res) => {
         password: hashedPassword,
       },
     });
-    const token = createSecretToken(user.id);
-    res.cookie("token", token, {
-      withCredentials: true,
-      httpOnly: false,
-      sameSite: "none",
-      secure: true,
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000, // expiresIn 30 days
-    });
-    //
+
     res.status(200).json({ message: "User created successfully" });
   } catch (error) {
     console.error("Error creating user:", error);
@@ -267,12 +258,6 @@ const authLogin = async (req, res) => {
     });
 
     const token = createSecretToken(user.id);
-    res.cookie("token", token, {
-      withCredentials: true,
-      httpOnly: false,
-      sameSite: "none",
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
     return res
       .status(200)
       .json({ message: "User logged in successfully", token, user });
@@ -292,7 +277,6 @@ const authLogout = async (req, res) => {
       },
     });
 
-    res.clearCookie("token");
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
     console.error("Error while user logging out:", error);
