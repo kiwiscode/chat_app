@@ -211,9 +211,11 @@ const authSignup = async (req, res) => {
       withCredentials: true,
       httpOnly: false,
       sameSite: "none",
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: true,
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000, // expiresIn 30 days
     });
-
+    //
     res.status(200).json({ message: "User created successfully" });
   } catch (error) {
     console.error("Error creating user:", error);

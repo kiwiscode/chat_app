@@ -35,6 +35,7 @@ export const UserProvider = ({ children }) => {
         setAuthToken(null);
         setIsAuthenticatedUser(false);
         navigate("/");
+        console.log("here is working 4");
       }
     } catch (error) {
       console.error("error:", error);
@@ -83,6 +84,7 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (user?.id) {
+      console.log("here is working 6");
       console.log("userid:", user.id);
       refreshUser();
     }

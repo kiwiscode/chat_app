@@ -9,8 +9,8 @@ const cookieParser = require("cookie-parser");
 const socketIo = require("socket.io");
 const http = require("http");
 const server = http.createServer(app);
-const FRONTEND_URL = "http://localhost:5173";
-
+const FRONTEND_URL = "https://chatswift-lovat.vercel.app";
+//
 const corsOptions = {
   origin: FRONTEND_URL,
   methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
@@ -46,10 +46,6 @@ app.use("/users", userRoutes);
 app.use("/conversations", conversationRoutes);
 app.use("/messages", messageRoutes);
 app.use("/", connectionRoutes);
-
-app.get("/api/hello", (req, res) => {
-  res.send("hello world");
-});
 
 let users = [];
 
