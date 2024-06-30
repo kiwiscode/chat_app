@@ -1139,6 +1139,7 @@ function Dashboard() {
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 minWidth: "fit-content",
+                overflowY: "auto",
               }}
             >
               <div
@@ -1590,6 +1591,7 @@ function Dashboard() {
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 minWidth: "fit-content",
+                overflowY: "auto",
               }}
             >
               {user?.coworkers?.length > 0 ? (
@@ -1731,7 +1733,7 @@ function Dashboard() {
                               )}
                             </>
                           );
-                        })}
+                        })}{" "}
                       </div>
                     )}
                   </div>
@@ -1802,6 +1804,7 @@ function Dashboard() {
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 minWidth: "fit-content",
+                overflowY: "auto",
               }}
             >
               {user?.friends?.length > 0 ? (
@@ -1999,6 +2002,7 @@ function Dashboard() {
           className="h-100 border-box"
           style={{
             flex: 1,
+            overflowY: "auto",
           }}
         >
           <div>
