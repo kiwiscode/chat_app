@@ -7,7 +7,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import Main from "./pages/main/Main";
 import Dashboard from "./pages/dashboard/Dashboard";
 import { useUser } from "./context/UserContext";
-
+//
 function App() {
   const { isAuthenticatedUser } = useUser();
 
