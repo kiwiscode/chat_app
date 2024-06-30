@@ -171,16 +171,6 @@ function Dashboard() {
     }
   }, [user?.id]);
 
-  useEffect(() => {
-    if (user?.id) {
-      refreshUser();
-      const interval = setInterval(() => {
-        refreshUser();
-      }, 30000);
-      return () => clearInterval(interval);
-    }
-  }, []);
-
   const findMemberNotEqualUser = (array) => {
     const filteredArray = array?.filter((eachMember) => {
       return eachMember?.id !== user?.id;
@@ -252,17 +242,6 @@ function Dashboard() {
       return () => clearInterval(interval);
     }
   }, []);
-
-  useEffect(() => {
-    if (user?.id && arrivalMessage) {
-      getConversations();
-      const interval = setInterval(() => {
-        getConversations();
-      }, 1500);
-
-      return () => clearInterval(interval);
-    }
-  }, [arrivalMessage]);
 
   useEffect(() => {
     socket.emit("addUser", user?.id);
@@ -3028,25 +3007,26 @@ function Dashboard() {
                 position: "sticky",
                 width: "100%",
                 bottom: "0px",
-                backgroundColor: "white",
-                backgroundColor: "rgba(255, 255, 255, 0.85)",
-                backdropFilter: "blur(12px)",
                 height: "53px",
                 maxHeight: "53px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                backgroundColor: "rgba(255, 255, 255, 0.85)",
+                backdropFilter: "blur(12px)",
               }}
             >
               <div className="w-100 dflex jfycenter algncenter">
                 <input
-                  className="border-1px w-100 fs-15 lh-20 chirp-regular-font"
+                  className="border-1px fs-15 lh-20 chirp-regular-font"
                   style={{
                     borderRadius: "9999px",
                     height: "42px",
                     outlineStyle: "none",
                     paddingLeft: "15px",
                     paddingRight: "36px",
+                    width: "100%",
+                    margin: "0px 12px",
                   }}
                   placeholder={"Start a new message"}
                   onChange={(e) => setMessage(e.target.value)}
@@ -3060,7 +3040,7 @@ function Dashboard() {
                 />
                 <svg
                   style={{
-                    right: "15px",
+                    right: "27px",
                   }}
                   onClick={() => {
                     if (message.length) {
