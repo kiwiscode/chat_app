@@ -10,6 +10,8 @@ const http = require("http");
 const server = http.createServer(app);
 const FRONTEND_URL = "https://chatswift-lovat.vercel.app";
 
+//
+
 const corsOptions = {
   origin: FRONTEND_URL,
   methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
