@@ -13,12 +13,13 @@ const FRONTEND_URL = process.env.FRONTEND_URL;
 const corsOptions = {
   origin: FRONTEND_URL,
   methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
+
 const io = socketIo(server, {
   cors: {
     origin: FRONTEND_URL,
     methods: ["GET", "POST"],
-    withCredentials: true,
   },
 });
 
