@@ -58,9 +58,6 @@ function Sidebar() {
       if (result.data.imageInfo.url) {
         setChangingBar(false);
       }
-      // else {
-      //   window.location.reload();
-      // }
     } catch (error) {
       console.error("error:", error);
       throw error;
@@ -99,6 +96,7 @@ function Sidebar() {
 
   // coworkers modal toggle view
   const toggleViewCoworkersModal = (active) => {
+    refreshUser();
     if (active === "Coworkers") {
       setShowCoworkers(true);
       setShowCoworkerRequests(false);
@@ -239,6 +237,13 @@ function Sidebar() {
   };
 
   const removeCoworker = async (userId) => {
+    // optimistic ui for remove coworker
+    const newArray = user.coworkers?.filter((eachCoworker) => {
+      return eachCoworker.coworkerId !== userId;
+    });
+
+    setShowRemoveCoworkerModal(false);
+    updateUser({ ...user, coworkers: newArray });
     try {
       await axios.delete(`${API_URL}/coworker/${userId}/users/${user?.id}`, {
         headers: createAuthHeader(),
@@ -267,6 +272,13 @@ function Sidebar() {
   };
 
   const removeFriend = async (userId) => {
+    // optimistic ui for remove friend
+    const newArray = user.friends?.filter((eachFriend) => {
+      return eachFriend.friendId !== userId;
+    });
+
+    setShowRemoveFriendModal(false);
+    updateUser({ ...user, friends: newArray });
     try {
       await axios.delete(`${API_URL}/friend/${userId}/users/${user?.id}`, {
         headers: createAuthHeader(),
@@ -283,6 +295,12 @@ function Sidebar() {
 
   const [hovered_index, setHovered_index] = useState(null);
   const [hovered_div, setHovered_div] = useState(null);
+
+  useEffect(() => {
+    if (user?.id) {
+      refreshUser();
+    }
+  }, [user?.id]);
 
   return (
     <>

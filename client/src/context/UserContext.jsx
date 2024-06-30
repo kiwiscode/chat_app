@@ -41,7 +41,6 @@ export const UserProvider = ({ children }) => {
         setAuthToken(null);
         setIsAuthenticatedUser(false);
         navigate("/");
-        console.log("here is working 4");
       }
     } catch (error) {
       console.error("error:", error);
@@ -55,13 +54,11 @@ export const UserProvider = ({ children }) => {
     }));
   };
   const refreshUser = async () => {
-    console.log("refresh");
     try {
       const result = await axios.get(`${API_URL}/users/${user?.id}`, {
         headers: createAuthHeader(),
       });
       const userR = result.data;
-      console.log("result:", result);
       localStorage.setItem("userInfo", JSON.stringify(userR));
       updateUser(userR);
       setUser(userR);
@@ -90,8 +87,6 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (user?.id) {
-      console.log("here is working 6");
-      console.log("userid:", user.id);
       refreshUser();
     }
   }, [user?.id]);

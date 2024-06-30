@@ -78,7 +78,6 @@ function Main() {
       const response = await axios.post(`${API_URL}/auth/check-username`, {
         username: formData.username,
       });
-      console.log("result auth/check-username:", response);
       setUsernameError("");
     } catch (error) {
       console.error("Error:", error);
@@ -102,7 +101,6 @@ function Main() {
       const response = await axios.post(`${API_URL}/auth/check-email`, {
         email: formData.email,
       });
-      console.log("result auth/check-email:", response);
 
       setEmailError("");
     } catch (error) {
@@ -224,8 +222,6 @@ function Main() {
         formData,
       });
 
-      console.log("result auth/signup:", result);
-
       if (result) {
         setUsernameError("");
         setEmailError("");
@@ -284,15 +280,7 @@ function Main() {
 
       const secretKey = import.meta.env.VITE_SECRET_KEY;
       const encryptedToken = CryptoJS.AES.encrypt(token, secretKey).toString();
-      console.log("result after login:", token);
-      console.log(
-        "secret key & api_url:",
-        import.meta.env.VITE_SECRET_KEY,
-        import.meta.env.VITE_API_URL
-      );
 
-      console.log("result after token encrypted ... :", encryptedToken);
-      console.log("login result:", result);
       if (result?.status === 200) {
         localStorage.setItem("encryptedToken", encryptedToken);
         localStorage.setItem("userInfo", JSON.stringify(user));
