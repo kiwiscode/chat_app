@@ -580,16 +580,14 @@ function Sidebar() {
           }}
         >
           <div
-            className="shadow_div_white p-abs border-r-4 none-outline"
+            className="shadow_div_white p-abs none-outline "
             style={{
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              width: 600,
-              height: 600,
-              borderRadius: "16px",
-              maxHeight: 600,
-              overflowY: "auto",
+              width: width <= 768 ? "100%" : 600,
+              height: width <= 768 ? "100%" : 600,
+              borderRadius: width <= 768 ? "" : "16px",
             }}
           >
             <div className="dflex">
@@ -598,7 +596,7 @@ function Sidebar() {
                 style={{
                   width: "50%",
                   height: "53px",
-                  borderTopLeftRadius: "16px",
+                  borderTopLeftRadius: width <= 768 ? "" : "16px",
                 }}
                 onClick={() => toggleViewCoworkersModal("Coworkers")}
               >
@@ -640,7 +638,7 @@ function Sidebar() {
                 style={{
                   width: "50%",
                   height: "53px",
-                  borderTopRightRadius: "16px",
+                  borderTopRightRadius: width <= 768 ? "" : "16px",
                 }}
                 onClick={() => toggleViewCoworkersModal("Requests")}
               >
@@ -1068,18 +1066,21 @@ function Sidebar() {
           className="z-9999 p-0 m-0"
           open={showFRequestsModal}
           onClose={handleCloseFReqModal}
+          sx={{
+            "& > .MuiBackdrop-root": {
+              opacity: "0.8 !important",
+            },
+          }}
         >
           <div
-            className="shadow_div_white p-abs border-r-4 none-outline"
+            className="shadow_div_white p-abs none-outline "
             style={{
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              width: 600,
-              height: 600,
-              borderRadius: "16px",
-              maxHeight: 600,
-              overflowY: "auto",
+              width: width <= 768 ? "100%" : 600,
+              height: width <= 768 ? "100%" : 600,
+              borderRadius: width <= 768 ? "" : "16px",
             }}
           >
             <div className="dflex">
@@ -1088,7 +1089,7 @@ function Sidebar() {
                 style={{
                   width: "50%",
                   height: "53px",
-                  borderTopLeftRadius: "16px",
+                  borderTopLeftRadius: width <= 768 ? "" : "16px",
                 }}
                 onClick={() => toggleViewFriendsModal("Friends")}
               >
@@ -1130,7 +1131,7 @@ function Sidebar() {
                 style={{
                   width: "50%",
                   height: "53px",
-                  borderTopRightRadius: "16px",
+                  borderTopRightRadius: width <= 768 ? "" : "16px",
                 }}
                 onClick={() => toggleViewFriendsModal("Requests")}
               >
