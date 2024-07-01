@@ -9,8 +9,7 @@ const socketIo = require("socket.io");
 const http = require("http");
 const server = http.createServer(app);
 const FRONTEND_URL = "https://chatswift-lovat.vercel.app";
-
-//
+// const FRONTEND_URL = "http://localhost:5173";
 
 const corsOptions = {
   origin: FRONTEND_URL,
