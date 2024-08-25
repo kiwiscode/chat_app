@@ -29,6 +29,7 @@ function Sidebar() {
   const [changingBar, setChangingBar] = useState(false);
   const handleChangeProfileImage = (e) => {
     const file = e.target.files[0];
+    console.log("target value for file :", e.target.files[0]);
     handleChangeProfileImageSetFileToBase(file);
     setShow(false);
   };
@@ -39,8 +40,10 @@ function Sidebar() {
     reader.onloadend = () => {
       setprofileImage(reader.result);
     };
+    console.log("reader result:", reader.result);
   };
 
+  console.log("profile image:", profileImage);
   const changeProfileImage = async () => {
     setChangingBar(true);
 
@@ -749,9 +752,6 @@ function Sidebar() {
                             </div>
 
                             <div
-                              onClick={() =>
-                                openRemoveCoworkerModal(eachCoworker?.user)
-                              }
                               className="dflex algncenter w-100"
                               style={{
                                 justifyContent: "flex-end",
@@ -763,6 +763,9 @@ function Sidebar() {
                               }}
                             >
                               <div
+                                onClick={() =>
+                                  openRemoveCoworkerModal(eachCoworker?.user)
+                                }
                                 onMouseEnter={() =>
                                   setHovered_div(eachCoworker?.id)
                                 }
@@ -1241,9 +1244,6 @@ function Sidebar() {
                               {eachFriend?.user?.username}
                             </div>
                             <div
-                              onClick={() =>
-                                openRemoveFriendModal(eachFriend?.user)
-                              }
                               className="dflex algncenter w-100"
                               style={{
                                 justifyContent: "flex-end",
@@ -1255,6 +1255,9 @@ function Sidebar() {
                               }}
                             >
                               <div
+                                onClick={() =>
+                                  openRemoveFriendModal(eachFriend?.user)
+                                }
                                 onMouseEnter={() =>
                                   setHovered_div(eachFriend?.id)
                                 }
