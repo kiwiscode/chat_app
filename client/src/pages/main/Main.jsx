@@ -72,6 +72,7 @@ function Main() {
   const [invalidCodeError, setInvalidCodeError] = useState(null);
   const [showInfoMessage, setShowInfoMessage] = useState(null);
   const [showInfoMessageClose, setShowInfoMessageClose] = useState(null);
+  const [noClickableSignUpBtn, setNoClickableSignUpBtn] = useState(false);
 
   const regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
 
@@ -80,10 +81,12 @@ function Main() {
       const response = await axios.post(`${API_URL}/auth/check-username`, {
         username: formData.username,
       });
+      setNoClickableSignUpBtn(false);
       setUsernameError("");
     } catch (error) {
       console.error("Error:", error);
       if (error.response.status === 409) {
+        setNoClickableSignUpBtn(true);
         setUsernameError(
           "Username already exists. Please choose a different username."
         );
@@ -103,11 +106,12 @@ function Main() {
       const response = await axios.post(`${API_URL}/auth/check-email`, {
         email: formData.email,
       });
-
+      setNoClickableSignUpBtn(false);
       setEmailError("");
     } catch (error) {
       console.error("Error:", error);
       if (error.response.status === 409) {
+        setNoClickableSignUpBtn(true);
         setEmailError("Email already exists. Please use a different email.");
       }
     }
@@ -539,7 +543,21 @@ function Main() {
                     backgroundColor: "#10172A",
                     border: "none",
                     marginTop: "36px",
-                    pointerEvents: loading ? "none" : null,
+                    pointerEvents:
+                      loading ||
+                      noClickableSignUpBtn ||
+                      usernameError ||
+                      emailError
+                        ? "none"
+                        : null,
+                    opacity:
+                      noClickableSignUpBtn || usernameError || emailError
+                        ? 0.3
+                        : 1,
+                    cursor:
+                      noClickableSignUpBtn || usernameError || emailError
+                        ? "default"
+                        : "none",
                   }}
                 >
                   {loading ? (
