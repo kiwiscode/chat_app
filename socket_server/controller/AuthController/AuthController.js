@@ -89,6 +89,7 @@ const checkIfUsernameExists = async (req, res) => {
 const checkIfEmailExists = async (req, res) => {
   try {
     const { email } = req.body;
+    console.log("email exist check email:", email);
     const user = await prisma.user.findUnique({
       where: {
         email: email.toLowerCase(),
@@ -100,7 +101,7 @@ const checkIfEmailExists = async (req, res) => {
       return res.status(200).json({ exists: false });
     }
   } catch (error) {
-    console.error(error);
+    console.log("error:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
