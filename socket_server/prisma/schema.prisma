@@ -3,10 +3,11 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
   // on deployment version
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  // on local version
+  // url      = env("DATABASE_URL") // uses connection pooling
 }
 
 model User {

@@ -8,7 +8,8 @@ const cors = require("cors");
 const socketIo = require("socket.io");
 const http = require("http");
 const server = http.createServer(app);
-
+// const FRONTEND_URL =
+//   "https://chat-oqnm69whw-aykuts-projects-7a691475.vercel.app";
 // const FRONTEND_URL = "http://localhost:5173";
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
