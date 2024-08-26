@@ -1142,38 +1142,35 @@ function Dashboard() {
                 overflowY: "auto",
               }}
             >
-              <div
-                className="p-abs border-r-50 pointer"
+              <button
+                className="toggle-close-btn"
                 onClick={handleCloseSearchPeopleModal}
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  position: "absolute",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  top: "20px",
+                  left: "20px",
+                  cursor: "pointer",
+                  borderRadius: "50%",
+                }}
               >
-                <div
-                  className="dflex jfycenter algncenter border-r-50 hover_close_btn"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                  }}
+                <svg
+                  width={20}
+                  height={20}
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
-                  {/* close signin modal icon start to check  */}
-                  <svg
-                    style={{
-                      border: "none",
-                      margin: "5px",
-                    }}
-                    width={20}
-                    height={20}
-                    color={"rgb(15,20,25)"}
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    className={` r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-z80fyv r-19wmn03`}
-                  >
-                    <g>
-                      <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
-                    </g>
-                  </svg>{" "}
-                  {/* close signin modal icon finish to check  */}
-                </div>
-              </div>{" "}
+                  <g>
+                    <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                  </g>
+                </svg>
+              </button>
               <div
                 style={{
                   paddingTop: "60px",
@@ -1594,6 +1591,35 @@ function Dashboard() {
                 overflowY: "auto",
               }}
             >
+              <button
+                className="toggle-close-btn"
+                onClick={handleCloseSearchCoworkerModal}
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  position: "absolute",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  bottom: "20px",
+                  left: "20px",
+                  cursor: "pointer",
+                  borderRadius: "50%",
+                }}
+              >
+                <svg
+                  width={20}
+                  height={20}
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <g>
+                    <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                  </g>
+                </svg>
+              </button>
               {user?.coworkers?.length > 0 ? (
                 <>
                   <div
@@ -1807,6 +1833,35 @@ function Dashboard() {
                 overflowY: "auto",
               }}
             >
+              <button
+                className="toggle-close-btn"
+                onClick={handleCloseSearchFriendModal}
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  position: "absolute",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  bottom: "20px",
+                  left: "20px",
+                  cursor: "pointer",
+                  borderRadius: "50%",
+                }}
+              >
+                <svg
+                  width={20}
+                  height={20}
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <g>
+                    <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                  </g>
+                </svg>
+              </button>
               {user?.friends?.length > 0 ? (
                 <>
                   <div

@@ -249,7 +249,8 @@ body {
   box-sizing: border-box;
 }
 
-.toggle-view-hover-effect:hover {
+.toggle-view-hover-effect:hover,
+.toggle-close-btn:hover {
   background-color: #e7e7e8 !important ;
 }
 
