@@ -1961,6 +1961,27 @@ function Sidebar() {
                     >
                       Log out @{user?.username}
                     </div>
+                    <div
+                      className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none chirp-regular-font`}
+                      style={{
+                        left: width <= 768 ? "0px" : "15px",
+                        bottom: "15px",
+                        position: "absolute",
+                        textAlign: "center",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          color: "rgb(112, 112, 112)",
+                          flexWrap: "wrap",
+                          cursor: "default",
+                          color: "rgb(112, 112, 112)",
+                        }}
+                      >
+                        © 2024 Chat Swift | Designed & Developed by Aykut Kav
+                      </div>
+                    </div>
                   </div>
                 </div>
               </>
@@ -2070,7 +2091,7 @@ function Sidebar() {
                         backgroundColor: "#37BCF8",
                       }}
                     >
-                      Sign in
+                      Sign In
                     </div>
                   </div>
                   <div
@@ -2121,6 +2142,27 @@ function Sidebar() {
                         </div>
                       </div>
                     )}
+                  </div>
+                  <div
+                    className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none chirp-regular-font`}
+                    style={{
+                      left: width <= 768 ? "0px" : "15px",
+                      bottom: "15px",
+                      position: "absolute",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "13px",
+                        color: "rgb(112, 112, 112)",
+                        flexWrap: "wrap",
+                        cursor: "default",
+                        color: "rgb(112, 112, 112)",
+                      }}
+                    >
+                      © 2024 Chat Swift | Designed & Developed by Aykut Kav
+                    </div>
                   </div>
                 </div>
               </>
