@@ -43,7 +43,6 @@ function Sidebar() {
     console.log("reader result:", reader.result);
   };
 
-  console.log("profile image:", profileImage);
   const changeProfileImage = async () => {
     setChangingBar(true);
 
