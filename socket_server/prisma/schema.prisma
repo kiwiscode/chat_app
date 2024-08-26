@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   // on deployment version
-  url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  url      = env("DATABASE_URL") // uses connection pooling
   // on local version
   // url      = env("DATABASE_URL") // uses connection pooling
 }
