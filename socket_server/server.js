@@ -37,12 +37,12 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.set("trust proxy", 1);
 
-const authRoutes = require("../routes/auth.routes");
-const userVerification = require("../routes/userVerification.routes");
-const userRoutes = require("../routes/user.routes");
-const conversationRoutes = require("../routes/conversation.routes");
-const messageRoutes = require("../routes/message.routes");
-const connectionRoutes = require("../routes/connection.routes");
+const authRoutes = require("./routes/auth.routes");
+const userVerification = require("./routes/userVerification.routes");
+const userRoutes = require("./routes/user.routes");
+const conversationRoutes = require("./routes/conversation.routes");
+const messageRoutes = require("./routes/message.routes");
+const connectionRoutes = require("./routes/connection.routes");
 
 app.use("/auth", authRoutes);
 app.use("/user-verify", userVerification);

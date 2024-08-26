@@ -1,7 +1,4 @@
 {
-  "engines": {
-    "node": "20.x"
-  },
   "dependencies": {
     "@prisma/adapter-pg": "^5.16.1",
     "@prisma/client": "^5.16.1",
