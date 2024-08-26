@@ -557,7 +557,7 @@ function Main() {
                     cursor:
                       noClickableSignUpBtn || usernameError || emailError
                         ? "default"
-                        : "none",
+                        : "pointer",
                   }}
                 >
                   {loading ? (
