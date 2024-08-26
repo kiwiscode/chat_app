@@ -1964,7 +1964,8 @@ function Sidebar() {
                     <div
                       className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none chirp-regular-font`}
                       style={{
-                        bottom: "15px",
+                        bottom: 15,
+                        left: 0,
                         position: "absolute",
                         textAlign: "center",
                       }}
@@ -2121,9 +2122,11 @@ function Sidebar() {
                   <div
                     className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none chirp-regular-font`}
                     style={{
-                      bottom: "15px",
+                      bottom: 15,
+                      left: 0,
                       position: "absolute",
                       textAlign: "center",
+                      display: width > 768 && "none",
                     }}
                   >
                     <div
