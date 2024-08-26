@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CryptoJS from "crypto-js";
 import { useUser } from "../../context/UserContext";
+import useWindowDimensions from "../../utils/window-dimensions";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -15,6 +16,7 @@ function Main() {
     user,
     updateUser,
   } = useUser();
+  const { width } = useWindowDimensions();
   const [authModal, setAuthModal] = useState(null);
   const [formData, setFormData] = useState({
     username: "",
@@ -786,11 +788,22 @@ function Main() {
           <div
             className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none p-16 chirp-regular-font p-fix z-1`}
             style={{
-              left: "15px",
+              left: width <= 768 ? "0px" : "15px",
               bottom: "15px",
             }}
           >
-            © Aykut Kav 2024
+            <div
+              style={{
+                fontSize: "13px",
+                color: "rgb(112, 112, 112)",
+                flexWrap: "wrap",
+                whiteSpace: "nowrap",
+                cursor: "default",
+                color: "rgb(112, 112, 112)",
+              }}
+            >
+              © 2024 Chat Swift | Designed & Developed by Aykut Kav
+            </div>
           </div>
           <div
             onClick={() => {
