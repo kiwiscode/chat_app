@@ -412,7 +412,7 @@ function Main() {
               }
             }}
             style={{
-              right: "15px",
+              right: "30px",
               bottom: "15px",
               backgroundColor: "#37BCF8",
             }}
@@ -424,7 +424,7 @@ function Main() {
                   : ""
               }
             >
-              Start for free
+              Start For Free
             </div>
             {authModal ? (
               <div
@@ -788,8 +788,9 @@ function Main() {
           <div
             className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none p-16 chirp-regular-font p-fix z-1`}
             style={{
-              left: width <= 768 ? "0px" : "15px",
+              left: "15px",
               bottom: "15px",
+              display: width <= 768 && "none",
             }}
           >
             <div
