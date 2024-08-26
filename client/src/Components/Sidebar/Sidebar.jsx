@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import "../../index.css";
@@ -8,6 +8,7 @@ import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import useWindowDimensions from "../../utils/window-dimensions";
 import { Modal } from "@mui/material";
 import { createAuthHeader } from "../../utils/apiUtils";
+import { SearchPeopleModalContext } from "../../context/SearchPeopleModalContext";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Sidebar() {
@@ -15,7 +16,9 @@ function Sidebar() {
   const navigate = useNavigate();
   const { user, isAuthenticatedUser, handleLogout, updateUser, refreshUser } =
     useUser();
-
+  const { searchPeopleModalOpened, setSearchPeopleModalOpened } = useContext(
+    SearchPeopleModalContext
+  );
   const handleParentClick = () => {
     setShow(false);
   };
@@ -1863,6 +1866,34 @@ function Sidebar() {
                       }}
                     >
                       Friends
+                    </div>
+                  </div>
+
+                  <div
+                    onClick={() => setSearchPeopleModalOpened(true)}
+                    style={{
+                      width: "100%",
+                      marginTop: "16px",
+                      textAlign: "center",
+                      display: width > 768 && "none",
+                    }}
+                  >
+                    <div
+                      className={
+                        effect === "find_friend_or_coworker"
+                          ? "slide_up_effect color-dark-text"
+                          : " color-dark-text"
+                      }
+                      onMouseEnter={() => setEffect("find_friend_or_coworker")}
+                      onMouseLeave={() => setEffect(null)}
+                      style={{
+                        padding: "16px",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        transition: "transform 0.3s ease",
+                      }}
+                    >
+                      Find your friend or coworker
                     </div>
                   </div>
                   <div

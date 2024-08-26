@@ -10,10 +10,14 @@ import { useAntdMessageHandler } from "../../utils/useAntdMessageHandler";
 import useWindowDimensions from "../../utils/window-dimensions";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
 import { createAuthHeader } from "../../utils/apiUtils";
+import { SearchPeopleModalContext } from "../../context/SearchPeopleModalContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Dashboard() {
+  const { searchPeopleModalOpened, setSearchPeopleModalOpened } = useContext(
+    SearchPeopleModalContext
+  );
   const { user, refreshUser, updateUser, setUser } = useUser();
   const { showCustomMessage, contextHolder } = useAntdMessageHandler();
   const navigate = useNavigate();
@@ -356,6 +360,7 @@ function Dashboard() {
     setShowSearchPeopleModal(true);
   };
   const handleCloseSearchPeopleModal = () => {
+    setSearchPeopleModalOpened(false);
     setShowSearchPeopleModal(false);
     setFilteredUsers(null);
     setSearchInput("");
@@ -1111,7 +1116,7 @@ function Dashboard() {
       <>
         <Modal
           className="z-9999 p-0 m-0"
-          open={showSearchPeopleModal}
+          open={showSearchPeopleModal || searchPeopleModalOpened}
           onClose={handleCloseSearchPeopleModal}
           sx={{
             "& > .MuiBackdrop-root": {
@@ -1193,17 +1198,27 @@ function Dashboard() {
                     })}
                   </AvatarGroup>
                 </div>
-                <input
-                  placeholder="Search people"
-                  type="text"
-                  className="w-100 border-r-999 border-1px fs-15 lh-20 chirp-regular-font"
+                <div
                   style={{
-                    borderRadius: "9999px",
-                    height: "42px",
-                    outlineStyle: "none",
+                    display: "flex",
+                    justifyContent: "center",
                   }}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                />
+                >
+                  <input
+                    placeholder="Search people"
+                    type="text"
+                    className="w-100 border-r-999 border-1px fs-15 lh-20 chirp-regular-font"
+                    style={{
+                      borderRadius: "9999px",
+                      height: "42px",
+                      outlineStyle: "none",
+                      maxWidth: "90%",
+                      padding: "0px 12px",
+                      marginTop: "10px",
+                    }}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </div>
               </div>
               <div>
                 {filteredUsers?.length > 0 && (
