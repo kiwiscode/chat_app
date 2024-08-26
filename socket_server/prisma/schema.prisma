@@ -7,8 +7,6 @@ datasource db {
   // on deployment version
   url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
-  // on local version
-  // url = env("DATABASE_URL") 
 }
 
 model User {
