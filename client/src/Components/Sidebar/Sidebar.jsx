@@ -592,6 +592,35 @@ function Sidebar() {
               borderRadius: width <= 768 ? "" : "16px",
             }}
           >
+            <button
+              className="toggle-close-btn"
+              onClick={handleCloseCReqModal}
+              style={{
+                width: "50px",
+                height: "50px",
+                position: "absolute",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                border: "none",
+                backgroundColor: "transparent",
+                bottom: "15px",
+                left: "10px",
+                cursor: "pointer",
+                borderRadius: "50%",
+              }}
+            >
+              <svg
+                width={20}
+                height={20}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <g>
+                  <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                </g>
+              </svg>
+            </button>
             <div className="dflex">
               <div
                 className="dflex jfycenter pointer toggle-view-hover-effect"
@@ -1085,6 +1114,35 @@ function Sidebar() {
               borderRadius: width <= 768 ? "" : "16px",
             }}
           >
+            <button
+              className="toggle-close-btn"
+              onClick={handleCloseFReqModal}
+              style={{
+                width: "50px",
+                height: "50px",
+                position: "absolute",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                border: "none",
+                backgroundColor: "transparent",
+                bottom: "15px",
+                left: "10px",
+                cursor: "pointer",
+                borderRadius: "50%",
+              }}
+            >
+              <svg
+                width={20}
+                height={20}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <g>
+                  <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                </g>
+              </svg>
+            </button>
             <div className="dflex">
               <div
                 className="dflex jfycenter pointer toggle-view-hover-effect"

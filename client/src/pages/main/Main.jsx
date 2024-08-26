@@ -337,6 +337,19 @@ function Main() {
     };
   }, []);
 
+  useEffect(() => {
+    if (
+      (!regex.test(formData.password) || formData.password.length < 8) &&
+      formData.password.length > 0
+    ) {
+      setPasswordError(
+        "Password needs to have at least 8 chars and must contain at least one number, one lowercase and one uppercase letter."
+      );
+    } else {
+      setPasswordError("");
+    }
+  }, [formData.password]);
+
   return (
     <>
       {loading && !notSignupClicked && !verifyClicked && !loginClicked ? (
@@ -502,12 +515,7 @@ function Main() {
                       !formData.email ||
                       !formData.password
                     ) {
-                      setUsernameError("");
-                      setEmailError("");
-                      setPasswordError("");
-                      setEmptyFieldsError(
-                        "All fields are mandatory.Please provide username,email, and password"
-                      );
+                      setNoClickableSignUpBtn(true);
                     } else if (
                       formData.username.length < 4 ||
                       formData.username.length > 15 ||
@@ -518,16 +526,6 @@ function Main() {
                       setPasswordError("");
                       setUsernameError(
                         "Username must be between 4 and 15 characters without spaces."
-                      );
-                    } else if (
-                      !regex.test(formData.password) ||
-                      formData.password.length < 8
-                    ) {
-                      setEmptyFieldsError("");
-                      setUsernameError("");
-                      setEmailError("");
-                      setPasswordError(
-                        "Password needs to have at least 8 chars and must contain at least one number, one lowercase and one uppercase letter."
                       );
                     } else {
                       setEmptyFieldsError("");
@@ -547,15 +545,34 @@ function Main() {
                       loading ||
                       noClickableSignUpBtn ||
                       usernameError ||
-                      emailError
+                      emailError ||
+                      !formData.username ||
+                      !formData.email ||
+                      !formData.password ||
+                      !regex.test(formData.password) ||
+                      formData.password.length < 8
                         ? "none"
                         : null,
                     opacity:
-                      noClickableSignUpBtn || usernameError || emailError
+                      noClickableSignUpBtn ||
+                      usernameError ||
+                      emailError ||
+                      !formData.username ||
+                      !formData.email ||
+                      !formData.password ||
+                      !regex.test(formData.password) ||
+                      formData.password.length < 8
                         ? 0.3
                         : 1,
                     cursor:
-                      noClickableSignUpBtn || usernameError || emailError
+                      noClickableSignUpBtn ||
+                      usernameError ||
+                      emailError ||
+                      !formData.username ||
+                      !formData.email ||
+                      !formData.password ||
+                      !regex.test(formData.password) ||
+                      formData.password.length < 8
                         ? "default"
                         : "pointer",
                   }}
