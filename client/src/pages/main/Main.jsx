@@ -909,6 +909,7 @@ function Main() {
               className="p-abs h-100"
               src="https://tailwindui.com/img/beams-home@95.jpg"
               alt=""
+              loading="lazy"
               style={{
                 marginLeft: "-67.5rem",
                 width: "163rem",

@@ -39,7 +39,6 @@ function Sidebar() {
   const [changingBar, setChangingBar] = useState(false);
   const handleChangeProfileImage = (e) => {
     const file = e.target.files[0];
-    console.log("target value for file :", e.target.files[0]);
     handleChangeProfileImageSetFileToBase(file);
     setShow(false);
   };
@@ -50,7 +49,6 @@ function Sidebar() {
     reader.onloadend = () => {
       setprofileImage(reader.result);
     };
-    console.log("reader result:", reader.result);
   };
 
   const changeProfileImage = async () => {
@@ -746,11 +744,13 @@ function Sidebar() {
                                 >
                                   <img
                                     src={eachCoworker?.user?.profilePicture}
-                                    width={40}
-                                    height={40}
+                                    width={"100%"}
+                                    height={"100%"}
+                                    loading="lazy"
                                     alt=""
                                     style={{
                                       borderRadius: "50%",
+                                      objectFit: "cover",
                                     }}
                                   />{" "}
                                 </div>
@@ -918,11 +918,13 @@ function Sidebar() {
                                               eachCRequest?.requester
                                                 ?.profilePicture
                                             }
-                                            width={40}
-                                            height={40}
+                                            width={"100%"}
+                                            height={"100%"}
+                                            loading="lazy"
                                             alt=""
                                             style={{
                                               borderRadius: "50%",
+                                              objectFit: "cover",
                                             }}
                                           />{" "}
                                         </div>
@@ -1269,11 +1271,13 @@ function Sidebar() {
                                 >
                                   <img
                                     src={eachFriend?.user?.profilePicture}
-                                    width={40}
-                                    height={40}
+                                    width={"100%"}
+                                    height={"100%"}
+                                    loading="lazy"
                                     alt=""
                                     style={{
                                       borderRadius: "50%",
+                                      objectFit: "cover",
                                     }}
                                   />{" "}
                                 </div>
@@ -1437,11 +1441,13 @@ function Sidebar() {
                                             eachCRequest?.requester
                                               ?.profilePicture
                                           }
-                                          width={40}
-                                          height={40}
+                                          width={"100%"}
+                                          height={"100%"}
+                                          loading="lazy"
                                           alt=""
                                           style={{
                                             borderRadius: "50%",
+                                            objectFit: "cover",
                                           }}
                                         />{" "}
                                       </div>
@@ -1700,6 +1706,7 @@ function Sidebar() {
                           src={user?.profilePicture}
                           width={40}
                           height={40}
+                          loading="lazy"
                           alt=""
                           style={{
                             borderRadius: "50%",

@@ -1286,9 +1286,14 @@ function Dashboard() {
                                     <img
                                       className="border-r-50"
                                       src={eachUser.profilePicture}
-                                      width={40}
-                                      height={40}
+                                      width={44}
+                                      height={44}
+                                      loading="lazy"
                                       alt=""
+                                      style={{
+                                        borderRadius: "50%",
+                                        objectFit: "cover",
+                                      }}
                                     />{" "}
                                   </div>
                                 ) : (
@@ -1753,9 +1758,14 @@ function Dashboard() {
                                         <img
                                           className="border-r-50"
                                           src={eachUser?.user?.profilePicture}
-                                          width={40}
-                                          height={40}
+                                          width={44}
+                                          height={44}
+                                          loading="lazy"
                                           alt=""
+                                          style={{
+                                            borderRadius: "50%",
+                                            objectFit: "cover",
+                                          }}
                                         />{" "}
                                       </div>
                                     ) : (
@@ -2005,9 +2015,14 @@ function Dashboard() {
                                         <img
                                           className="border-r-50"
                                           src={eachUser?.user?.profilePicture}
-                                          width={40}
-                                          height={40}
+                                          width={44}
+                                          height={44}
+                                          loading="lazy"
                                           alt=""
+                                          style={{
+                                            borderRadius: "50%",
+                                            objectFit: "cover",
+                                          }}
                                         />{" "}
                                       </div>
                                     ) : (
@@ -2174,10 +2189,14 @@ function Dashboard() {
                                           eachConv.members
                                         )[0].profilePicture
                                       }
-                                      width={40}
-                                      height={40}
+                                      width={44}
+                                      height={44}
                                       alt=""
-                                      className="border-r-50"
+                                      loading="lazy"
+                                      style={{
+                                        borderRadius: "50%",
+                                        objectFit: "cover",
+                                      }}
                                     />{" "}
                                   </div>
                                 ) : (
@@ -2212,9 +2231,14 @@ function Dashboard() {
                                 </div>
                                 <div
                                   style={{
-                                    maxWidth: "200px",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                    maxWidth: "fit-content",
+                                    maxWidth: "150px",
+                                    display: width <= 768 && "none",
                                   }}
-                                  className="fs-15 lh-20 chirp-regular-font color-soft-dark-text t-ov ov-hid w-sp"
+                                  className="fs-15 lh-20 chirp-regular-font color-soft-dark-text"
                                 >
                                   {
                                     eachConv?.Message[
@@ -3041,11 +3065,13 @@ function Dashboard() {
                 "default_profile_picture_url" ? (
                   <img
                     src={selectedUser?.profilePicture}
-                    width={32}
-                    height={32}
+                    width={"40px"}
+                    height={"40px"}
+                    loading="lazy"
                     alt=""
                     style={{
                       borderRadius: "50%",
+                      objectFit: "cover",
                     }}
                   />
                 ) : (

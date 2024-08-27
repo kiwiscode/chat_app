@@ -9,17 +9,6 @@ const InstantConversationModalProvider = ({ children }) => {
   const [searchYourFriendsModalOpened, setSearchYourFriendsModalOpened] =
     useState(false);
 
-  useEffect(() => {
-    console.log(
-      "show your coworkers modal for instant conversation:",
-      searchYourCoworkersModalOpened
-    );
-    console.log(
-      "show your friends modal for instant conversation:",
-      searchYourFriendsModalOpened
-    );
-  }, [searchYourCoworkersModalOpened, searchYourFriendsModalOpened]);
-
   return (
     <InstantConversationModalContext.Provider
       value={{

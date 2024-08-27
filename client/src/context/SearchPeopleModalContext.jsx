@@ -6,13 +6,6 @@ const SearchPeopleModalContext = createContext();
 const SearchPeopleModalProvider = ({ children }) => {
   const [searchPeopleModalOpened, setSearchPeopleModalOpened] = useState(false);
 
-  useEffect(() => {
-    console.log(
-      "global context search people modal status:",
-      searchPeopleModalOpened
-    );
-  }, [searchPeopleModalOpened]);
-
   return (
     <SearchPeopleModalContext.Provider
       value={{ searchPeopleModalOpened, setSearchPeopleModalOpened }}
