@@ -429,7 +429,7 @@ function Main() {
               }
             }}
             style={{
-              right: "15px",
+              right: "30px",
               bottom: "15px",
               backgroundColor: "#37BCF8",
             }}
@@ -441,7 +441,7 @@ function Main() {
                   : ""
               }
             >
-              Start for free
+              Start For Free
             </div>
             {authModal ? (
               <div

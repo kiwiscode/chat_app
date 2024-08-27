@@ -4,7 +4,10 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // on deployment version
+  url      = env("DATABASE_URL") // uses connection pooling
+  // on local version
+  // url      = env("DATABASE_URL") // uses connection pooling
 }
 
 model User {

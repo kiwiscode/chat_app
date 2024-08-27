@@ -2185,6 +2185,30 @@ function Sidebar() {
                     >
                       Register
                     </div>
+                    {width <= 768 && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "95%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          width: "100%",
+                        }}
+                        className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none chirp-regular-font`}
+                      >
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            color: "rgb(112, 112, 112)",
+                            flexWrap: "wrap",
+                            cursor: "default",
+                            color: "rgb(112, 112, 112)",
+                          }}
+                        >
+                          © 2024 Chat Swift | Designed & Developed by Aykut Kav
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div
                     className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none chirp-regular-font`}

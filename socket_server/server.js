@@ -8,8 +8,14 @@ const cors = require("cors");
 const socketIo = require("socket.io");
 const http = require("http");
 const server = http.createServer(app);
-// const FRONTEND_URL = "https://chatswift-lovat.vercel.app";
-const FRONTEND_URL = "http://localhost:5173";
+
+// on deployment version
+const FRONTEND_URL = "https://chat-swift-two.vercel.app";
+
+// on local version
+// const FRONTEND_URL = process.env.FRONTEND_URL;
+
+console.log("front end url:", FRONTEND_URL);
 
 const corsOptions = {
   origin: FRONTEND_URL,
