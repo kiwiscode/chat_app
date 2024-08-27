@@ -1793,34 +1793,66 @@ function Dashboard() {
                   </div>
                 </>
               ) : (
-                <div className="dflex jfycenter p-32">
-                  <div
+                <>
+                  <button
+                    className="toggle-close-btn"
+                    onClick={handleCloseSearchCoworkerModal}
                     style={{
-                      maxWidth: "350px",
+                      width: "50px",
+                      height: "50px",
+                      position: "absolute",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      top: "20px",
+                      left: "20px",
+                      cursor: "pointer",
+                      borderRadius: "50%",
                     }}
                   >
+                    <svg
+                      width={20}
+                      height={20}
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <g>
+                        <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                      </g>
+                    </svg>
+                  </button>
+                  <div className="dflex jfycenter p-32">
                     <div
-                      className="chirp-heavy-font"
                       style={{
-                        fontSize: "31px",
-                        lineHeight: "36px",
-                        margin: "10px",
+                        maxWidth: "350px",
                       }}
                     >
-                      Looking for coworkers?
-                    </div>
-                    <div
-                      className="chirp-regular-font fs-15 lh-20"
-                      style={{
-                        color: "rgb(83, 100, 113)",
-                        margin: "10px",
-                      }}
-                    >
-                      Currently, there are no coworkers added to your list. You
-                      can add coworkers by using the 'Add Coworker' button.
+                      <div
+                        className="chirp-heavy-font"
+                        style={{
+                          fontSize: "31px",
+                          lineHeight: "36px",
+                          margin: "10px",
+                        }}
+                      >
+                        Looking for coworkers?
+                      </div>
+                      <div
+                        className="chirp-regular-font fs-15 lh-20"
+                        style={{
+                          color: "rgb(83, 100, 113)",
+                          margin: "10px",
+                        }}
+                      >
+                        Currently, there are no coworkers added to your list.
+                        You can add coworkers by using the 'Add Coworker'
+                        button.
+                      </div>
                     </div>
                   </div>
-                </div>
+                </>
               )}{" "}
             </div>
           </div>
@@ -2016,6 +2048,35 @@ function Dashboard() {
                 </>
               ) : (
                 <>
+                  <button
+                    className="toggle-close-btn"
+                    onClick={handleCloseSearchFriendModal}
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      position: "absolute",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      top: "20px",
+                      left: "20px",
+                      cursor: "pointer",
+                      borderRadius: "50%",
+                    }}
+                  >
+                    <svg
+                      width={20}
+                      height={20}
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <g>
+                        <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                      </g>
+                    </svg>
+                  </button>
                   <div className="dflex jfycenter p-32">
                     <div
                       style={{
