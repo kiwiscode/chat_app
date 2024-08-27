@@ -359,6 +359,13 @@ function Dashboard() {
     getAllUsers();
     setShowSearchPeopleModal(true);
   };
+
+  useEffect(() => {
+    if (searchPeopleModalOpened) {
+      searchPeopleModal();
+    }
+  }, [searchPeopleModalOpened]);
+
   const handleCloseSearchPeopleModal = () => {
     setSearchPeopleModalOpened(false);
     setShowSearchPeopleModal(false);
