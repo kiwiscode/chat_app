@@ -600,6 +600,7 @@ function Sidebar() {
               width: width <= 768 ? "100%" : 600,
               height: width <= 768 ? "100%" : 600,
               borderRadius: width <= 768 ? "" : "16px",
+              overflowY: "auto",
             }}
           >
             <button
@@ -608,14 +609,13 @@ function Sidebar() {
               style={{
                 width: "50px",
                 height: "50px",
-                position: "absolute",
+                marginTop: "10px",
+                marginLeft: "10px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 border: "none",
                 backgroundColor: "transparent",
-                bottom: "15px",
-                left: "10px",
                 cursor: "pointer",
                 borderRadius: "50%",
               }}
@@ -637,7 +637,6 @@ function Sidebar() {
                 style={{
                   width: "50%",
                   height: "53px",
-                  borderTopLeftRadius: width <= 768 ? "" : "16px",
                 }}
                 onClick={() => toggleViewCoworkersModal("Coworkers")}
               >
@@ -679,7 +678,6 @@ function Sidebar() {
                 style={{
                   width: "50%",
                   height: "53px",
-                  borderTopRightRadius: width <= 768 ? "" : "16px",
                 }}
                 onClick={() => toggleViewCoworkersModal("Requests")}
               >
@@ -841,39 +839,41 @@ function Sidebar() {
                     </div>
                   </>
                 ) : (
-                  <div
-                    className="dflex jfycenter"
-                    style={{
-                      padding: "32px",
-                    }}
-                  >
+                  <>
                     <div
+                      className="dflex jfycenter"
                       style={{
-                        maxWidth: "350px",
+                        padding: "32px",
                       }}
                     >
                       <div
-                        className="chirp-heavy-font"
                         style={{
-                          fontSize: "31px",
-                          lineHeight: "36px",
-                          margin: "10px",
+                          maxWidth: "400px",
                         }}
                       >
-                        Looking for coworkers?
-                      </div>
-                      <div
-                        className="chirp-regular-font fs-15 lh-20"
-                        style={{
-                          color: "rgb(83, 100, 113)",
-                          margin: "10px",
-                        }}
-                      >
-                        When someone adds this account as coworker they'll show
-                        up here.{" "}
+                        <div
+                          className="chirp-heavy-font"
+                          style={{
+                            fontSize: "31px",
+                            lineHeight: "36px",
+                            margin: "10px",
+                          }}
+                        >
+                          Looking for coworkers?
+                        </div>
+                        <div
+                          className="chirp-regular-font fs-15 lh-20"
+                          style={{
+                            color: "rgb(83, 100, 113)",
+                            margin: "10px",
+                          }}
+                        >
+                          When someone adds this account as coworker they'll
+                          show up here.{" "}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </>
                 )}
               </>
             )}
@@ -1033,7 +1033,7 @@ function Sidebar() {
                     >
                       <div
                         style={{
-                          maxWidth: "350px",
+                          maxWidth: "400px",
                         }}
                       >
                         <div
@@ -1058,6 +1058,90 @@ function Sidebar() {
                         </div>
                       </div>
                     </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
                   </>
                 ) : (
                   <>
@@ -1069,7 +1153,7 @@ function Sidebar() {
                     >
                       <div
                         style={{
-                          maxWidth: "350px",
+                          maxWidth: "400px",
                         }}
                       >
                         <div
@@ -1122,6 +1206,7 @@ function Sidebar() {
               width: width <= 768 ? "100%" : 600,
               height: width <= 768 ? "100%" : 600,
               borderRadius: width <= 768 ? "" : "16px",
+              overflowY: "auto",
             }}
           >
             <button
@@ -1130,14 +1215,13 @@ function Sidebar() {
               style={{
                 width: "50px",
                 height: "50px",
-                position: "absolute",
+                marginTop: "10px",
+                marginLeft: "10px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 border: "none",
                 backgroundColor: "transparent",
-                bottom: "15px",
-                left: "10px",
                 cursor: "pointer",
                 borderRadius: "50%",
               }}
@@ -1153,13 +1237,13 @@ function Sidebar() {
                 </g>
               </svg>
             </button>
+
             <div className="dflex">
               <div
                 className="dflex jfycenter pointer toggle-view-hover-effect"
                 style={{
                   width: "50%",
                   height: "53px",
-                  borderTopLeftRadius: width <= 768 ? "" : "16px",
                 }}
                 onClick={() => toggleViewFriendsModal("Friends")}
               >
@@ -1201,7 +1285,6 @@ function Sidebar() {
                 style={{
                   width: "50%",
                   height: "53px",
-                  borderTopRightRadius: width <= 768 ? "" : "16px",
                 }}
                 onClick={() => toggleViewFriendsModal("Requests")}
               >
@@ -1361,39 +1444,132 @@ function Sidebar() {
                     </div>
                   </>
                 ) : (
-                  <div
-                    className="dflex jfycenter"
-                    style={{
-                      padding: "32px",
-                    }}
-                  >
+                  <>
                     <div
+                      className="dflex jfycenter"
                       style={{
-                        maxWidth: "350px",
+                        padding: "32px",
                       }}
                     >
                       <div
-                        className="chirp-heavy-font"
                         style={{
-                          fontSize: "31px",
-                          lineHeight: "36px",
-                          margin: "10px",
+                          maxWidth: "400px",
                         }}
                       >
-                        Looking for friends?
-                      </div>
-                      <div
-                        className="chirp-regular-font fs-15 lh-20"
-                        style={{
-                          color: "rgb(83, 100, 113)",
-                          margin: "10px",
-                        }}
-                      >
-                        When someone adds this account as friend they'll show up
-                        here.{" "}
+                        <div
+                          className="chirp-heavy-font"
+                          style={{
+                            fontSize: "31px",
+                            lineHeight: "36px",
+                            margin: "10px",
+                          }}
+                        >
+                          Looking for friends?
+                        </div>
+                        <div
+                          className="chirp-regular-font fs-15 lh-20"
+                          style={{
+                            color: "rgb(83, 100, 113)",
+                            margin: "10px",
+                          }}
+                        >
+                          When someone adds this account as friend they'll show
+                          up here.{" "}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                  </>
                 )}
               </>
             )}
@@ -1539,39 +1715,125 @@ function Sidebar() {
                     </div>
                   </>
                 ) : !pendingFriendRequests?.length ? (
-                  <div
-                    className="dflex jfycenter"
-                    style={{
-                      padding: "32px",
-                    }}
-                  >
+                  <>
                     <div
+                      className="dflex jfycenter"
                       style={{
-                        maxWidth: "350px",
+                        padding: "32px",
                       }}
                     >
                       <div
-                        className="chirp-heavy-font"
                         style={{
-                          fontSize: "31px",
-                          lineHeight: "36px",
-                          margin: "10px",
+                          maxWidth: "400px",
                         }}
                       >
-                        Friend Requests
-                      </div>
-                      <div
-                        className="chirp-regular-font fs-15 lh-20"
-                        style={{
-                          color: "rgb(83, 100, 113)",
-                          margin: "10px",
-                        }}
-                      >
-                        You currently have no friend requests.If you receive a
-                        friend request, it will be shown here.
+                        <div
+                          className="chirp-heavy-font"
+                          style={{
+                            fontSize: "31px",
+                            lineHeight: "36px",
+                            margin: "10px",
+                          }}
+                        >
+                          Friend Requests
+                        </div>
+                        <div
+                          className="chirp-regular-font fs-15 lh-20"
+                          style={{
+                            color: "rgb(83, 100, 113)",
+                            margin: "10px",
+                          }}
+                        >
+                          You currently have no friend requests.If you receive a
+                          friend request, it will be shown here.
+                        </div>
                       </div>
                     </div>
-                  </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                    <div
+                      style={{
+                        height: "50px",
+                      }}
+                    >
+                      aa
+                    </div>
+                  </>
                 ) : (
                   <div
                     className="dflex jfycenter"
@@ -1581,7 +1843,7 @@ function Sidebar() {
                   >
                     <div
                       style={{
-                        maxWidth: "350px",
+                        maxWidth: "400px",
                       }}
                     >
                       <div

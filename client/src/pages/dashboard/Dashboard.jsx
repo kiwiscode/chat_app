@@ -1185,14 +1185,13 @@ function Dashboard() {
                 style={{
                   width: "50px",
                   height: "50px",
-                  position: "absolute",
                   display: "flex",
+                  marginTop: width <= 768 && "10px",
+                  marginLeft: width <= 768 && "10px",
                   justifyContent: "center",
                   alignItems: "center",
                   border: "none",
                   backgroundColor: "transparent",
-                  top: "20px",
-                  left: "20px",
                   cursor: "pointer",
                   borderRadius: "50%",
                 }}
@@ -1208,9 +1207,10 @@ function Dashboard() {
                   </g>
                 </svg>
               </button>
+
               <div
                 style={{
-                  paddingTop: "60px",
+                  paddingTop: "40px",
                 }}
               >
                 <div
@@ -1253,6 +1253,7 @@ function Dashboard() {
                   />
                 </div>
               </div>
+
               <div>
                 {filteredUsers?.length > 0 && (
                   <div
@@ -1647,14 +1648,13 @@ function Dashboard() {
                     style={{
                       width: "50px",
                       height: "50px",
-                      position: "absolute",
                       display: "flex",
+                      marginTop: width <= 768 && "10px",
+                      marginLeft: width <= 768 && "10px",
                       justifyContent: "center",
                       alignItems: "center",
                       border: "none",
                       backgroundColor: "transparent",
-                      top: "20px",
-                      left: "20px",
                       cursor: "pointer",
                       borderRadius: "50%",
                     }}
@@ -1672,7 +1672,7 @@ function Dashboard() {
                   </button>
                   <div
                     style={{
-                      paddingTop: "60px",
+                      paddingTop: "40px",
                     }}
                   >
                     <div
@@ -1715,6 +1715,7 @@ function Dashboard() {
                       />
                     </div>
                   </div>
+
                   <div>
                     {filteredUsers?.length > 0 && (
                       <div
@@ -1800,14 +1801,13 @@ function Dashboard() {
                     style={{
                       width: "50px",
                       height: "50px",
-                      position: "absolute",
                       display: "flex",
+                      marginTop: width <= 768 && "10px",
+                      marginLeft: width <= 768 && "10px",
                       justifyContent: "center",
                       alignItems: "center",
                       border: "none",
                       backgroundColor: "transparent",
-                      top: "20px",
-                      left: "20px",
                       cursor: "pointer",
                       borderRadius: "50%",
                     }}
@@ -1826,7 +1826,7 @@ function Dashboard() {
                   <div className="dflex jfycenter p-32">
                     <div
                       style={{
-                        maxWidth: "350px",
+                        maxWidth: "400px",
                       }}
                     >
                       <div
@@ -1901,14 +1901,13 @@ function Dashboard() {
                     style={{
                       width: "50px",
                       height: "50px",
-                      position: "absolute",
                       display: "flex",
+                      marginTop: width <= 768 && "10px",
+                      marginLeft: width <= 768 && "10px",
                       justifyContent: "center",
                       alignItems: "center",
                       border: "none",
                       backgroundColor: "transparent",
-                      top: "20px",
-                      left: "20px",
                       cursor: "pointer",
                       borderRadius: "50%",
                     }}
@@ -1926,7 +1925,7 @@ function Dashboard() {
                   </button>
                   <div
                     style={{
-                      paddingTop: "60px",
+                      paddingTop: "40px",
                     }}
                   >
                     <div
@@ -2054,14 +2053,13 @@ function Dashboard() {
                     style={{
                       width: "50px",
                       height: "50px",
-                      position: "absolute",
                       display: "flex",
+                      marginTop: width <= 768 && "10px",
+                      marginLeft: width <= 768 && "10px",
                       justifyContent: "center",
                       alignItems: "center",
                       border: "none",
                       backgroundColor: "transparent",
-                      top: "20px",
-                      left: "20px",
                       cursor: "pointer",
                       borderRadius: "50%",
                     }}
@@ -2080,7 +2078,7 @@ function Dashboard() {
                   <div className="dflex jfycenter p-32">
                     <div
                       style={{
-                        maxWidth: "350px",
+                        maxWidth: "400px",
                       }}
                     >
                       <div
