@@ -289,7 +289,7 @@ const authLogout = async (req, res) => {
   }
 };
 
-// createTestUser();
+createTestUser();
 
 module.exports = {
   authSignup,
