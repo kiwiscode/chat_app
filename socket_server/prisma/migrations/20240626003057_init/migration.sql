@@ -8,8 +8,6 @@ CREATE TABLE "User" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "profilePicture" TEXT NOT NULL DEFAULT 'default_profile_picture_url',
-    "testField" TEXT NOT NULL DEFAULT 'testField',
-
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
