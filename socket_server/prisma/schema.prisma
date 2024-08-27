@@ -24,7 +24,6 @@ model User {
   receivedFriendRequests   FriendRequest[]   @relation("ReceivedFriendRequests")
   coworkers                Coworker[]        @relation("UserCoworkers")
   friends                  Friend[]          @relation("UserFriends")
-  testField                String            @default("testField")
   Coworker                 Coworker[]
   Friend                   Friend[]
 }
