@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 const nodemailer = require("nodemailer");
+const { createTestUser } = require("../../util/CreateTestUser");
 let sendVerificationCodeToEmail;
 
 emailProcess();
@@ -287,6 +288,8 @@ const authLogout = async (req, res) => {
     });
   }
 };
+
+createTestUser();
 
 module.exports = {
   authSignup,
