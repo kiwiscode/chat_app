@@ -9,6 +9,7 @@ import useWindowDimensions from "../../utils/window-dimensions";
 import { Modal } from "@mui/material";
 import { createAuthHeader } from "../../utils/apiUtils";
 import { SearchPeopleModalContext } from "../../context/SearchPeopleModalContext";
+import { InstantConversationModalContext } from "../../context/InstantConversationModalContext";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Sidebar() {
@@ -19,6 +20,12 @@ function Sidebar() {
   const { searchPeopleModalOpened, setSearchPeopleModalOpened } = useContext(
     SearchPeopleModalContext
   );
+  const {
+    searchYourCoworkersModalOpened,
+    searchYourFriendsModalOpened,
+    setSearchYourCoworkersModalOpened,
+    setSearchYourFriendsModalOpened,
+  } = useContext(InstantConversationModalContext);
   const handleParentClick = () => {
     setShow(false);
   };
@@ -1868,6 +1875,66 @@ function Sidebar() {
                       Friends
                     </div>
                   </div>
+                  {width <= 768 && (
+                    <>
+                      <div
+                        onClick={() => {
+                          setSearchYourCoworkersModalOpened(true);
+                        }}
+                        style={{
+                          width: "100%",
+                          marginTop: "16px",
+                          textAlign: "center",
+                        }}
+                      >
+                        <div
+                          className={
+                            effect === "chat_w_colleagues"
+                              ? "slide_up_effect color-dark-text"
+                              : " color-dark-text"
+                          }
+                          onMouseEnter={() => setEffect("chat_w_colleagues")}
+                          onMouseLeave={() => setEffect(null)}
+                          style={{
+                            padding: "16px",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            transition: "transform 0.3s ease",
+                          }}
+                        >
+                          Chat with your colleagues
+                        </div>
+                      </div>
+                      <div
+                        onClick={() => {
+                          setSearchYourFriendsModalOpened(true);
+                        }}
+                        style={{
+                          width: "100%",
+                          marginTop: "16px",
+                          textAlign: "center",
+                        }}
+                      >
+                        <div
+                          className={
+                            effect === "chat_w_friends"
+                              ? "slide_up_effect color-dark-text"
+                              : " color-dark-text"
+                          }
+                          onMouseEnter={() => setEffect("chat_w_friends")}
+                          onMouseLeave={() => setEffect(null)}
+                          style={{
+                            padding: "16px",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            transition: "transform 0.3s ease",
+                          }}
+                        >
+                          Chat with your friends
+                        </div>
+                      </div>
+                    </>
+                  )}
 
                   <div
                     onClick={() => setSearchPeopleModalOpened(true)}

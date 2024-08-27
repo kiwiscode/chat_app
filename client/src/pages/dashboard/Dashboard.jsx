@@ -11,6 +11,7 @@ import useWindowDimensions from "../../utils/window-dimensions";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
 import { createAuthHeader } from "../../utils/apiUtils";
 import { SearchPeopleModalContext } from "../../context/SearchPeopleModalContext";
+import { InstantConversationModalContext } from "../../context/InstantConversationModalContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -56,7 +57,12 @@ function Dashboard() {
         );
       });
       setFilteredUsers(filteredArray);
-    } else if (showSearchCoworkerModal || showSearchFriendModal) {
+    } else if (
+      showSearchCoworkerModal ||
+      showSearchFriendModal ||
+      searchYourFriendsModalOpened ||
+      searchYourCoworkersModalOpened
+    ) {
       const filteredArray = array.filter((eachUser) => {
         return (
           eachUser.user.username
@@ -73,9 +79,9 @@ function Dashboard() {
     if (searchInput) {
       if (showSearchPeopleModal) {
         filterUsers(users, searchInput);
-      } else if (showSearchCoworkerModal) {
+      } else if (showSearchCoworkerModal || searchYourCoworkersModalOpened) {
         filterUsers(user?.coworkers, searchInput);
-      } else if (showSearchFriendModal) {
+      } else if (showSearchFriendModal || searchYourFriendsModalOpened) {
         filterUsers(user?.friends, searchInput);
       }
     } else {
@@ -374,11 +380,18 @@ function Dashboard() {
   };
 
   // search coworker modal
+  const {
+    searchYourCoworkersModalOpened,
+    searchYourFriendsModalOpened,
+    setSearchYourCoworkersModalOpened,
+    setSearchYourFriendsModalOpened,
+  } = useContext(InstantConversationModalContext);
   const [showSearchCoworkerModal, setShowSearchCoworkerModal] = useState(false);
   const searchCoworkerModal = () => {
     setShowSearchCoworkerModal(true);
   };
-  const handleCloseSearchCoworkerModal = () => {
+  const handleCloseSearchCoworkerModal = (e) => {
+    setSearchYourCoworkersModalOpened(false);
     setShowSearchCoworkerModal(false);
     setFilteredUsers(null);
     setSearchInput("");
@@ -390,10 +403,22 @@ function Dashboard() {
     setShowSearchFriendModal(true);
   };
   const handleCloseSearchFriendModal = () => {
+    setSearchYourFriendsModalOpened(false);
     setShowSearchFriendModal(false);
     setFilteredUsers(null);
     setSearchInput("");
   };
+
+  useEffect(() => {
+    if (!searchYourFriendsModalOpened) {
+      handleCloseSearchFriendModal();
+    }
+  }, [searchYourFriendsModalOpened, setSearchYourFriendsModalOpened]);
+  useEffect(() => {
+    if (!searchYourCoworkersModalOpened) {
+      handleCloseSearchCoworkerModal();
+    }
+  }, [searchYourCoworkersModalOpened, setSearchYourCoworkersModalOpened]);
 
   // manage request start to check
   const [hovered, setHovered] = useState(null);
@@ -1191,6 +1216,7 @@ function Dashboard() {
                 <div
                   style={{
                     marginBottom: "12px",
+                    marginRight: width <= 768 && "12px",
                   }}
                 >
                   <AvatarGroup total={users.length}>
@@ -1221,7 +1247,7 @@ function Dashboard() {
                       outlineStyle: "none",
                       maxWidth: "90%",
                       padding: "0px 12px",
-                      marginTop: "10px",
+                      marginTop: width <= 768 && "10px",
                     }}
                     onChange={(e) => setSearchInput(e.target.value)}
                   />
@@ -1581,7 +1607,7 @@ function Dashboard() {
       <>
         <Modal
           className="z-9999 p-0 m-0"
-          open={showSearchCoworkerModal}
+          open={showSearchCoworkerModal || searchYourCoworkersModalOpened}
           onClose={handleCloseSearchCoworkerModal}
           sx={{
             "& > .MuiBackdrop-root": {
@@ -1613,69 +1639,37 @@ function Dashboard() {
                 overflowY: "auto",
               }}
             >
-              <button
-                className="toggle-close-btn"
-                onClick={handleCloseSearchCoworkerModal}
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  position: "absolute",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  border: "none",
-                  backgroundColor: "transparent",
-                  bottom: "20px",
-                  left: "20px",
-                  cursor: "pointer",
-                  borderRadius: "50%",
-                }}
-              >
-                <svg
-                  width={20}
-                  height={20}
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <g>
-                    <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
-                  </g>
-                </svg>
-              </button>
               {user?.coworkers?.length > 0 ? (
                 <>
-                  <div
-                    className="p-abs border-r-50 pointer"
+                  <button
+                    className="toggle-close-btn"
                     onClick={handleCloseSearchCoworkerModal}
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      position: "absolute",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      top: "20px",
+                      left: "20px",
+                      cursor: "pointer",
+                      borderRadius: "50%",
+                    }}
                   >
-                    <div
-                      className="dflex jfycenter algncenter border-r-50 hover_close_btn"
-                      style={{
-                        width: "40px",
-                        height: "40px",
-                      }}
+                    <svg
+                      width={20}
+                      height={20}
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
-                      {/* close signin modal icon start to check  */}
-                      <svg
-                        style={{
-                          border: "none",
-                          margin: "5px",
-                        }}
-                        width={20}
-                        height={20}
-                        color={"rgb(15,20,25)"}
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        className={` r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-z80fyv r-19wmn03`}
-                      >
-                        <g>
-                          <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
-                        </g>
-                      </svg>{" "}
-                      {/* close signin modal icon finish to check  */}
-                    </div>
-                  </div>{" "}
+                      <g>
+                        <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                      </g>
+                    </svg>
+                  </button>
                   <div
                     style={{
                       paddingTop: "60px",
@@ -1684,6 +1678,7 @@ function Dashboard() {
                     <div
                       style={{
                         marginBottom: "12px",
+                        marginRight: "12px",
                       }}
                     >
                       <AvatarGroup total={user?.coworkers?.length}>
@@ -1698,16 +1693,27 @@ function Dashboard() {
                         })}
                       </AvatarGroup>
                     </div>
-                    <input
-                      placeholder="Search for a coworker..."
-                      type="text"
-                      className="w-100 border-r-999 border-1px fs-15 lh-20 chirp-regular-font"
+                    <div
                       style={{
-                        height: "42px",
-                        outlineStyle: "none",
+                        display: "flex",
+                        justifyContent: "center",
                       }}
-                      onChange={(e) => setSearchInput(e.target.value)}
-                    />
+                    >
+                      <input
+                        placeholder="Search for a coworker..."
+                        type="text"
+                        className="w-100 border-r-999 border-1px fs-15 lh-20 chirp-regular-font"
+                        style={{
+                          borderRadius: "9999px",
+                          height: "42px",
+                          outlineStyle: "none",
+                          maxWidth: "90%",
+                          padding: "0px 12px",
+                          marginTop: width <= 768 && "10px",
+                        }}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                      />
+                    </div>
                   </div>
                   <div>
                     {filteredUsers?.length > 0 && (
@@ -1824,7 +1830,7 @@ function Dashboard() {
       <>
         <Modal
           className="z-9999 p-0 m-0"
-          open={showSearchFriendModal}
+          open={showSearchFriendModal || searchYourFriendsModalOpened}
           onClose={handleCloseSearchFriendModal}
           sx={{
             "& > .MuiBackdrop-root": {
@@ -1855,69 +1861,37 @@ function Dashboard() {
                 overflowY: "auto",
               }}
             >
-              <button
-                className="toggle-close-btn"
-                onClick={handleCloseSearchFriendModal}
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  position: "absolute",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  border: "none",
-                  backgroundColor: "transparent",
-                  bottom: "20px",
-                  left: "20px",
-                  cursor: "pointer",
-                  borderRadius: "50%",
-                }}
-              >
-                <svg
-                  width={20}
-                  height={20}
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <g>
-                    <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
-                  </g>
-                </svg>
-              </button>
               {user?.friends?.length > 0 ? (
                 <>
-                  <div
-                    className="border-r-50 pointer p-abs"
+                  <button
+                    className="toggle-close-btn"
                     onClick={handleCloseSearchFriendModal}
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      position: "absolute",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      border: "none",
+                      backgroundColor: "transparent",
+                      top: "20px",
+                      left: "20px",
+                      cursor: "pointer",
+                      borderRadius: "50%",
+                    }}
                   >
-                    <div
-                      className="dflex jfycenter algncenter border-r-50 hover_close_btn"
-                      style={{
-                        width: "40px",
-                        height: "40px",
-                      }}
+                    <svg
+                      width={20}
+                      height={20}
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
-                      {/* close signin modal icon start to check  */}
-                      <svg
-                        style={{
-                          border: "none",
-                          margin: "5px",
-                        }}
-                        width={20}
-                        height={20}
-                        color={"rgb(15,20,25)"}
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        className={` r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-z80fyv r-19wmn03`}
-                      >
-                        <g>
-                          <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
-                        </g>
-                      </svg>{" "}
-                      {/* close signin modal icon finish to check  */}
-                    </div>
-                  </div>{" "}
+                      <g>
+                        <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                      </g>
+                    </svg>
+                  </button>
                   <div
                     style={{
                       paddingTop: "60px",
@@ -1926,6 +1900,7 @@ function Dashboard() {
                     <div
                       style={{
                         marginBottom: "12px",
+                        marginRight: width <= 768 && "12px",
                       }}
                     >
                       <AvatarGroup total={user?.friends?.length}>
@@ -1940,16 +1915,27 @@ function Dashboard() {
                         })}
                       </AvatarGroup>
                     </div>
-                    <input
-                      placeholder="Search for a friend..."
-                      type="text"
-                      className="w-100 border-r-999 border-1px fs-15 lh-20 chirp-regular-font"
+                    <div
                       style={{
-                        height: "42px",
-                        outlineStyle: "none",
+                        display: "flex",
+                        justifyContent: "center",
                       }}
-                      onChange={(e) => setSearchInput(e.target.value)}
-                    />
+                    >
+                      <input
+                        placeholder="Search for a friend..."
+                        type="text"
+                        className="w-100 border-r-999 border-1px fs-15 lh-20 chirp-regular-font"
+                        style={{
+                          borderRadius: "9999px",
+                          height: "42px",
+                          outlineStyle: "none",
+                          maxWidth: "90%",
+                          padding: "0px 12px",
+                          marginTop: width <= 768 && "10px",
+                        }}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                      />
+                    </div>
                   </div>
                   <div>
                     {filteredUsers?.length > 0 && (
