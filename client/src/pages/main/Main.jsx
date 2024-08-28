@@ -830,7 +830,7 @@ function Main() {
           >
             <div
               style={{
-                fontSize: "13px",
+                fontSize: "12px",
                 color: "rgb(112, 112, 112)",
                 flexWrap: "wrap",
                 whiteSpace: "nowrap",
@@ -850,22 +850,22 @@ function Main() {
               <div
                 className="chirp-heavy-font color-dark-text"
                 style={{
-                  maxWidth: "50%",
-                  padding: "60px",
-                  fontSize: "72px",
-                  lineHeight: "72px",
+                  maxWidth: width <= 768 ? "100%" : "50%",
+                  padding: width <= 768 ? "30px" : "60px",
+                  fontSize: width <= 768 ? "36px" : "72px",
+                  lineHeight: width <= 768 ? "44px" : "72px",
                 }}
               >
                 <span>Platform for efficient communication</span>
                 <div
                   className="chirp-regular-font color-soft-dark-text"
                   style={{
-                    fontSize: "18px",
-                    lineHeight: "28px",
-                    marginTop: "1rem",
+                    fontSize: width <= 768 ? "14px" : "18px",
+                    lineHeight: width <= 768 ? "20px" : "28px",
+                    marginTop: width <= 768 ? "0.5rem" : "1rem",
                   }}
                 >
-                  Connect effortlessly with colleagues and friends on our
+                  Connect effortlessly with your coworkers and friends on our
                   platform designed for seamless communication. Strengthen
                   collaboration with secure and effective communication tools,
                   enhancing both professional and personal relationships. Get
@@ -877,27 +877,25 @@ function Main() {
             <div
               className="dflex w-100"
               style={{
-                fontSize: "36px",
-                lineHeight: "36px",
                 justifyContent: "flex-end",
               }}
             >
               <div
                 className="chirp-heavy-font color-dark-text"
                 style={{
-                  maxWidth: "50%",
-                  padding: "60px",
-                  fontSize: "72px",
-                  lineHeight: "72px",
+                  maxWidth: width <= 768 ? "100%" : "50%",
+                  padding: width <= 768 ? "30px" : "60px",
+                  fontSize: width <= 768 ? "36px" : "72px",
+                  lineHeight: width <= 768 ? "44px" : "72px",
                 }}
               >
                 Powerful Instant Messaging
                 <div
                   className="chirp-regular-font color-soft-dark-text"
                   style={{
-                    fontSize: "18px",
-                    lineHeight: "28px",
-                    marginTop: "1rem",
+                    fontSize: width <= 768 ? "14px" : "18px",
+                    lineHeight: width <= 768 ? "20px" : "28px",
+                    marginTop: width <= 768 ? "0.5rem" : "1rem",
                   }}
                 >
                   Stay connected instantly with robust features designed to

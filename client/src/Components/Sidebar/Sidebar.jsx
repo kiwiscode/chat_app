@@ -720,12 +720,16 @@ function Sidebar() {
                               setHovered_index(eachCoworker?.id)
                             }
                             onMouseLeave={() => setHovered_index(null)}
-                            className="p-16 border-r-4 dflex algncenter each-message-parent-div"
+                            className={`${
+                              width > 768 && "p-16"
+                            } border-r-4 dflex algncenter each-message-parent-div`}
                             style={{
                               justifyContent: "flex-start",
                               gap: "12px",
                               marginLeft: "16px",
                               marginRight: "16px",
+                              paddingBottom: width <= 768 && "10px",
+                              paddingTop: width <= 768 && "10px",
                             }}
                             key={eachCoworker?.user?.id}
                           >
@@ -744,8 +748,8 @@ function Sidebar() {
                                 >
                                   <img
                                     src={eachCoworker?.user?.profilePicture}
-                                    width={"100%"}
-                                    height={"100%"}
+                                    width={width <= 768 ? 32 : 44}
+                                    height={width <= 768 ? 32 : 44}
                                     loading="lazy"
                                     alt=""
                                     style={{
@@ -768,8 +772,8 @@ function Sidebar() {
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    width="40"
-                                    height="40"
+                                    width={width <= 768 ? "32px" : "40px"}
+                                    height={width <= 768 ? "32px" : "40px"}
                                     fill={"rgb(83, 100, 113)"}
                                     style={{
                                       borderRadius: "50%",
@@ -890,12 +894,16 @@ function Sidebar() {
                               {eachCRequest?.status === "pending" ? (
                                 <>
                                   <div
-                                    className="p-16 border-r-4 dflex algncenter each-message-parent-div"
+                                    className={`${
+                                      width > 768 && "p-16"
+                                    } border-r-4 dflex algncenter each-message-parent-div`}
                                     style={{
                                       justifyContent: "flex-start",
                                       gap: "12px",
                                       marginLeft: "16px",
                                       marginRight: "16px",
+                                      paddingTop: width <= 768 && "10px",
+                                      paddingBottom: width <= 768 && "10px",
                                     }}
                                     key={eachCRequest?.id}
                                   >
@@ -918,8 +926,8 @@ function Sidebar() {
                                               eachCRequest?.requester
                                                 ?.profilePicture
                                             }
-                                            width={"100%"}
-                                            height={"100%"}
+                                            width={width <= 768 ? 32 : 44}
+                                            height={width <= 768 ? 32 : 44}
                                             loading="lazy"
                                             alt=""
                                             style={{
@@ -942,8 +950,12 @@ function Sidebar() {
                                         >
                                           <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            width="40"
-                                            height="40"
+                                            width={
+                                              width <= 768 ? "32px" : "40px"
+                                            }
+                                            height={
+                                              width <= 768 ? "32px" : "40px"
+                                            }
                                             fill={"rgb(83, 100, 113)"}
                                             style={{
                                               borderRadius: "50%",
@@ -1247,12 +1259,16 @@ function Sidebar() {
                               setHovered_index(eachFriend?.id)
                             }
                             onMouseLeave={() => setHovered_index(null)}
-                            className="p-16 border-r-4 dflex algncenter each-message-parent-div"
+                            className={`${
+                              width > 768 && "p-16"
+                            } border-r-4 dflex algncenter each-message-parent-div`}
                             style={{
                               justifyContent: "flex-start",
                               gap: "12px",
                               marginLeft: "16px",
                               marginRight: "16px",
+                              paddingTop: width <= 768 && "10px",
+                              paddingBottom: width <= 768 && "10px",
                             }}
                             key={eachFriend?.user?.id}
                           >
@@ -1271,8 +1287,8 @@ function Sidebar() {
                                 >
                                   <img
                                     src={eachFriend?.user?.profilePicture}
-                                    width={"100%"}
-                                    height={"100%"}
+                                    width={width <= 768 ? 32 : 44}
+                                    height={width <= 768 ? 32 : 44}
                                     loading="lazy"
                                     alt=""
                                     style={{
@@ -1295,8 +1311,8 @@ function Sidebar() {
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    width="40"
-                                    height="40"
+                                    width={width <= 768 ? "32px" : "40px"}
+                                    height={width <= 768 ? "32px" : "40px"}
                                     fill={"rgb(83, 100, 113)"}
                                     style={{
                                       borderRadius: "50%",
@@ -1409,22 +1425,26 @@ function Sidebar() {
                   <>
                     <div>
                       {user.receivedFriendRequests.map(
-                        (eachCRequest, itemIndex) => {
+                        (eachFRequest, itemIndex) => {
                           return (
                             <>
-                              {eachCRequest?.status === "pending" ? (
+                              {eachFRequest?.status === "pending" ? (
                                 <div
-                                  className="p-16 border-r-4 dflex algncenter each-message-parent-div"
+                                  className={`${
+                                    width > 768 && "p-16"
+                                  } border-r-4 dflex algncenter each-message-parent-div`}
                                   style={{
                                     justifyContent: "flex-start",
                                     gap: "12px",
                                     marginLeft: "16px",
                                     marginRight: "16px",
+                                    paddingTop: width <= 768 && "10px",
+                                    paddingBottom: width <= 768 && "10px",
                                   }}
-                                  key={eachCRequest?.id}
+                                  key={eachFRequest?.id}
                                 >
                                   <div>
-                                    {eachCRequest?.requester?.profilePicture !==
+                                    {eachFRequest?.requester?.profilePicture !==
                                     "default_profile_picture_url" ? (
                                       <div
                                         style={{
@@ -1438,11 +1458,11 @@ function Sidebar() {
                                       >
                                         <img
                                           src={
-                                            eachCRequest?.requester
+                                            eachFRequest?.requester
                                               ?.profilePicture
                                           }
-                                          width={"100%"}
-                                          height={"100%"}
+                                          width={width <= 768 ? 32 : 44}
+                                          height={width <= 768 ? 32 : 44}
                                           loading="lazy"
                                           alt=""
                                           style={{
@@ -1465,8 +1485,10 @@ function Sidebar() {
                                       >
                                         <svg
                                           xmlns="http://www.w3.org/2000/svg"
-                                          width="40"
-                                          height="40"
+                                          width={width <= 768 ? "32px" : "40px"}
+                                          height={
+                                            width <= 768 ? "32px" : "40px"
+                                          }
                                           fill={"rgb(83, 100, 113)"}
                                           style={{
                                             borderRadius: "50%",
@@ -1481,7 +1503,7 @@ function Sidebar() {
                                     )}
                                   </div>
                                   <div className="fs-15 lh-20 chirp-medium-font color-dark-text">
-                                    {eachCRequest?.requester?.username}
+                                    {eachFRequest?.requester?.username}
                                   </div>
                                   <div
                                     className="dflex algncenter w-100"
@@ -1494,9 +1516,9 @@ function Sidebar() {
                                       onClick={() => {
                                         handleRejectFRequest(
                                           itemIndex,
-                                          eachCRequest.id,
-                                          eachCRequest.requester.id,
-                                          eachCRequest.recipient.id
+                                          eachFRequest.id,
+                                          eachFRequest.requester.id,
+                                          eachFRequest.recipient.id
                                         );
                                       }}
                                       className="fs-15 lh-20 chirp-bold-font jfycenter algncenter pointer circle_hover_reject"
@@ -1517,9 +1539,9 @@ function Sidebar() {
                                       onClick={() => {
                                         handleAcceptFRequest(
                                           itemIndex,
-                                          eachCRequest.id,
-                                          eachCRequest.requester.id,
-                                          eachCRequest.recipient.id
+                                          eachFRequest.id,
+                                          eachFRequest.requester.id,
+                                          eachFRequest.recipient.id
                                         );
                                       }}
                                       className="fs-15 lh-20 chirp-bold-font jfycenter algncenter pointer circle_hover_accept"
@@ -1704,8 +1726,8 @@ function Sidebar() {
                       >
                         <img
                           src={user?.profilePicture}
-                          width={40}
-                          height={40}
+                          width={width <= 768 ? 32 : 40}
+                          height={width <= 768 ? 32 : 40}
                           loading="lazy"
                           alt=""
                           style={{
@@ -1728,8 +1750,8 @@ function Sidebar() {
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          width="40"
-                          height="40"
+                          width={width <= 768 ? "32px" : "40px"}
+                          height={width <= 768 ? "32px" : "40px"}
                           fill={"rgb(83, 100, 113)"}
                           style={{
                             borderRadius: "50%",
@@ -1793,10 +1815,11 @@ function Sidebar() {
             {isAuthenticatedUser ? (
               <>
                 <div
-                  className="dflex algncenter algncenter"
+                  className="dflex algncenter algncenter chirp-regular-font"
                   style={{
                     padding: "32px",
                     flexDirection: "column",
+                    fontSize: "14px",
                   }}
                 >
                   <div
@@ -1812,8 +1835,8 @@ function Sidebar() {
                       }}
                       className={
                         effect === "dashboard_div"
-                          ? "slide_up_effect  color-dark-text"
-                          : "color-dark-text"
+                          ? "slide_up_effect  color-dark-text "
+                          : "color-dark-text "
                       }
                       onMouseEnter={() => setEffect("dashboard_div")}
                       onMouseLeave={() => setEffect(null)}
@@ -1899,11 +1922,11 @@ function Sidebar() {
                       >
                         <div
                           className={
-                            effect === "chat_w_colleagues"
+                            effect === "chat_w_coworkers"
                               ? "slide_up_effect color-dark-text"
                               : " color-dark-text"
                           }
-                          onMouseEnter={() => setEffect("chat_w_colleagues")}
+                          onMouseEnter={() => setEffect("chat_w_coworkers")}
                           onMouseLeave={() => setEffect(null)}
                           style={{
                             padding: "16px",
@@ -1912,7 +1935,7 @@ function Sidebar() {
                             transition: "transform 0.3s ease",
                           }}
                         >
-                          Chat with your colleagues
+                          Chat with your coworkers
                         </div>
                       </div>
                       <div
@@ -2034,6 +2057,7 @@ function Sidebar() {
                         backgroundColor: "green",
                         lineHeight: "20px",
                         backgroundColor: "rgb(16,23,42)",
+                        fontSize: "14px",
                       }}
                     >
                       Log out @{user?.username}
@@ -2049,7 +2073,7 @@ function Sidebar() {
                     >
                       <div
                         style={{
-                          fontSize: "13px",
+                          fontSize: "12px",
                           color: "rgb(112, 112, 112)",
                           flexWrap: "wrap",
                           cursor: "default",
@@ -2066,7 +2090,7 @@ function Sidebar() {
               <>
                 {" "}
                 <div
-                  className="dflex jfycenter algncenter"
+                  className="dflex jfycenter algncenter chirp-regular-font"
                   style={{
                     padding: "32px",
                     flexDirection: "column",
@@ -2181,7 +2205,7 @@ function Sidebar() {
                   >
                     <div
                       className={
-                        "color-white-text border-r-4 fs-15 pointer p-16 dark-btn-hover-effect"
+                        "color-white-text border-r-4 fs-15 pointer p-16 dark-btn-hover-effect "
                       }
                       onClick={() => {
                         setShow(false);
@@ -2208,7 +2232,7 @@ function Sidebar() {
                       >
                         <div
                           style={{
-                            fontSize: "13px",
+                            fontSize: "12px",
                             color: "rgb(112, 112, 112)",
                             flexWrap: "wrap",
                             cursor: "default",
@@ -2221,7 +2245,7 @@ function Sidebar() {
                     )}
                   </div>
                   <div
-                    className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none chirp-regular-font`}
+                    className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none `}
                     style={{
                       bottom: 15,
                       left: 0,
@@ -2232,7 +2256,7 @@ function Sidebar() {
                   >
                     <div
                       style={{
-                        fontSize: "13px",
+                        fontSize: "12px",
                         color: "rgb(112, 112, 112)",
                         flexWrap: "wrap",
                         cursor: "default",

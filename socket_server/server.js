@@ -10,10 +10,10 @@ const http = require("http");
 const server = http.createServer(app);
 
 // on deployment version
-const FRONTEND_URL = "https://chat-swift-two.vercel.app";
+// const FRONTEND_URL = "https://chat-swift-two.vercel.app";
 
 // on local version
-// const FRONTEND_URL = process.env.FRONTEND_URL;
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 console.log("front end url:", FRONTEND_URL);
 

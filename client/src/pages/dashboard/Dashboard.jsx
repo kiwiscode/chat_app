@@ -1207,7 +1207,6 @@ function Dashboard() {
                   </g>
                 </svg>
               </button>
-
               <div
                 style={{
                   paddingTop: "40px",
@@ -1286,8 +1285,8 @@ function Dashboard() {
                                     <img
                                       className="border-r-50"
                                       src={eachUser.profilePicture}
-                                      width={44}
-                                      height={44}
+                                      width={width <= 768 ? 32 : 44}
+                                      height={width <= 768 ? 32 : 44}
                                       loading="lazy"
                                       alt=""
                                       style={{
@@ -1307,8 +1306,8 @@ function Dashboard() {
                                   >
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
-                                      width="40"
-                                      height="40"
+                                      width={width <= 768 ? "32px" : "40px"}
+                                      height={width <= 768 ? "32px" : "40px"}
                                       fill={"rgb(83, 100, 113)"}
                                       className="bi bi-person-circle border-r-50"
                                       viewBox="0 0 16 16"
@@ -1426,8 +1425,9 @@ function Dashboard() {
                                         : "#0F141A",
                                     overflow: "hidden",
                                     position: "relative",
-                                    minWidth: "166px",
                                     boxSizing: "border-box",
+                                    minWidth: "166px",
+                                    fontSize: width <= 768 && "13px",
                                   }}
                                 >
                                   {!getCoworkerIds().includes(eachUser.id) ? (
@@ -1559,8 +1559,9 @@ function Dashboard() {
                                         : "#0F141A",
                                     overflow: "hidden",
                                     position: "relative",
-                                    minWidth: "166px",
                                     boxSizing: "border-box",
+                                    minWidth: "166px",
+                                    fontSize: width <= 768 && "13px",
                                   }}
                                 >
                                   {!getFriendIds().includes(eachUser.id) ? (
@@ -1758,8 +1759,8 @@ function Dashboard() {
                                         <img
                                           className="border-r-50"
                                           src={eachUser?.user?.profilePicture}
-                                          width={44}
-                                          height={44}
+                                          width={width <= 768 ? 32 : 44}
+                                          height={width <= 768 ? 32 : 44}
                                           loading="lazy"
                                           alt=""
                                           style={{
@@ -1779,8 +1780,10 @@ function Dashboard() {
                                       >
                                         <svg
                                           xmlns="http://www.w3.org/2000/svg"
-                                          width="40"
-                                          height="40"
+                                          width={width <= 768 ? "32px" : "40px"}
+                                          height={
+                                            width <= 768 ? "32px" : "40px"
+                                          }
                                           fill={"rgb(83, 100, 113)"}
                                           className="bi bi-person-circle border-r-50"
                                           viewBox="0 0 16 16"
@@ -2015,8 +2018,8 @@ function Dashboard() {
                                         <img
                                           className="border-r-50"
                                           src={eachUser?.user?.profilePicture}
-                                          width={44}
-                                          height={44}
+                                          width={width <= 768 ? 32 : 44}
+                                          height={width <= 768 ? 32 : 44}
                                           loading="lazy"
                                           alt=""
                                           style={{
@@ -2036,8 +2039,10 @@ function Dashboard() {
                                       >
                                         <svg
                                           xmlns="http://www.w3.org/2000/svg"
-                                          width="40"
-                                          height="40"
+                                          width={width <= 768 ? "32px" : "40px"}
+                                          height={
+                                            width <= 768 ? "32px" : "40px"
+                                          }
                                           fill={"rgb(83, 100, 113)"}
                                           className="bi bi-person-circle border-r-50"
                                           viewBox="0 0 16 16"
@@ -2158,7 +2163,7 @@ function Dashboard() {
                                   findMemberNotEqualUser(eachConv.members)[0]
                                 );
                               }}
-                              className={`pointer p-16 ${
+                              className={`pointer ${width > 768 && "p-16"} ${
                                 findMemberNotEqualUser(eachConv.members)[0]
                                   .username === selectedUser?.username &&
                                 "selected-message dflex"
@@ -2169,7 +2174,9 @@ function Dashboard() {
                                   findMemberNotEqualUser(eachConv.members)[0]
                                     .username === selectedUser?.username &&
                                   "5px solid #36bbf7",
-                                gap: "12px",
+                                gap: width <= 768 ? "5px" : "12px",
+                                paddingBottom: width <= 768 && "5px",
+                                paddingTop: width <= 768 && "5px",
                               }}
                             >
                               <div>
@@ -2189,8 +2196,8 @@ function Dashboard() {
                                           eachConv.members
                                         )[0].profilePicture
                                       }
-                                      width={44}
-                                      height={44}
+                                      width={width <= 768 ? 32 : 44}
+                                      height={width <= 768 ? 32 : 44}
                                       alt=""
                                       loading="lazy"
                                       style={{
@@ -2203,8 +2210,8 @@ function Dashboard() {
                                   <div
                                     className="dflex jfycenter algncenter border-r-50 pointer"
                                     style={{
-                                      width: "44px",
-                                      height: "44px",
+                                      width: width <= 768 ? "32px" : "44px",
+                                      height: width <= 768 ? "32px" : "44px",
                                     }}
                                     href=""
                                   >
@@ -2223,7 +2230,15 @@ function Dashboard() {
                                 )}
                               </div>
                               <div>
-                                <div className="chirp-bold-font color-dark-text">
+                                <div
+                                  style={{
+                                    maxWidth: width <= 768 && "100px",
+                                    textOverflow: "ellipsis",
+                                    overflow: "hidden",
+                                    textWrap: "nowrap",
+                                  }}
+                                  className="chirp-bold-font color-dark-text"
+                                >
                                   {
                                     findMemberNotEqualUser(eachConv.members)[0]
                                       .username
@@ -3065,8 +3080,8 @@ function Dashboard() {
                 "default_profile_picture_url" ? (
                   <img
                     src={selectedUser?.profilePicture}
-                    width={"40px"}
-                    height={"40px"}
+                    width={width <= 768 ? 32 : 44}
+                    height={width <= 768 ? 32 : 44}
                     loading="lazy"
                     alt=""
                     style={{
@@ -3077,8 +3092,8 @@ function Dashboard() {
                 ) : (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="32"
-                    height="32"
+                    width={width <= 768 ? "32px" : "44px"}
+                    height={width <= 768 ? "32px" : "44px"}
                     fill={"rgb(83, 100, 113)"}
                     className="bi bi-person-circle"
                     viewBox="0 0 16 16"
