@@ -2212,8 +2212,10 @@ function Dashboard() {
                                     style={{
                                       width: width <= 768 ? "32px" : "44px",
                                       height: width <= 768 ? "32px" : "44px",
+                                      paddingBottom: width <= 768 && "5px",
+                                      paddingTop: width <= 768 && "5px",
+                                      paddingLeft: width <= 768 && "5px",
                                     }}
-                                    href=""
                                   >
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
