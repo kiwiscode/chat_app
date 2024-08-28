@@ -130,6 +130,7 @@ function Dashboard() {
 
   // send message
   const sendMessage = async () => {
+    console.log("message content:", message);
     try {
       await axios.post(
         `${API_URL}/messages`,
@@ -3203,7 +3204,7 @@ function Dashboard() {
                   value={message}
                   autoFocus={true}
                   onKeyPress={(event) => {
-                    if (event.key === "Enter") {
+                    if (event.key === "Enter" && message.trim().length > 0) {
                       sendMessage();
                     }
                   }}
@@ -3211,9 +3212,10 @@ function Dashboard() {
                 <svg
                   style={{
                     right: "27px",
+                    opacity: message.trim().length > 0 ? 1 : 0.3,
                   }}
                   onClick={() => {
-                    if (message.length) {
+                    if (message.trim().length > 0) {
                       sendMessage();
                     }
                   }}
