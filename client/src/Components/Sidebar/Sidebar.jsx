@@ -2244,28 +2244,6 @@ function Sidebar() {
                       </div>
                     )}
                   </div>
-                  <div
-                    className={`color-dark-text fs-15 lh-20 border-r-4 pointer-none `}
-                    style={{
-                      bottom: 15,
-                      left: 0,
-                      position: "absolute",
-                      textAlign: "center",
-                      display: width > 768 && "none",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        color: "rgb(112, 112, 112)",
-                        flexWrap: "wrap",
-                        cursor: "default",
-                        color: "rgb(112, 112, 112)",
-                      }}
-                    >
-                      © 2024 Chat Swift | Designed & Developed by Aykut Kav
-                    </div>
-                  </div>
                 </div>
               </>
             )}
