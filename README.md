@@ -14,7 +14,6 @@ This project is a chat application with real-time messaging capabilities. Users 
 - **Express**: Used for the API service.
 - **jsonwebtoken**: Used for user authentication.
 - **nodemailer**: Used for email services.
-- **Render**: Used for deploying the backend application.
 
 ### Frontend
 
