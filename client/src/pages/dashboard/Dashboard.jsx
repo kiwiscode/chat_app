@@ -2153,124 +2153,144 @@ function Dashboard() {
             <div>
               {conversations?.length ? (
                 <div>
-                  {conversations.map((eachConv) => {
-                    return (
-                      <div>
-                        {eachConv.Message.length > 0 && (
-                          <>
-                            <div
-                              onClick={() => {
-                                getConversation(
-                                  findMemberNotEqualUser(eachConv.members)[0]
-                                );
-                              }}
-                              className={`pointer ${width > 768 && "p-16"} ${
-                                findMemberNotEqualUser(eachConv.members)[0]
-                                  .username === selectedUser?.username &&
-                                "selected-message dflex"
-                              } each-message-parent-div dflex algncenter`}
-                              key={eachConv?.id}
-                              style={{
-                                borderRight:
+                  {conversations
+                    .sort((a, b) => {
+                      const dateA =
+                        a.Message?.length > 0
+                          ? new Date(a.Message[a.Message.length - 1]?.createdAt)
+                          : new Date(0);
+                      const dateB =
+                        b.Message?.length > 0
+                          ? new Date(b.Message[b.Message.length - 1]?.createdAt)
+                          : new Date(0);
+                      return dateB - dateA;
+                    })
+                    .map((eachConv) => {
+                      return (
+                        <div>
+                          {eachConv.Message.length > 0 && (
+                            <>
+                              <div
+                                onClick={() => {
+                                  getConversation(
+                                    findMemberNotEqualUser(eachConv.members)[0]
+                                  );
+                                }}
+                                className={`pointer ${width > 768 && "p-16"} ${
                                   findMemberNotEqualUser(eachConv.members)[0]
                                     .username === selectedUser?.username &&
-                                  "5px solid #36bbf7",
-                                gap: width <= 768 ? "5px" : "12px",
-                                paddingBottom: width <= 768 && "5px",
-                                paddingTop: width <= 768 && "5px",
-                              }}
-                            >
-                              <div>
-                                {findMemberNotEqualUser(eachConv.members)[0]
-                                  .profilePicture !==
-                                "default_profile_picture_url" ? (
-                                  <div
-                                    className="image-hover-effect dflex jfycenter algncenter border-r-50 pointer"
-                                    style={{
-                                      width: "44px",
-                                      height: "44px",
-                                    }}
-                                  >
-                                    <img
-                                      src={
-                                        findMemberNotEqualUser(
-                                          eachConv.members
-                                        )[0].profilePicture
-                                      }
-                                      width={width <= 768 ? 32 : 44}
-                                      height={width <= 768 ? 32 : 44}
-                                      alt=""
-                                      loading="lazy"
-                                      style={{
-                                        borderRadius: "50%",
-                                        objectFit: "cover",
-                                      }}
-                                    />{" "}
-                                  </div>
-                                ) : (
-                                  <div
-                                    className="dflex jfycenter algncenter border-r-50 pointer"
-                                    style={{
-                                      width: width <= 768 ? "32px" : "44px",
-                                      height: width <= 768 ? "32px" : "44px",
-                                      paddingBottom: width <= 768 && "5px",
-                                      paddingTop: width <= 768 && "5px",
-                                      paddingLeft: width <= 768 && "5px",
-                                    }}
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      width="40"
-                                      height="40"
-                                      fill={"rgb(83, 100, 113)"}
-                                      className="bi bi-person-circle border-r-50"
-                                      viewBox="0 0 16 16"
-                                    >
-                                      <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                                      <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
-                                    </svg>{" "}
-                                  </div>
-                                )}
-                              </div>
-                              <div>
-                                <div
-                                  style={{
-                                    maxWidth: width <= 768 && "100px",
-                                    textOverflow: "ellipsis",
-                                    overflow: "hidden",
-                                    textWrap: "nowrap",
-                                  }}
-                                  className="chirp-bold-font color-dark-text"
-                                >
-                                  {
+                                  "selected-message dflex"
+                                } each-message-parent-div dflex algncenter`}
+                                key={eachConv?.id}
+                                style={{
+                                  borderRight:
                                     findMemberNotEqualUser(eachConv.members)[0]
-                                      .username
-                                  }
+                                      .username === selectedUser?.username &&
+                                    "5px solid #36bbf7",
+                                  gap: width <= 768 ? "5px" : "12px",
+                                  paddingBottom: width <= 768 && "5px",
+                                  paddingTop: width <= 768 && "5px",
+                                }}
+                              >
+                                <div>
+                                  {findMemberNotEqualUser(eachConv.members)[0]
+                                    .profilePicture !==
+                                  "default_profile_picture_url" ? (
+                                    <div
+                                      className="image-hover-effect dflex jfycenter algncenter border-r-50 pointer"
+                                      style={{
+                                        width: "44px",
+                                        height: "44px",
+                                      }}
+                                    >
+                                      <img
+                                        src={
+                                          findMemberNotEqualUser(
+                                            eachConv.members
+                                          )[0].profilePicture
+                                        }
+                                        width={width <= 768 ? 32 : 44}
+                                        height={width <= 768 ? 32 : 44}
+                                        alt=""
+                                        loading="lazy"
+                                        style={{
+                                          borderRadius: "50%",
+                                          objectFit: "cover",
+                                        }}
+                                      />{" "}
+                                    </div>
+                                  ) : (
+                                    <div
+                                      className="dflex jfycenter algncenter border-r-50 pointer"
+                                      style={{
+                                        width: width <= 768 ? "32px" : "44px",
+                                        height: width <= 768 ? "32px" : "44px",
+                                        paddingBottom: width <= 768 && "5px",
+                                        paddingTop: width <= 768 && "5px",
+                                        paddingLeft: width <= 768 && "5px",
+                                      }}
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="40"
+                                        height="40"
+                                        fill={"rgb(83, 100, 113)"}
+                                        className="bi bi-person-circle border-r-50"
+                                        viewBox="0 0 16 16"
+                                      >
+                                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                                        <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                                      </svg>{" "}
+                                    </div>
+                                  )}
                                 </div>
-                                <div
-                                  style={{
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
-                                    maxWidth: "fit-content",
-                                    maxWidth: "150px",
-                                    display: width <= 768 && "none",
-                                  }}
-                                  className="fs-15 lh-20 chirp-regular-font color-soft-dark-text"
-                                >
+                                <div>
+                                  <div
+                                    style={{
+                                      maxWidth: width <= 768 && "100px",
+                                      textOverflow: "ellipsis",
+                                      overflow: "hidden",
+                                      textWrap: "nowrap",
+                                    }}
+                                    className="chirp-bold-font color-dark-text"
+                                  >
+                                    {
+                                      findMemberNotEqualUser(
+                                        eachConv.members
+                                      )[0].username
+                                    }
+                                  </div>
+                                  <div
+                                    style={{
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                      maxWidth: "fit-content",
+                                      maxWidth: "150px",
+                                      display: width <= 768 && "none",
+                                    }}
+                                    className="fs-15 lh-20 chirp-regular-font color-soft-dark-text"
+                                  >
+                                    {
+                                      eachConv?.Message[
+                                        eachConv.Message?.length - 1
+                                      ].text
+                                    }
+                                  </div>
+                                  {/* <div>
                                   {
-                                    eachConv?.Message[
-                                      eachConv.Message?.length - 1
-                                    ].text
-                                  }
+                                      eachConv?.Message[
+                                        eachConv.Message?.length - 1
+                                      ].createdAt
+                                    }
+                                  </div> */}
                                 </div>
-                              </div>
-                            </div>{" "}
-                          </>
-                        )}
-                      </div>
-                    );
-                  })}
+                              </div>{" "}
+                            </>
+                          )}
+                        </div>
+                      );
+                    })}
                 </div>
               ) : loading ? (
                 <div className="p-16">
