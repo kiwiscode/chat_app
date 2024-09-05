@@ -838,7 +838,7 @@ function Main() {
                 color: "rgb(112, 112, 112)",
               }}
             >
-              © 2024 Chat Swift | Designed & Developed by Aykut Kav
+              © 2024 Chat Swift | Designed & Developed by kiwisc0de
             </div>
           </div>
           <div
