@@ -29,6 +29,7 @@ This project is a chat application with real-time messaging capabilities. Users 
 
 - Users can add friends or coworkers.
 - Users can chat with their added friends in real-time.
+- The application is fully responsive and optimized for all devices and screen sizes.
 - Users can upload profile pictures via Cloudinary.
 - Secure authentication and password storage are implemented.
 - Email verification and notifications are provided.
