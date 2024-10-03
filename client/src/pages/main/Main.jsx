@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import CryptoJS from "crypto-js";
 import { useUser } from "../../context/UserContext";
 import useWindowDimensions from "../../utils/window-dimensions";
+import TailwindHero from "../../assets/tailwind-hero.jpg";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -903,20 +904,38 @@ function Main() {
                 </div>
               </div>
             </div>
-            <img
-              className="p-abs h-100"
-              src="https://tailwindui.com/img/beams-home@95.jpg"
-              alt=""
-              loading="lazy"
+
+            <div
               style={{
-                marginLeft: "-67.5rem",
-                width: "163rem",
-                top: "-1rem",
-                left: "50%",
+                position: "absolute",
+                top: 0,
+                right: 0,
+                bottom: "2.5rem", // bottom-10
+                left: 0,
+                backgroundPosition: "bottom",
+                backgroundRepeat: "no-repeat",
+                backgroundColor: "#f8fafc", // bg-slate-50 for light mode
+                backgroundSize: "150rem",
+                backgroundImage: `url(${TailwindHero})`,
                 zIndex: -1,
-                maxWidth: "100%",
               }}
-            />
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  left: 0,
+                  backgroundColor: "rgba(15, 23, 42, 0.04)", // bg-grid-slate-900/[0.04]
+                  backgroundPosition: "bottom 1px center",
+                  maskImage: "linear-gradient(to bottom, transparent, black)",
+                  WebkitMaskImage:
+                    "linear-gradient(to bottom, transparent, black)",
+                  borderBottom: "1px solid rgba(241, 245, 249, 0.05)", // dark:border-slate-100/5
+                }}
+              ></div>
+            </div>
           </div>
         </div>
       )}
