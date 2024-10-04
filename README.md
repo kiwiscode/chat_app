@@ -86,4 +86,4 @@ If you would like to contribute, please submit a pull request or open an issue.
 
 ## Contact
 
-For questions or feedback, please contact [aykutkav.dev@gmail.com](mailto:aykutkav.dev@gmail.com).
+For questions or feedback, please contact [ayktkav@gmail.com](mailto:ayktkav@gmail.com).
