@@ -371,11 +371,7 @@ function Main() {
           ></LoadingSpinner>
         </div>
       ) : (
-        <div
-          style={{
-            position: "relative",
-          }}
-        >
+        <div>
           {showInfoMessage && (
             <div
               className={
@@ -798,7 +794,7 @@ function Main() {
                         marginTop: "36px",
                       }}
                     >
-                      Don't you have an account yet?
+                      {"Don't you have an account yet?"}
                     </div>
                     <button
                       className="color-white-text chirp-medium-font fs-15 border-r-4 pointer dark-btn-hover-effect b-none"
@@ -832,7 +828,6 @@ function Main() {
             <div
               style={{
                 fontSize: "12px",
-                color: "rgb(112, 112, 112)",
                 flexWrap: "wrap",
                 whiteSpace: "nowrap",
                 cursor: "default",
@@ -910,14 +905,15 @@ function Main() {
                 position: "absolute",
                 top: 0,
                 right: 0,
-                bottom: "2.5rem", // bottom-10
+                bottom: "2.5rem",
                 left: 0,
                 backgroundPosition: "bottom",
                 backgroundRepeat: "no-repeat",
-                backgroundColor: "#f8fafc", // bg-slate-50 for light mode
+                backgroundColor: "#f8fafc",
                 backgroundSize: "150rem",
                 backgroundImage: `url(${TailwindHero})`,
                 zIndex: -1,
+                height: "100dvh",
               }}
             >
               <div
@@ -927,12 +923,12 @@ function Main() {
                   right: 0,
                   bottom: 0,
                   left: 0,
-                  backgroundColor: "rgba(15, 23, 42, 0.04)", // bg-grid-slate-900/[0.04]
+                  backgroundColor: "rgba(15, 23, 42, 0.04)",
                   backgroundPosition: "bottom 1px center",
                   maskImage: "linear-gradient(to bottom, transparent, black)",
                   WebkitMaskImage:
                     "linear-gradient(to bottom, transparent, black)",
-                  borderBottom: "1px solid rgba(241, 245, 249, 0.05)", // dark:border-slate-100/5
+                  borderBottom: "1px solid rgba(241, 245, 249, 0.05)",
                 }}
               ></div>
             </div>
