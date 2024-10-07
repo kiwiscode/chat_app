@@ -564,3 +564,12 @@ body {
 .anticon-check-circle {
   display: none !important;
 }
+
+.kiwisc0de-- {
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.kiwisc0de--:hover {
+  color: #1c9bef !important;
+}

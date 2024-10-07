@@ -351,8 +351,95 @@ function Main() {
     }
   }, [formData.password]);
 
+  // show alert
+  const [showAlert, setShowAlert] = useState(false);
+
+  useEffect(() => {
+    const hasSeenAlert = localStorage.getItem("hasSeenAlert");
+    if (!hasSeenAlert) {
+      setShowAlert(true);
+    }
+  }, []);
+
+  const closeAlert = () => {
+    setShowAlert(false);
+    localStorage.setItem("hasSeenAlert", "true");
+  };
+
+  const handleOutsideClick = (e) => {
+    if (e.target.id === "alert-overlay") {
+      closeAlert();
+    }
+  };
+
   return (
     <>
+      {showAlert && (
+        <div
+          className="chirp-regular-font"
+          id="alert-overlay"
+          onClick={handleOutsideClick}
+          style={{
+            position: "fixed",
+            top: 0,
+            bottom: 0,
+            right: 0,
+            left: 0,
+            zIndex: 1,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "8px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+              maxWidth: "90%",
+              width: "400px",
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%,-50%)",
+              zIndex: 2,
+            }}
+          >
+            🚨 Attention! The PostgreSQL database for this project was hosted on
+            Supabase with a free 1-month trial. As the trial period has ended,
+            the database connection is no longer functional.
+            <br />
+            <div
+              style={{
+                marginTop: "20px",
+              }}
+            ></div>
+            You can still watch a demo of the project via the following link:
+            <a
+              href="https://www.linkedin.com/posts/kavaykut_recent-portfolio-update-ive-been-working-activity-7235002489907941376-wcVE?utm_source=share&utm_medium=member_desktop"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                marginLeft: "5px",
+              }}
+            >
+              Project Video
+            </a>
+            .
+            <br /> Thank you for your understanding! 🚀
+            <br />
+            <button
+              className="chirp-regular-font"
+              onClick={closeAlert}
+              style={{ marginTop: "20px", padding: "10px", cursor: "pointer" }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       {loading && !notSignupClicked && !verifyClicked && !loginClicked ? (
         <div
           style={{
@@ -834,7 +921,19 @@ function Main() {
                 color: "rgb(112, 112, 112)",
               }}
             >
-              © 2024 Chat Swift | Designed & Developed by kiwisc0de
+              <span>© 2024 Chat Swift | Designed & Developed by</span>{" "}
+              <a
+                style={{
+                  textDecoration: "none",
+                  color: "inherit",
+                }}
+                rel="noreferrer"
+                className="kiwisc0de--"
+                target="_blank"
+                href="https://www.aykutkav.com"
+              >
+                kiwisc0de
+              </a>
             </div>
           </div>
           <div

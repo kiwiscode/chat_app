@@ -2074,7 +2074,6 @@ function Sidebar() {
                       <div
                         style={{
                           fontSize: "12px",
-                          color: "rgb(112, 112, 112)",
                           flexWrap: "wrap",
                           cursor: "default",
                           color: "rgb(112, 112, 112)",
