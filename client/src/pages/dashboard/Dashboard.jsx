@@ -123,14 +123,12 @@ function Dashboard() {
         setShow(false);
       }
     } catch (error) {
-      console.log("error:", error);
-      throw error;
+      throw new Error(error);
     }
   };
 
   // send message
   const sendMessage = async () => {
-    console.log("message content:", message);
     try {
       await axios.post(
         `${API_URL}/messages`,
@@ -155,8 +153,7 @@ function Dashboard() {
         text: message,
       });
     } catch (error) {
-      console.log("error:", error);
-      throw error;
+      throw new Error(error);
     }
   };
 
@@ -170,8 +167,7 @@ function Dashboard() {
       setLoading(false);
       setConversations(result.data);
     } catch (error) {
-      console.log("error:", error);
-      throw error;
+      throw new Error(error);
     }
   };
 
@@ -210,8 +206,7 @@ function Dashboard() {
       setSelectedUser(selectedUser);
       setConversation(result.data);
     } catch (error) {
-      console.log("error:", error);
-      throw error;
+      throw new Error(error);
     }
   };
 
@@ -227,8 +222,7 @@ function Dashboard() {
       }
       setConversation(result.data);
     } catch (error) {
-      console.log("error:", error);
-      throw error;
+      throw new Error(error);
     }
   };
 

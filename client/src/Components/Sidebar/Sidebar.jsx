@@ -154,8 +154,7 @@ function Sidebar() {
       );
       refreshUser();
     } catch (error) {
-      console.log("error:", error);
-      throw error;
+      throw new Error(error);
     }
   };
 
@@ -183,8 +182,7 @@ function Sidebar() {
       );
       refreshUser();
     } catch (error) {
-      console.log("error:", error);
-      throw error;
+      throw new Error(error);
     }
   };
   // friend requests accept & reject
@@ -212,8 +210,7 @@ function Sidebar() {
       );
       refreshUser();
     } catch (error) {
-      console.log("error:", error);
-      throw error;
+      throw new Error(error);
     }
   };
 
@@ -241,8 +238,7 @@ function Sidebar() {
       );
       refreshUser();
     } catch (error) {
-      console.log("error:", error);
-      throw error;
+      throw new Error(error);
     }
   };
 
