@@ -17,6 +17,7 @@ function Sidebar() {
   const navigate = useNavigate();
   const { user, isAuthenticatedUser, handleLogout, updateUser, refreshUser } =
     useUser();
+  const currentYear = new Date().getFullYear();
   const { searchPeopleModalOpened, setSearchPeopleModalOpened } = useContext(
     SearchPeopleModalContext
   );
@@ -2075,7 +2076,8 @@ function Sidebar() {
                           color: "rgb(112, 112, 112)",
                         }}
                       >
-                        © 2024 Chat Swift | Designed & Developed by kiwisc0de
+                        © {currentYear} Chat Swift | Designed & Developed by
+                        kiwisc0de
                       </div>
                     </div>
                   </div>
@@ -2234,7 +2236,8 @@ function Sidebar() {
                             color: "rgb(112, 112, 112)",
                           }}
                         >
-                          © 2024 Chat Swift | Designed & Developed by kiwisc0de
+                          © {currentYear} Chat Swift | Designed & Developed by
+                          kiwisc0de
                         </div>
                       </div>
                     )}

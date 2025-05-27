@@ -17,6 +17,7 @@ function Main() {
     user,
     updateUser,
   } = useUser();
+  const currentYear = new Date().getFullYear();
   const { width } = useWindowDimensions();
   const [authModal, setAuthModal] = useState(null);
   const [formData, setFormData] = useState({
@@ -921,7 +922,7 @@ function Main() {
                 color: "rgb(112, 112, 112)",
               }}
             >
-              <span>© 2024 Chat Swift | Designed & Developed by</span>{" "}
+              <span>© {currentYear} Chat Swift | Designed & Developed by</span>{" "}
               <a
                 style={{
                   textDecoration: "none",
